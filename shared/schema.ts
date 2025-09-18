@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, timestamp, integer, jsonb, boolean, index } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, timestamp, integer, jsonb, boolean, index, numeric, check } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -20,7 +20,7 @@ export const users = pgTable("users", {
   passwordHash: varchar("password_hash"), // Bcrypt hashed password
   firstName: varchar("first_name"),
   lastName: varchar("last_name"),
-  role: varchar("role").notNull().default("user"), // user, admin, faculty, student, compliance_officer
+  role: varchar("role").notNull().default("user"), // user, admin, faculty, student, compliance_officer, public_health_officer, epidemiologist, contact_tracer, health_facility_admin, emergency_coordinator
   organization: varchar("organization"),
   profileImageUrl: varchar("profile_image_url"),
   isActive: boolean("is_active").default(true),
@@ -430,6 +430,825 @@ export const threatIntelligenceSources = pgTable("threat_intelligence_sources", 
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// ===== PUBLIC HEALTH SECTOR INTEGRATION TABLES =====
+
+// 1. Public Health Incidents Table - Disease outbreaks, health emergencies, contamination events
+export const publicHealthIncidents = pgTable("public_health_incidents", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  incidentId: varchar("incident_id").notNull().unique(), // PHI-YYYYMMDD-XXXX format
+  title: varchar("title").notNull(),
+  description: text("description").notNull(),
+  incidentType: varchar("incident_type").notNull(), // disease_outbreak, contamination, bioterrorism, pandemic, epidemic, health_emergency
+  diseaseType: varchar("disease_type"), // covid19, influenza, measles, foodborne, etc.
+  severity: varchar("severity").notNull(), // low, medium, high, critical, catastrophic
+  status: varchar("status").notNull().default("investigating"), // investigating, active, contained, resolved, monitoring
+  priority: varchar("priority").notNull().default("medium"), // low, medium, high, critical, emergency
+  
+  // Geographic and Location Data
+  affectedRegion: varchar("affected_region").notNull(),
+  latitude: numeric("latitude", { precision: 10, scale: 8 }),
+  longitude: numeric("longitude", { precision: 11, scale: 8 }),
+  radiusMeters: integer("radius_meters"), // Affected area radius
+  geographicScope: varchar("geographic_scope").notNull(), // local, regional, state, national, international
+  boundaryData: jsonb("boundary_data"), // GeoJSON polygon data for affected areas
+  
+  // Health Impact Metrics
+  casesConfirmed: integer("cases_confirmed").default(0),
+  casesSuspected: integer("cases_suspected").default(0),
+  casesRecovered: integer("cases_recovered").default(0),
+  deathsConfirmed: integer("deaths_confirmed").default(0),
+  hospitalizationsRequired: integer("hospitalizations_required").default(0),
+  populationAtRisk: integer("population_at_risk"),
+  demographicImpact: jsonb("demographic_impact"), // Age groups, gender, vulnerable populations
+  
+  // Response and Management
+  responseLevel: varchar("response_level").notNull().default("local"), // local, regional, state, federal, international
+  responseTeamAssigned: varchar("response_team_assigned").references(() => users.id),
+  emergencyCoordinator: varchar("emergency_coordinator").references(() => users.id),
+  publicHealthOfficer: varchar("public_health_officer").references(() => users.id),
+  
+  // Integration with Existing Systems
+  relatedThreatId: varchar("related_threat_id").references(() => threats.id),
+  relatedIncidentId: varchar("related_incident_id").references(() => incidents.id),
+  triggeredByAlertId: varchar("triggered_by_alert_id").references(() => threatNotifications.id),
+  
+  // CDC Integration and Reporting
+  cdcReported: boolean("cdc_reported").default(false),
+  cdcReportingId: varchar("cdc_reporting_id"), // CDC case identifier
+  cdcReportingData: jsonb("cdc_reporting_data"), // CDC-specific data format
+  cdcClassification: varchar("cdc_classification"), // CDC disease classification
+  notifiableCondition: boolean("notifiable_condition").default(false),
+  reportingRequirements: jsonb("reporting_requirements"), // Required reporting data
+  
+  // HIPAA Compliance and Privacy
+  dataClassification: varchar("data_classification").notNull().default("phi"), // phi, pii, public, restricted
+  encryptionStatus: varchar("encryption_status").notNull().default("encrypted"),
+  accessLevel: varchar("access_level").notNull().default("authorized_only"), // public, authorized_only, restricted, emergency_only
+  hipaaCompliant: boolean("hipaa_compliant").default(true),
+  dataRetentionPolicy: varchar("data_retention_policy").default("7_years"), // CDC standard retention
+  anonymizationLevel: varchar("anonymization_level").default("identifiable"), // identifiable, de_identified, anonymous
+  
+  // Temporal Tracking
+  firstReportedAt: timestamp("first_reported_at"),
+  confirmedAt: timestamp("confirmed_at"),
+  detectedAt: timestamp("detected_at").defaultNow(),
+  peakAt: timestamp("peak_at"),
+  resolvedAt: timestamp("resolved_at"),
+  lastUpdatedAt: timestamp("last_updated_at").defaultNow(),
+  
+  // Audit and Compliance
+  createdBy: varchar("created_by").notNull().references(() => users.id),
+  lastModifiedBy: varchar("last_modified_by").references(() => users.id),
+  accessLog: jsonb("access_log").default('[]'), // Who accessed PHI data
+  modificationLog: jsonb("modification_log").default('[]'), // Changes made to incident
+  
+  // Additional Metadata
+  metadata: jsonb("metadata"),
+  emergencyContacts: jsonb("emergency_contacts"), // Emergency response contacts
+  resourceRequirements: jsonb("resource_requirements"), // Required resources and supplies
+  communicationPlan: jsonb("communication_plan"), // Public communication strategy
+  
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => [
+  index("idx_phi_location").on(table.latitude, table.longitude),
+  index("idx_phi_type_severity").on(table.incidentType, table.severity),
+  index("idx_phi_status_date").on(table.status, table.detectedAt),
+  index("idx_phi_temporal_reporting").on(table.firstReportedAt),
+  index("idx_phi_temporal_confirmed").on(table.confirmedAt),
+  index("idx_phi_temporal_resolved").on(table.resolvedAt),
+  index("idx_phi_priority_status").on(table.priority, table.status),
+  // Partial index for active incidents for better performance
+  index("idx_phi_active_incidents").on(table.status, table.priority).where(sql`status IN ('investigating', 'active', 'monitoring')`),
+  // CHECK constraints for data integrity
+  check("chk_phi_severity", sql`severity IN ('low', 'medium', 'high', 'critical', 'catastrophic')`),
+  check("chk_phi_status", sql`status IN ('investigating', 'active', 'contained', 'resolved', 'monitoring')`),
+  check("chk_phi_priority", sql`priority IN ('low', 'medium', 'high', 'critical', 'emergency')`),
+  check("chk_phi_response_level", sql`response_level IN ('local', 'regional', 'state', 'federal', 'international')`),
+]);
+
+// 2. Disease Surveillance Table - Disease types, transmission patterns, epidemiological data
+export const diseaseSurveillance = pgTable("disease_surveillance", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  surveillanceId: varchar("surveillance_id").notNull().unique(), // SUR-YYYYMMDD-XXXX format
+  diseaseCode: varchar("disease_code").notNull(), // ICD-10 or CDC disease codes
+  diseaseName: varchar("disease_name").notNull(),
+  diseaseCategory: varchar("disease_category").notNull(), // infectious, chronic, genetic, environmental, behavioral
+  
+  // Epidemiological Data
+  transmissionMode: varchar("transmission_mode"), // airborne, contact, vector_borne, foodborne, waterborne, sexual
+  incubationPeriod: integer("incubation_period"), // Days
+  infectiousPeriod: integer("infectious_period"), // Days
+  basicReproductionNumber: varchar("basic_reproduction_number"), // R0 value
+  caseDefinition: text("case_definition"),
+  clinicalPresentation: text("clinical_presentation"),
+  diagnosticCriteria: text("diagnostic_criteria"),
+  
+  // Geographic Tracking
+  surveillanceArea: varchar("surveillance_area").notNull(),
+  latitude: numeric("latitude", { precision: 10, scale: 8 }),
+  longitude: numeric("longitude", { precision: 11, scale: 8 }),
+  coverageRadius: integer("coverage_radius"), // Surveillance area radius in meters
+  populationCovered: integer("population_covered"),
+  geographicScope: varchar("geographic_scope").notNull(), // local, regional, state, national
+  boundaryData: jsonb("boundary_data"), // GeoJSON for surveillance boundaries
+  
+  // Case Tracking
+  activeCases: integer("active_cases").default(0),
+  totalCases: integer("total_cases").default(0),
+  newCasesLastWeek: integer("new_cases_last_week").default(0),
+  newCasesLastMonth: integer("new_cases_last_month").default(0),
+  casesByAgeGroup: jsonb("cases_by_age_group").default('{}'),
+  casesByGender: jsonb("cases_by_gender").default('{}'),
+  casesByRace: jsonb("cases_by_race").default('{}'),
+  hospitalizations: integer("hospitalizations").default(0),
+  deaths: integer("deaths").default(0),
+  caseMapping: jsonb("case_mapping"), // Geographic distribution of cases
+  
+  // Transmission Analysis
+  transmissionPatterns: jsonb("transmission_patterns"),
+  clusterAnalysis: jsonb("cluster_analysis"),
+  superspreaderEvents: jsonb("superspreader_events"),
+  contactNetworks: jsonb("contact_networks"),
+  riskFactors: jsonb("risk_factors"),
+  vulnerablePopulations: jsonb("vulnerable_populations"),
+  
+  // Surveillance Methods
+  surveillanceType: varchar("surveillance_type").notNull(), // active, passive, sentinel, syndromic
+  dataSource: varchar("data_source").notNull(), // hospital, laboratory, physician, self_report, syndromic
+  reportingFrequency: varchar("reporting_frequency").default("daily"), // real_time, daily, weekly, monthly
+  dataQuality: varchar("data_quality").default("high"), // high, medium, low, unverified
+  completenessScore: integer("completeness_score").default(100), // 0-100 data completeness
+  
+  // CDC Integration
+  cdcSurveillanceProgram: varchar("cdc_surveillance_program"), // NNDSS, NEDSS, etc.
+  cdcConditionCode: varchar("cdc_condition_code"), // CDC condition coding
+  cdcReportingData: jsonb("cdc_reporting_data"),
+  nhsnCondition: boolean("nhsn_condition").default(false), // Healthcare-associated infection
+  laboratoryCriteria: text("laboratory_criteria"),
+  
+  // Contact Tracing Integration
+  contactTracingActive: boolean("contact_tracing_active").default(false),
+  averageContactsPerCase: integer("average_contacts_per_case"),
+  contactTracingCoverage: integer("contact_tracing_coverage"), // Percentage
+  
+  // HIPAA Compliance
+  dataClassification: varchar("data_classification").notNull().default("phi"),
+  encryptionStatus: varchar("encryption_status").notNull().default("encrypted"),
+  accessLevel: varchar("access_level").notNull().default("authorized_only"),
+  hipaaCompliant: boolean("hipaa_compliant").default(true),
+  aggregationLevel: varchar("aggregation_level").default("individual"), // individual, aggregated, anonymized
+  
+  // Personnel
+  surveillanceOfficer: varchar("surveillance_officer").notNull().references(() => users.id),
+  epidemiologist: varchar("epidemiologist").references(() => users.id),
+  dataAnalyst: varchar("data_analyst").references(() => users.id),
+  
+  // Temporal Data
+  surveillancePeriodStart: timestamp("surveillance_period_start").notNull(),
+  surveillancePeriodEnd: timestamp("surveillance_period_end"),
+  lastCaseReported: timestamp("last_case_reported"),
+  nextReviewDate: timestamp("next_review_date"),
+  
+  // Audit Trail
+  createdBy: varchar("created_by").notNull().references(() => users.id),
+  lastModifiedBy: varchar("last_modified_by").references(() => users.id),
+  accessLog: jsonb("access_log").default('[]'),
+  modificationLog: jsonb("modification_log").default('[]'),
+  
+  metadata: jsonb("metadata"),
+  alertThresholds: jsonb("alert_thresholds"), // Thresholds for automated alerts
+  statisticalModels: jsonb("statistical_models"), // Predictive models in use
+  
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => [
+  index("idx_ds_disease_area").on(table.diseaseCode, table.surveillanceArea),
+  index("idx_ds_geographic").on(table.latitude, table.longitude),
+  index("idx_ds_temporal").on(table.surveillancePeriodStart, table.surveillancePeriodEnd),
+  index("idx_ds_first_detected").on(table.surveillancePeriodStart),
+  index("idx_ds_last_updated").on(table.updatedAt),
+  index("idx_ds_transmission_type").on(table.transmissionMode),
+  index("idx_ds_surveillance_type").on(table.surveillanceType, table.dataQuality),
+  // CHECK constraints for data integrity
+  check("chk_ds_surveillance_type", sql`surveillance_type IN ('active', 'passive', 'sentinel', 'syndromic')`),
+  check("chk_ds_data_quality", sql`data_quality IN ('high', 'medium', 'low', 'unverified')`),
+  check("chk_ds_transmission_mode", sql`transmission_mode IN ('airborne', 'contact', 'vector_borne', 'foodborne', 'waterborne', 'sexual')`),
+  // Geospatial validation constraints
+  check("chk_ds_latitude_range", sql`latitude IS NULL OR (latitude >= -90 AND latitude <= 90)`),
+  check("chk_ds_longitude_range", sql`longitude IS NULL OR (longitude >= -180 AND longitude <= 180)`),
+]);
+
+// 3. Contact Tracing Table - Individual contact records with privacy compliance
+export const contactTracing = pgTable("contact_tracing", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  contactId: varchar("contact_id").notNull().unique(), // CT-YYYYMMDD-XXXX format
+  
+  // Case and Contact Information
+  indexCaseId: varchar("index_case_id"), // Reference to primary case
+  surveillanceId: varchar("surveillance_id").references(() => diseaseSurveillance.id),
+  incidentId: varchar("incident_id").references(() => publicHealthIncidents.id),
+  
+  // Contact Person Data (HIPAA Protected)
+  contactPersonId: varchar("contact_person_id"), // Internal unique identifier
+  contactType: varchar("contact_type").notNull(), // direct, indirect, household, workplace, social, healthcare
+  relationshipToCase: varchar("relationship_to_case"), // family, coworker, friend, healthcare_worker, unknown
+  
+  // Exposure Details
+  exposureDate: timestamp("exposure_date"),
+  exposureDuration: integer("exposure_duration"), // Minutes of exposure
+  exposureLocation: varchar("exposure_location"),
+  exposureLatitude: numeric("exposure_latitude", { precision: 10, scale: 8 }),
+  exposureLongitude: numeric("exposure_longitude", { precision: 11, scale: 8 }),
+  exposureType: varchar("exposure_type"), // close_contact, casual_contact, environmental, unknown
+  exposureSetting: varchar("exposure_setting"), // home, workplace, healthcare, social, transport, other
+  protectiveEquipmentUsed: jsonb("protective_equipment_used"),
+  riskLevel: varchar("risk_level").notNull(), // high, medium, low, minimal
+  
+  // Contact Status and Monitoring
+  contactStatus: varchar("contact_status").notNull().default("identified"), // identified, contacted, monitoring, quarantined, tested, cleared, lost
+  monitoringPeriod: integer("monitoring_period").default(14), // Days
+  monitoringStartDate: timestamp("monitoring_start_date"),
+  monitoringEndDate: timestamp("monitoring_end_date"),
+  quarantineRequired: boolean("quarantine_required").default(false),
+  quarantineStartDate: timestamp("quarantine_start_date"),
+  quarantineEndDate: timestamp("quarantine_end_date"),
+  quarantineLocation: varchar("quarantine_location"), // home, facility, other
+  quarantineCompliance: varchar("quarantine_compliance"), // compliant, non_compliant, partial, unknown
+  
+  // Health Monitoring
+  symptomOnset: timestamp("symptom_onset"),
+  symptomsReported: jsonb("symptoms_reported"),
+  testingRecommended: boolean("testing_recommended").default(false),
+  testingCompleted: boolean("testing_completed").default(false),
+  testResults: jsonb("test_results"),
+  healthStatus: varchar("health_status").default("asymptomatic"), // asymptomatic, symptomatic, confirmed_case, hospitalized, recovered
+  
+  // Communication and Notifications
+  contactAttempts: integer("contact_attempts").default(0),
+  lastContactDate: timestamp("last_contact_date"),
+  contactMethod: varchar("contact_method"), // phone, sms, email, in_person, app
+  notificationSent: boolean("notification_sent").default(false),
+  notificationMethod: varchar("notification_method"), // automated, manual, app_notification
+  consentToContact: boolean("consent_to_contact").default(false),
+  consentToMonitor: boolean("consent_to_monitor").default(false),
+  
+  // Digital Contact Tracing Integration
+  digitalTracingData: jsonb("digital_tracing_data"), // Bluetooth, GPS, app data
+  exposureNotificationSent: boolean("exposure_notification_sent").default(false),
+  bluetoothProximityData: jsonb("bluetooth_proximity_data"),
+  gpsLocationData: jsonb("gps_location_data"), // Encrypted location data
+  
+  // HIPAA Compliance and Privacy
+  dataClassification: varchar("data_classification").notNull().default("phi"),
+  encryptionStatus: varchar("encryption_status").notNull().default("aes256_encrypted"),
+  accessLevel: varchar("access_level").notNull().default("contact_tracer_only"),
+  hipaaCompliant: boolean("hipaa_compliant").default(true),
+  privacyLevel: varchar("privacy_level").notNull().default("maximum"), // maximum, high, standard, minimal
+  dataMinimization: boolean("data_minimization").default(true), // Only collect necessary data
+  purposeLimitation: varchar("purpose_limitation").default("contact_tracing"), // Purpose of data collection
+  retentionPeriod: varchar("retention_period").default("30_days"), // Data retention period
+  automaticPurgeDate: timestamp("automatic_purge_date"),
+  
+  // Legal and Consent
+  legalBasis: varchar("legal_basis").default("public_health_emergency"), // Legal basis for data processing
+  consentGiven: boolean("consent_given").default(false),
+  consentType: varchar("consent_type"), // explicit, implied, emergency, legal_requirement
+  consentDate: timestamp("consent_date"),
+  rightToWithdraw: boolean("right_to_withdraw").default(true),
+  dataPortabilityRequested: boolean("data_portability_requested").default(false),
+  deletionRequested: boolean("deletion_requested").default(false),
+  
+  // Contact Tracer Information
+  assignedContactTracer: varchar("assigned_contact_tracer").notNull().references(() => users.id),
+  supervisingOfficer: varchar("supervising_officer").references(() => users.id),
+  
+  // System Integration
+  reportedToPublicHealth: boolean("reported_to_public_health").default(false),
+  integratedWithHIS: boolean("integrated_with_his").default(false), // Health Information System
+  caseInvestigationId: varchar("case_investigation_id"),
+  
+  // Quality and Completeness
+  dataQuality: varchar("data_quality").default("high"), // high, medium, low, incomplete
+  verificationStatus: varchar("verification_status").default("pending"), // verified, pending, unverified, rejected
+  
+  // Audit and Security
+  createdBy: varchar("created_by").notNull().references(() => users.id),
+  lastModifiedBy: varchar("last_modified_by").references(() => users.id),
+  accessLog: jsonb("access_log").default('[]'), // Detailed access logging for HIPAA
+  modificationLog: jsonb("modification_log").default('[]'),
+  securityFlags: jsonb("security_flags").default('[]'), // Security alerts or concerns
+  
+  metadata: jsonb("metadata"),
+  notes: text("notes"), // Contact tracer notes (encrypted)
+  
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => [
+  index("idx_ct_case_contact").on(table.indexCaseId, table.contactType),
+  index("idx_ct_status_date").on(table.contactStatus, table.monitoringStartDate),
+  index("idx_ct_exposure_location").on(table.exposureLatitude, table.exposureLongitude),
+  index("idx_ct_tracer").on(table.assignedContactTracer),
+  index("idx_ct_exposure_date").on(table.exposureDate),
+  index("idx_ct_notification_status").on(table.notificationSent, table.consentToContact),
+  index("idx_ct_risk_level").on(table.riskLevel, table.contactStatus),
+  // CHECK constraints for data integrity
+  check("chk_ct_contact_status", sql`contact_status IN ('identified', 'contacted', 'monitoring', 'quarantined', 'tested', 'cleared', 'lost')`),
+  check("chk_ct_risk_level", sql`risk_level IN ('high', 'medium', 'low', 'minimal')`),
+  check("chk_ct_exposure_type", sql`exposure_type IN ('close_contact', 'casual_contact', 'environmental', 'unknown')`),
+  // Geospatial validation constraints
+  check("chk_ct_latitude_range", sql`exposure_latitude IS NULL OR (exposure_latitude >= -90 AND exposure_latitude <= 90)`),
+  check("chk_ct_longitude_range", sql`exposure_longitude IS NULL OR (exposure_longitude >= -180 AND exposure_longitude <= 180)`),
+]);
+
+// 4. Health Facilities Table - Hospitals, clinics, testing centers, emergency facilities
+export const healthFacilities = pgTable("health_facilities", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  facilityId: varchar("facility_id").notNull().unique(), // HF-XXXXXX format
+  
+  // Basic Facility Information
+  facilityName: varchar("facility_name").notNull(),
+  facilityType: varchar("facility_type").notNull(), // hospital, clinic, testing_center, emergency_facility, nursing_home, pharmacy, laboratory
+  licenseNumber: varchar("license_number"),
+  npiNumber: varchar("npi_number"), // National Provider Identifier
+  federalTaxId: varchar("federal_tax_id"),
+  
+  // Location and Geographic Data
+  address: text("address").notNull(),
+  city: varchar("city").notNull(),
+  state: varchar("state").notNull(),
+  zipCode: varchar("zip_code").notNull(),
+  county: varchar("county"),
+  latitude: numeric("latitude", { precision: 10, scale: 8 }),
+  longitude: numeric("longitude", { precision: 11, scale: 8 }),
+  serviceArea: jsonb("service_area"), // GeoJSON of service boundaries
+  serviceRadius: integer("service_radius"), // Service radius in meters
+  
+  // Contact Information
+  primaryPhone: varchar("primary_phone"),
+  emergencyPhone: varchar("emergency_phone"),
+  faxNumber: varchar("fax_number"),
+  email: varchar("email"),
+  website: varchar("website"),
+  
+  // Facility Characteristics
+  ownershipType: varchar("ownership_type"), // public, private, non_profit, federal, state, county
+  hospitalSystem: varchar("hospital_system"),
+  networkAffiliation: varchar("network_affiliation"),
+  accreditation: jsonb("accreditation"), // Joint Commission, etc.
+  certifications: jsonb("certifications"),
+  specialties: jsonb("specialties"), // Medical specialties offered
+  
+  // Capacity Information
+  totalBeds: integer("total_beds").default(0),
+  availableBeds: integer("available_beds").default(0),
+  icuBeds: integer("icu_beds").default(0),
+  availableIcuBeds: integer("available_icu_beds").default(0),
+  emergencyBeds: integer("emergency_beds").default(0),
+  surgicalSuites: integer("surgical_suites").default(0),
+  isolationBeds: integer("isolation_beds").default(0),
+  availableIsolationBeds: integer("available_isolation_beds").default(0),
+  negativePressureRooms: integer("negative_pressure_rooms").default(0),
+  staffCount: integer("staff_count").default(0),
+  physicianCount: integer("physician_count").default(0),
+  nurseCount: integer("nurse_count").default(0),
+  
+  // Equipment and Resources
+  ventilators: integer("ventilators").default(0),
+  availableVentilators: integer("available_ventilators").default(0),
+  dialysisMachines: integer("dialysis_machines").default(0),
+  xrayMachines: integer("xray_machines").default(0),
+  ctScanners: integer("ct_scanners").default(0),
+  mriMachines: integer("mri_machines").default(0),
+  ambulances: integer("ambulances").default(0),
+  personalProtectiveEquipment: jsonb("personal_protective_equipment"),
+  medicationInventory: jsonb("medication_inventory"),
+  bloodBankCapacity: integer("blood_bank_capacity").default(0),
+  
+  // Testing Capabilities
+  testingCapabilities: jsonb("testing_capabilities"), // COVID, flu, etc.
+  dailyTestingCapacity: integer("daily_testing_capacity").default(0),
+  currentTestingLoad: integer("current_testing_load").default(0),
+  labCapabilities: jsonb("lab_capabilities"),
+  resultTurnaroundTime: integer("result_turnaround_time"), // Hours
+  
+  // Emergency Preparedness
+  emergencyLevel: varchar("emergency_level").default("green"), // green, yellow, orange, red, black
+  emergencyCapacity: integer("emergency_capacity").default(0),
+  surgeCapacity: integer("surge_capacity").default(0),
+  decontaminationCapability: boolean("decontamination_capability").default(false),
+  quarantineCapability: boolean("quarantine_capability").default(false),
+  emergencyPower: boolean("emergency_power").default(false),
+  emergencyWaterSupply: boolean("emergency_water_supply").default(false),
+  emergencyPlan: jsonb("emergency_plan"),
+  evacuationPlan: jsonb("evacuation_plan"),
+  
+  // Operational Status
+  operationalStatus: varchar("operational_status").notNull().default("operational"), // operational, limited, closed, emergency_only
+  serviceCapability: integer("service_capability").default(100), // Percentage of normal operations
+  staffingLevel: varchar("staffing_level").default("normal"), // normal, reduced, critical, crisis
+  lastCapacityUpdate: timestamp("last_capacity_update"),
+  
+  // Public Health Integration
+  publicHealthReporting: boolean("public_health_reporting").default(true),
+  cdcReporting: boolean("cdc_reporting").default(false),
+  nhsnParticipant: boolean("nhsn_participant").default(false), // National Healthcare Safety Network
+  hieParticipant: boolean("hie_participant").default(false), // Health Information Exchange
+  notifiableConditionsReporting: boolean("notifiable_conditions_reporting").default(true),
+  
+  // Quality and Performance Metrics
+  qualityRating: integer("quality_rating"), // CMS star rating
+  patientSatisfactionScore: integer("patient_satisfaction_score"), // 0-100
+  safetyScore: integer("safety_score"), // 0-100
+  performanceMetrics: jsonb("performance_metrics"),
+  
+  // Compliance and Accreditation
+  hipaaCompliant: boolean("hipaa_compliant").default(true),
+  hiTechCompliant: boolean("hi_tech_compliant").default(true),
+  emtalaCompliant: boolean("emtala_compliant").default(true),
+  oigCompliant: boolean("oig_compliant").default(true),
+  jointCommissionAccredited: boolean("joint_commission_accredited").default(false),
+  
+  // Contact Personnel
+  facilityAdministrator: varchar("facility_administrator").references(() => users.id),
+  chiefMedicalOfficer: varchar("chief_medical_officer").references(() => users.id),
+  infectionControlOfficer: varchar("infection_control_officer").references(() => users.id),
+  emergencyCoordinator: varchar("emergency_coordinator").references(() => users.id),
+  publicHealthLiaison: varchar("public_health_liaison").references(() => users.id),
+  
+  // Integration with Live Location System
+  liveLocationEnabled: boolean("live_location_enabled").default(true),
+  assetTrackingEnabled: boolean("asset_tracking_enabled").default(false),
+  geofenceRadius: integer("geofence_radius").default(1000), // Meters
+  
+  // Data Management
+  dataClassification: varchar("data_classification").notNull().default("sensitive"),
+  accessLevel: varchar("access_level").notNull().default("authorized_personnel"),
+  
+  // Audit Trail
+  createdBy: varchar("created_by").notNull().references(() => users.id),
+  lastModifiedBy: varchar("last_modified_by").references(() => users.id),
+  accessLog: jsonb("access_log").default('[]'),
+  modificationLog: jsonb("modification_log").default('[]'),
+  
+  metadata: jsonb("metadata"),
+  operatingHours: jsonb("operating_hours"), // Daily operating schedules
+  services: jsonb("services"), // Detailed services offered
+  
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => [
+  index("idx_hf_location").on(table.latitude, table.longitude),
+  index("idx_hf_type_status").on(table.facilityType, table.operationalStatus),
+  index("idx_hf_capacity").on(table.availableBeds, table.availableIcuBeds),
+  index("idx_hf_emergency").on(table.emergencyLevel),
+  index("idx_hf_facility_id").on(table.facilityId),
+  index("idx_hf_operational_status").on(table.operationalStatus),
+  index("idx_hf_last_updated").on(table.lastCapacityUpdate),
+  index("idx_hf_testing_capacity").on(table.dailyTestingCapacity, table.currentTestingLoad),
+  // CHECK constraints for data integrity
+  check("chk_hf_operational_status", sql`operational_status IN ('operational', 'limited', 'closed', 'emergency_only')`),
+  check("chk_hf_emergency_level", sql`emergency_level IN ('green', 'yellow', 'orange', 'red', 'black')`),
+  check("chk_hf_staffing_level", sql`staffing_level IN ('normal', 'reduced', 'critical', 'crisis')`),
+  // Geospatial validation constraints
+  check("chk_hf_latitude_range", sql`latitude IS NULL OR (latitude >= -90 AND latitude <= 90)`),
+  check("chk_hf_longitude_range", sql`longitude IS NULL OR (longitude >= -180 AND longitude <= 180)`),
+]);
+
+// 5. Public Health Alerts Table - Emergency notifications, health advisories, outbreak warnings
+export const publicHealthAlerts = pgTable("public_health_alerts", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  alertId: varchar("alert_id").notNull().unique(), // PHA-YYYYMMDD-XXXX format
+  
+  // Alert Classification
+  alertType: varchar("alert_type").notNull(), // outbreak_warning, health_advisory, emergency_notification, vaccination_alert, contamination_warning, bioterrorism_alert
+  severity: varchar("severity").notNull(), // informational, advisory, watch, warning, emergency
+  urgency: varchar("urgency").notNull(), // immediate, expected, future, past, unknown
+  certainty: varchar("certainty").notNull(), // observed, likely, possible, unlikely, unknown
+  alertCategory: varchar("alert_category").notNull(), // health, safety, security, rescue, fire, hazmat, met, geo, env, transport, infra, cbrne, other
+  
+  // Alert Content
+  headline: varchar("headline").notNull(),
+  description: text("description").notNull(),
+  instruction: text("instruction"), // What people should do
+  event: varchar("event").notNull(), // Type of hazard or event
+  responseType: varchar("response_type"), // shelter, evacuate, prepare, execute, avoid, monitor, assess, allclear, none
+  
+  // Geographic Scope
+  scope: varchar("scope").notNull(), // public, restricted, private
+  affectedAreas: jsonb("affected_areas").notNull(), // Array of affected geographic areas
+  latitude: numeric("latitude", { precision: 10, scale: 8 }),
+  longitude: numeric("longitude", { precision: 11, scale: 8 }),
+  radius: integer("radius"), // Alert radius in meters
+  boundaryData: jsonb("boundary_data"), // GeoJSON polygon data
+  geographicScope: varchar("geographic_scope").notNull(), // local, county, state, regional, national
+  
+  // Target Audience
+  targetAudience: jsonb("target_audience").notNull(), // general_public, healthcare_workers, first_responders, vulnerable_populations
+  audienceRestrictions: jsonb("audience_restrictions"), // Age groups, conditions, etc.
+  languageVersions: jsonb("language_versions").default('["en"]'), // Available language versions
+  accessibilityCompliant: boolean("accessibility_compliant").default(true),
+  
+  // Timing and Duration
+  effectiveTime: timestamp("effective_time").notNull(),
+  expirationTime: timestamp("expiration_time"),
+  onsetTime: timestamp("onset_time"), // When the event begins
+  expectedDuration: integer("expected_duration"), // Expected duration in hours
+  alertStatus: varchar("alert_status").notNull().default("actual"), // actual, exercise, system, test, draft
+  
+  // Distribution and Channels
+  distributionChannels: jsonb("distribution_channels").notNull(), // sms, email, web, mobile_app, social_media, broadcast, sirens
+  distributionStatus: jsonb("distribution_status").default('{}'), // Status per channel
+  totalRecipients: integer("total_recipients").default(0),
+  deliveredCount: integer("delivered_count").default(0),
+  readCount: integer("read_count").default(0),
+  acknowledgedCount: integer("acknowledged_count").default(0),
+  
+  // Integration with Existing Systems
+  relatedIncidentId: varchar("related_incident_id").references(() => publicHealthIncidents.id),
+  relatedSurveillanceId: varchar("related_surveillance_id").references(() => diseaseSurveillance.id),
+  triggeredByThreatId: varchar("triggered_by_threat_id").references(() => threats.id),
+  parentAlertId: varchar("parent_alert_id"), // For updates or related alerts
+  supersededByAlertId: varchar("superseded_by_alert_id"), // If alert is replaced
+  
+  // CDC and Federal Integration
+  cdcHanAlert: boolean("cdc_han_alert").default(false), // Health Alert Network
+  cdcHanId: varchar("cdc_han_id"), // CDC HAN identifier
+  emsCapAlert: boolean("ems_cap_alert").default(false), // Emergency Management
+  ipawsAlert: boolean("ipaws_alert").default(false), // Integrated Public Alert Warning System
+  capMessage: jsonb("cap_message"), // Common Alerting Protocol message
+  fedCoordination: boolean("fed_coordination").default(false),
+  
+  // Message Management
+  messageReference: varchar("message_reference").unique(), // For updates/cancellations
+  messageType: varchar("message_type").notNull().default("alert"), // alert, update, cancel, ack, error
+  version: integer("version").default(1), // Message version number
+  references: jsonb("references"), // Previous alert references
+  updateReason: text("update_reason"), // Reason for alert update
+  
+  // Authority and Authorization
+  issuingAuthority: varchar("issuing_authority").notNull(), // Organization issuing alert
+  authorityLevel: varchar("authority_level").notNull(), // local, state, federal, international
+  senderId: varchar("sender_id").notNull(), // Unique sender identifier
+  senderName: varchar("sender_name").notNull(),
+  issuedBy: varchar("issued_by").notNull().references(() => users.id),
+  approvedBy: varchar("approved_by").references(() => users.id),
+  
+  // Legal and Compliance
+  legalBasis: varchar("legal_basis"), // Legal authority for alert
+  mandatoryAlert: boolean("mandatory_alert").default(false),
+  optOutAllowed: boolean("opt_out_allowed").default(true),
+  privacyNotice: text("privacy_notice"),
+  dataRetention: varchar("data_retention").default("30_days"),
+  
+  // Quality Control
+  alertPriority: integer("alert_priority").default(3), // 1=highest, 5=lowest
+  reviewRequired: boolean("review_required").default(true),
+  testAlert: boolean("test_alert").default(false),
+  draftMode: boolean("draft_mode").default(false),
+  qualityChecked: boolean("quality_checked").default(false),
+  errorChecking: jsonb("error_checking"), // Automated error checking results
+  
+  // Performance Tracking
+  responseMetrics: jsonb("response_metrics"), // Alert performance data
+  feedbackReceived: jsonb("feedback_received"), // Public feedback
+  effectivenessScore: integer("effectiveness_score"), // 0-100 effectiveness rating
+  
+  // Integration with Notification System
+  integratedWithThreatNotifications: boolean("integrated_with_threat_notifications").default(true),
+  notificationTemplateId: varchar("notification_template_id"),
+  customizationData: jsonb("customization_data"),
+  
+  // Audit and Security
+  dataClassification: varchar("data_classification").notNull().default("public"),
+  accessLevel: varchar("access_level").notNull().default("public"),
+  createdBy: varchar("created_by").notNull().references(() => users.id),
+  lastModifiedBy: varchar("last_modified_by").references(() => users.id),
+  accessLog: jsonb("access_log").default('[]'),
+  modificationLog: jsonb("modification_log").default('[]'),
+  
+  metadata: jsonb("metadata"),
+  attachments: jsonb("attachments"), // Supporting documents, images, etc.
+  
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => [
+  index("idx_pha_type_severity").on(table.alertType, table.severity),
+  index("idx_pha_geographic").on(table.latitude, table.longitude),
+  index("idx_pha_time_status").on(table.effectiveTime, table.alertStatus),
+  index("idx_pha_audience").on(table.targetAudience),
+  index("idx_pha_issued_at").on(table.effectiveTime),
+  index("idx_pha_severity").on(table.severity),
+  index("idx_pha_alert_type").on(table.alertType),
+  index("idx_pha_urgency_certainty").on(table.urgency, table.certainty),
+  // CHECK constraints for data integrity
+  check("chk_pha_severity", sql`severity IN ('informational', 'advisory', 'watch', 'warning', 'emergency')`),
+  check("chk_pha_urgency", sql`urgency IN ('immediate', 'expected', 'future', 'past', 'unknown')`),
+  check("chk_pha_certainty", sql`certainty IN ('observed', 'likely', 'possible', 'unlikely', 'unknown')`),
+  check("chk_pha_alert_status", sql`alert_status IN ('actual', 'exercise', 'system', 'test', 'draft')`),
+  // Geospatial validation constraints
+  check("chk_pha_latitude_range", sql`latitude IS NULL OR (latitude >= -90 AND latitude <= 90)`),
+  check("chk_pha_longitude_range", sql`longitude IS NULL OR (longitude >= -180 AND longitude <= 180)`),
+]);
+
+// 6. Epidemiological Data Table - Population health metrics, disease statistics, trend analysis
+export const epidemiologicalData = pgTable("epidemiological_data", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  dataId: varchar("data_id").notNull().unique(), // EPI-YYYYMMDD-XXXX format
+  
+  // Data Classification
+  dataType: varchar("data_type").notNull(), // mortality, morbidity, incidence, prevalence, surveillance, outbreak, risk_factors, demographics
+  studyType: varchar("study_type"), // descriptive, analytical, experimental, cross_sectional, cohort, case_control
+  dataCategory: varchar("data_category").notNull(), // individual, aggregate, population, sentinel
+  aggregationLevel: varchar("aggregation_level").notNull(), // individual, facility, county, state, regional, national
+  
+  // Geographic Information
+  geographicScope: varchar("geographic_scope").notNull(), // local, county, state, regional, national, international
+  geographicIdentifier: varchar("geographic_identifier").notNull(), // FIPS code, postal code, etc.
+  latitude: numeric("latitude", { precision: 10, scale: 8 }),
+  longitude: numeric("longitude", { precision: 11, scale: 8 }),
+  populationServed: integer("population_served"),
+  boundaryData: jsonb("boundary_data"), // GeoJSON for geographic boundaries
+  urbanRuralClassification: varchar("urban_rural_classification"), // urban, suburban, rural, frontier
+  
+  // Time Period
+  dataPeriodStart: timestamp("data_period_start").notNull(),
+  dataPeriodEnd: timestamp("data_period_end").notNull(),
+  reportingPeriod: varchar("reporting_period"), // daily, weekly, monthly, quarterly, annually
+  seasonality: varchar("seasonality"), // spring, summer, fall, winter, year_round
+  epidemiologicalWeek: integer("epidemiological_week"), // CDC epidemiological week
+  epidemiologicalYear: integer("epidemiological_year"),
+  
+  // Disease/Condition Information
+  diseaseCode: varchar("disease_code"), // ICD-10, SNOMED, CDC codes
+  diseaseName: varchar("disease_name"),
+  diseaseCategory: varchar("disease_category"), // infectious, chronic, injury, environmental, occupational
+  conditionType: varchar("condition_type"), // primary, comorbidity, underlying, immediate
+  
+  // Population Demographics
+  totalPopulation: integer("total_population"),
+  demographicBreakdown: jsonb("demographic_breakdown").notNull(), // Age, gender, race, ethnicity
+  ageGroups: jsonb("age_groups"), // Cases/deaths by age group
+  genderDistribution: jsonb("gender_distribution"),
+  raceEthnicityData: jsonb("race_ethnicity_data"),
+  socioeconomicData: jsonb("socioeconomic_data"),
+  vulnerablePopulations: jsonb("vulnerable_populations"),
+  
+  // Epidemiological Measures
+  caseCount: integer("case_count").default(0),
+  deathCount: integer("death_count").default(0),
+  incidenceRate: varchar("incidence_rate"), // Per 100,000 population
+  prevalenceRate: varchar("prevalence_rate"), // Per 100,000 population
+  mortalityRate: varchar("mortality_rate"), // Per 100,000 population
+  caseFatalityRate: varchar("case_fatality_rate"), // Percentage
+  attackRate: varchar("attack_rate"), // Percentage
+  secondaryAttackRate: varchar("secondary_attack_rate"), // Percentage
+  basicReproductionNumber: varchar("basic_reproduction_number"), // R0
+  effectiveReproductionNumber: varchar("effective_reproduction_number"), // Rt
+  
+  // Risk Factors and Exposures
+  riskFactors: jsonb("risk_factors"),
+  exposureHistory: jsonb("exposure_history"),
+  behavioralFactors: jsonb("behavioral_factors"),
+  environmentalFactors: jsonb("environmental_factors"),
+  occupationalFactors: jsonb("occupational_factors"),
+  comorbidities: jsonb("comorbidities"),
+  vaccinationStatus: jsonb("vaccination_status"),
+  
+  // Clinical Data
+  clinicalPresentation: jsonb("clinical_presentation"),
+  symptomProfiles: jsonb("symptom_profiles"),
+  severityDistribution: jsonb("severity_distribution"),
+  hospitalizationData: jsonb("hospitalization_data"),
+  icuAdmissions: integer("icu_admissions").default(0),
+  ventilatorUse: integer("ventilator_use").default(0),
+  lengthOfStay: jsonb("length_of_stay"), // Average and distribution
+  
+  // Laboratory Data
+  laboratoryResults: jsonb("laboratory_results"),
+  testingData: jsonb("testing_data"),
+  positivityRate: varchar("positivity_rate"), // Percentage
+  specimenTypes: jsonb("specimen_types"),
+  diagnosticMethods: jsonb("diagnostic_methods"),
+  
+  // Temporal Trends
+  trendData: jsonb("trend_data").notNull(), // Time series data
+  seasonalPatterns: jsonb("seasonal_patterns"),
+  cyclicalPatterns: jsonb("cyclical_patterns"),
+  epidemiologicalCurve: jsonb("epidemiological_curve"),
+  forecastingData: jsonb("forecasting_data"),
+  
+  // Comparative Analysis
+  historicalComparison: jsonb("historical_comparison"),
+  peerComparison: jsonb("peer_comparison"), // Comparison with similar populations
+  nationalBenchmarks: jsonb("national_benchmarks"),
+  internationalComparison: jsonb("international_comparison"),
+  
+  // Data Quality and Validation
+  dataQuality: varchar("data_quality").notNull().default("high"), // high, medium, low, uncertain
+  completenessScore: integer("completeness_score").default(100), // 0-100
+  accuracyScore: integer("accuracy_score").default(100), // 0-100
+  timelinesScore: integer("timeliness_score").default(100), // 0-100
+  validationMethod: varchar("validation_method"), // automated, manual, peer_review, statistical
+  dataSource: varchar("data_source").notNull(), // surveillance, registry, survey, administrative, clinical
+  collectionMethod: varchar("collection_method"), // active, passive, sentinel, population_based
+  
+  // Statistical Analysis
+  confidenceIntervals: jsonb("confidence_intervals"),
+  statisticalSignificance: jsonb("statistical_significance"),
+  pValues: jsonb("p_values"),
+  riskRatios: jsonb("risk_ratios"),
+  oddsRatios: jsonb("odds_ratios"),
+  correlationAnalysis: jsonb("correlation_analysis"),
+  regressionAnalysis: jsonb("regression_analysis"),
+  spatialAnalysis: jsonb("spatial_analysis"),
+  clusterAnalysis: jsonb("cluster_analysis"),
+  
+  // Public Health Impact
+  diseaseburden: jsonb("disease_burden"), // DALYs, QALYs, YLL, YLD
+  economicImpact: jsonb("economic_impact"),
+  healthSystemImpact: jsonb("health_system_impact"),
+  socialImpact: jsonb("social_impact"),
+  environmentalImpact: jsonb("environmental_impact"),
+  
+  // CDC Integration and Reporting
+  cdcReporting: boolean("cdc_reporting").default(false),
+  cdcSurveillanceSystem: varchar("cdc_surveillance_system"), // NNDSS, NHSN, etc.
+  cdcConditionCode: varchar("cdc_condition_code"),
+  mmwrWeek: integer("mmwr_week"), // Morbidity and Mortality Weekly Report week
+  mmwrYear: integer("mmwr_year"),
+  nhsnData: jsonb("nhsn_data"), // National Healthcare Safety Network
+  whoReporting: boolean("who_reporting").default(false),
+  
+  // Research and Academic Use
+  researchStudyId: varchar("research_study_id"),
+  publicationReference: varchar("publication_reference"),
+  dataSetVersion: varchar("data_set_version"),
+  academicInstitution: varchar("academic_institution"),
+  principalInvestigator: varchar("principal_investigator").references(() => users.id),
+  
+  // Privacy and Compliance
+  dataClassification: varchar("data_classification").notNull().default("phi"),
+  privacyLevel: varchar("privacy_level").notNull().default("high"), // high, medium, low, public
+  deidentificationLevel: varchar("deidentification_level"), // identified, limited_dataset, deidentified, anonymous
+  hipaaCompliant: boolean("hipaa_compliant").default(true),
+  ethicsApproval: boolean("ethics_approval").default(false),
+  consentRequired: boolean("consent_required").default(true),
+  dataUseAgreement: boolean("data_use_agreement").default(false),
+  
+  // Access Control
+  accessLevel: varchar("access_level").notNull().default("researcher_only"),
+  sharingRestrictions: jsonb("sharing_restrictions"),
+  embargoDate: timestamp("embargo_date"),
+  publicReleaseDate: timestamp("public_release_date"),
+  
+  // Data Stewardship
+  dataOwner: varchar("data_owner").notNull().references(() => users.id),
+  dataCustodian: varchar("data_custodian").references(() => users.id),
+  epidemiologist: varchar("epidemiologist").references(() => users.id),
+  statistician: varchar("statistician").references(() => users.id),
+  qualityAssuranceOfficer: varchar("quality_assurance_officer").references(() => users.id),
+  
+  // System Integration
+  relatedIncidentId: varchar("related_incident_id").references(() => publicHealthIncidents.id),
+  relatedSurveillanceId: varchar("related_surveillance_id").references(() => diseaseSurveillance.id),
+  sourceDatasetId: varchar("source_dataset_id"), // Reference to source dataset
+  derivedFromDataId: varchar("derived_from_data_id"), // If derived from other epi data
+  
+  // Audit and Provenance
+  createdBy: varchar("created_by").notNull().references(() => users.id),
+  lastModifiedBy: varchar("last_modified_by").references(() => users.id),
+  accessLog: jsonb("access_log").default('[]'),
+  modificationLog: jsonb("modification_log").default('[]'),
+  dataLineage: jsonb("data_lineage"), // Data provenance and transformations
+  
+  metadata: jsonb("metadata"),
+  analyticalNotes: text("analytical_notes"),
+  limitations: text("limitations"),
+  
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => [
+  index("idx_ed_disease_period").on(table.diseaseCode, table.dataPeriodStart),
+  index("idx_ed_geographic").on(table.geographicScope, table.geographicIdentifier),
+  index("idx_ed_temporal").on(table.dataPeriodStart, table.dataPeriodEnd),
+  index("idx_ed_type_quality").on(table.dataType, table.dataQuality),
+  index("idx_ed_mmwr_week").on(table.mmwrWeek, table.mmwrYear),
+  index("idx_ed_report_date").on(table.dataPeriodStart),
+  index("idx_ed_region").on(table.geographicScope, table.geographicIdentifier),
+  index("idx_ed_epidemiological_week").on(table.epidemiologicalWeek, table.epidemiologicalYear),
+  // CHECK constraints for data integrity
+  check("chk_ed_data_quality", sql`data_quality IN ('high', 'medium', 'low', 'uncertain')`),
+  check("chk_ed_data_type", sql`data_type IN ('mortality', 'morbidity', 'incidence', 'prevalence', 'surveillance', 'outbreak', 'risk_factors', 'demographics')`),
+  check("chk_ed_geographic_scope", sql`geographic_scope IN ('local', 'county', 'state', 'regional', 'national', 'international')`),
+  // Ensure MMWR week is valid (1-53)
+  check("chk_ed_mmwr_week_valid", sql`mmwr_week >= 1 AND mmwr_week <= 53`),
+  check("chk_ed_epi_week_valid", sql`epidemiological_week >= 1 AND epidemiological_week <= 53`),
+  // Geospatial validation constraints
+  check("chk_ed_latitude_range", sql`latitude IS NULL OR (latitude >= -90 AND latitude <= 90)`),
+  check("chk_ed_longitude_range", sql`longitude IS NULL OR (longitude >= -180 AND longitude <= 180)`),
+]);
+
 // Email subscribers for marketing resources
 export const subscribers = pgTable("subscribers", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -548,8 +1367,70 @@ export const insertTicketSchema = createInsertSchema(tickets).omit({
   escalatedAt: true,
 });
 
+// ===== PUBLIC HEALTH INSERT SCHEMAS =====
+
+export const insertPublicHealthIncidentSchema = createInsertSchema(publicHealthIncidents).omit({
+  id: true,
+  incidentId: true, // Auto-generated
+  createdAt: true,
+  updatedAt: true,
+  detectedAt: true,
+  lastUpdatedAt: true,
+});
+
+export const insertDiseaseSurveillanceSchema = createInsertSchema(diseaseSurveillance).omit({
+  id: true,
+  surveillanceId: true, // Auto-generated
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertContactTracingSchema = createInsertSchema(contactTracing).omit({
+  id: true,
+  contactId: true, // Auto-generated
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertHealthFacilitySchema = createInsertSchema(healthFacilities).omit({
+  id: true,
+  facilityId: true, // Auto-generated
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertPublicHealthAlertSchema = createInsertSchema(publicHealthAlerts).omit({
+  id: true,
+  alertId: true, // Auto-generated
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertEpidemiologicalDataSchema = createInsertSchema(epidemiologicalData).omit({
+  id: true,
+  dataId: true, // Auto-generated
+  createdAt: true,
+  updatedAt: true,
+});
+
 export type Ticket = typeof tickets.$inferSelect;
 export type InsertTicket = z.infer<typeof insertTicketSchema>;
+
+// ===== PUBLIC HEALTH TYPE DEFINITIONS =====
+
+export type PublicHealthIncident = typeof publicHealthIncidents.$inferSelect;
+export type InsertPublicHealthIncident = z.infer<typeof insertPublicHealthIncidentSchema>;
+export type DiseaseSurveillance = typeof diseaseSurveillance.$inferSelect;
+export type InsertDiseaseSurveillance = z.infer<typeof insertDiseaseSurveillanceSchema>;
+export type ContactTracing = typeof contactTracing.$inferSelect;
+export type InsertContactTracing = z.infer<typeof insertContactTracingSchema>;
+export type HealthFacility = typeof healthFacilities.$inferSelect;
+export type InsertHealthFacility = z.infer<typeof insertHealthFacilitySchema>;
+export type PublicHealthAlert = typeof publicHealthAlerts.$inferSelect;
+export type InsertPublicHealthAlert = z.infer<typeof insertPublicHealthAlertSchema>;
+export type EpidemiologicalData = typeof epidemiologicalData.$inferSelect;
+export type InsertEpidemiologicalData = z.infer<typeof insertEpidemiologicalDataSchema>;
+
 export type InsertHardwareSecurityDevice = z.infer<typeof insertHardwareSecurityDeviceSchema>;
 export type InsertBiometricAuthRecord = z.infer<typeof insertBiometricAuthRecordSchema>;
 export type InsertIamIntegration = z.infer<typeof insertIamIntegrationSchema>;
