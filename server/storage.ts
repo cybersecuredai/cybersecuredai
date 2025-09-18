@@ -54,7 +54,20 @@ import {
   type AcdsCoordination,
   type InsertAcdsCoordination,
   type AcdsAnalytics,
-  type InsertAcdsAnalytics
+  type InsertAcdsAnalytics,
+  // Public Health imports
+  type PublicHealthIncident,
+  type InsertPublicHealthIncident,
+  type DiseaseSurveillance,
+  type InsertDiseaseSurveillance,
+  type ContactTracing,
+  type InsertContactTracing,
+  type HealthFacility,
+  type InsertHealthFacility,
+  type PublicHealthAlert,
+  type InsertPublicHealthAlert,
+  type EpidemiologicalData,
+  type InsertEpidemiologicalData
 } from "@shared/schema";
 import { randomUUID } from "crypto";
 
@@ -226,6 +239,62 @@ export interface IStorage {
   deleteAcdsAnalytic(analyticId: string): Promise<void>;
   getAcdsAnalyticsByCategory(category: string, organizationId?: string): Promise<AcdsAnalytics[]>;
   getAcdsAnalyticsByDateRange(startDate: Date, endDate: Date, organizationId?: string): Promise<AcdsAnalytics[]>;
+
+  // ===== PUBLIC HEALTH OPERATIONS =====
+  
+  // Public Health Incidents operations
+  getPublicHealthIncidents(filters?: { status?: string; severity?: string; region?: string; startDate?: Date; endDate?: Date }): Promise<PublicHealthIncident[]>;
+  getPublicHealthIncident(id: string): Promise<PublicHealthIncident | undefined>;
+  createPublicHealthIncident(incident: InsertPublicHealthIncident): Promise<PublicHealthIncident>;
+  updatePublicHealthIncident(id: string, updates: Partial<PublicHealthIncident>): Promise<PublicHealthIncident>;
+  deletePublicHealthIncident(id: string): Promise<void>;
+  escalateIncidentToCDC(id: string, escalationData: any): Promise<PublicHealthIncident>;
+  
+  // Disease Surveillance operations
+  getDiseaseSurveillanceRecords(filters?: { diseaseType?: string; status?: string; startDate?: Date; endDate?: Date }): Promise<DiseaseSurveillance[]>;
+  getDiseaseSurveillanceRecord(id: string): Promise<DiseaseSurveillance | undefined>;
+  createDiseaseSurveillanceRecord(surveillance: InsertDiseaseSurveillance): Promise<DiseaseSurveillance>;
+  updateDiseaseSurveillanceRecord(id: string, updates: Partial<DiseaseSurveillance>): Promise<DiseaseSurveillance>;
+  deleteDiseaseSurveillanceRecord(id: string): Promise<void>;
+  getSurveillanceByDiseaseType(diseaseType: string): Promise<DiseaseSurveillance[]>;
+  getDiseaseTrends(filters?: { diseaseType?: string; timeRange?: { start: Date; end: Date } }): Promise<any[]>;
+  
+  // Contact Tracing operations
+  getContactTracingRecords(filters?: { incidentId?: string; status?: string; contactType?: string }): Promise<ContactTracing[]>;
+  getContactTracingRecord(id: string): Promise<ContactTracing | undefined>;
+  createContactTracingRecord(contact: InsertContactTracing): Promise<ContactTracing>;
+  updateContactTracingRecord(id: string, updates: Partial<ContactTracing>): Promise<ContactTracing>;
+  deleteContactTracingRecord(id: string): Promise<void>;
+  notifyContact(id: string, notificationData: any): Promise<boolean>;
+  getExposedContactsByIncident(incidentId: string): Promise<ContactTracing[]>;
+  
+  // Health Facilities operations
+  getHealthFacilities(filters?: { facilityType?: string; status?: string; region?: string }): Promise<HealthFacility[]>;
+  getHealthFacility(id: string): Promise<HealthFacility | undefined>;
+  createHealthFacility(facility: InsertHealthFacility): Promise<HealthFacility>;
+  updateHealthFacility(id: string, updates: Partial<HealthFacility>): Promise<HealthFacility>;
+  deleteHealthFacility(id: string): Promise<void>;
+  getRegionalCapacityOverview(region?: string): Promise<any>;
+  activateEmergencyProtocols(id: string, protocols: any): Promise<HealthFacility>;
+  
+  // Public Health Alerts operations
+  getPublicHealthAlerts(filters?: { alertType?: string; severity?: string; status?: string }): Promise<PublicHealthAlert[]>;
+  getPublicHealthAlert(id: string): Promise<PublicHealthAlert | undefined>;
+  createPublicHealthAlert(alert: InsertPublicHealthAlert): Promise<PublicHealthAlert>;
+  updatePublicHealthAlert(id: string, updates: Partial<PublicHealthAlert>): Promise<PublicHealthAlert>;
+  deletePublicHealthAlert(id: string): Promise<void>;
+  broadcastAlert(id: string, channels: string[]): Promise<boolean>;
+  
+  // Epidemiological Data operations
+  getEpidemiologicalData(filters?: { dataType?: string; diseaseCode?: string; geographicScope?: string; startDate?: Date; endDate?: Date }): Promise<EpidemiologicalData[]>;
+  getEpidemiologicalDataRecord(id: string): Promise<EpidemiologicalData | undefined>;
+  createEpidemiologicalData(data: InsertEpidemiologicalData): Promise<EpidemiologicalData>;
+  updateEpidemiologicalData(id: string, updates: Partial<EpidemiologicalData>): Promise<EpidemiologicalData>;
+  deleteEpidemiologicalData(id: string): Promise<void>;
+  generateStatisticalReports(filters?: any): Promise<any[]>;
+  getMMWRData(week: number, year: number): Promise<EpidemiologicalData[]>;
+  getPopulationHealthTrends(filters?: any): Promise<any[]>;
+  generateCDCReport(filters?: any): Promise<any>;
 }
 
 export class MemStorage implements IStorage {
