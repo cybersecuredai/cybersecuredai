@@ -2482,6 +2482,1017 @@ export const AlertStatsSchema = z.object({
   })),
 });
 
+// ===== COMPREHENSIVE HIPAA COMPLIANCE TABLES =====
+
+// 1. ADMINISTRATIVE SAFEGUARDS
+
+// HIPAA Security Officer Designations and Role Management
+export const hipaaSecurityOfficers = pgTable("hipaa_security_officers", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  organizationId: varchar("organization_id").notNull(),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  officerType: varchar("officer_type").notNull(), // security_officer, privacy_officer, compliance_officer, backup_officer
+  designation: varchar("designation").notNull(), // primary, secondary, interim, backup
+  appointedBy: varchar("appointed_by").notNull().references(() => users.id), // Who made the appointment
+  appointmentDate: timestamp("appointment_date").notNull(),
+  effectiveDate: timestamp("effective_date").notNull(),
+  endDate: timestamp("end_date"), // null for current appointments
+  responsibilities: jsonb("responsibilities").notNull(), // Array of specific responsibilities
+  authorities: jsonb("authorities").notNull(), // Array of granted authorities
+  certifications: jsonb("certifications").default('[]'), // HIPAA certifications and training
+  contactInformation: jsonb("contact_information").notNull(), // Emergency contact details
+  delegatedTo: varchar("delegated_to").references(() => users.id), // Temporary delegation
+  delegationStartDate: timestamp("delegation_start_date"),
+  delegationEndDate: timestamp("delegation_end_date"),
+  status: varchar("status").notNull().default("active"), // active, inactive, suspended, terminated
+  appointmentDocument: varchar("appointment_document"), // Reference to official appointment letter
+  acknowledgmentDate: timestamp("acknowledgment_date"), // When officer acknowledged appointment
+  lastReview: timestamp("last_review"), // Last performance review
+  nextReview: timestamp("next_review"), // Scheduled performance review
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// HIPAA Policies and Procedures Management
+export const hipaaPolicies = pgTable("hipaa_policies", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  organizationId: varchar("organization_id").notNull(),
+  policyId: varchar("policy_id").notNull().unique(), // e.g., "HIPAA-ADM-001"
+  policyCategory: varchar("policy_category").notNull(), // administrative, physical, technical, breach_notification
+  policyType: varchar("policy_type").notNull(), // safeguard, procedure, standard, guideline
+  title: varchar("title").notNull(),
+  description: text("description").notNull(),
+  fullPolicyText: text("full_policy_text").notNull(),
+  version: varchar("version").notNull().default("1.0"),
+  status: varchar("status").notNull().default("draft"), // draft, under_review, approved, active, archived, superseded
+  approvalLevel: varchar("approval_level").notNull(), // management, security_officer, legal, board
+  createdBy: varchar("created_by").notNull().references(() => users.id),
+  reviewedBy: varchar("reviewed_by").references(() => users.id),
+  approvedBy: varchar("approved_by").references(() => users.id),
+  effectiveDate: timestamp("effective_date"),
+  reviewDate: timestamp("review_date"), // Scheduled review date
+  expirationDate: timestamp("expiration_date"),
+  lastReviewDate: timestamp("last_review_date"),
+  nextReviewDate: timestamp("next_review_date"),
+  reviewFrequency: integer("review_frequency").default(365), // Days between reviews
+  applicableRoles: jsonb("applicable_roles").default('[]'), // Which roles must follow this policy
+  requiredTraining: jsonb("required_training").default('[]'), // Associated training requirements
+  relatedPolicies: jsonb("related_policies").default('[]'), // References to related policies
+  complianceFrameworks: jsonb("compliance_frameworks").default('[]'), // HIPAA, HITECH, state laws
+  businessJustification: text("business_justification"),
+  riskAssessment: text("risk_assessment"),
+  implementationGuidance: text("implementation_guidance"),
+  auditCriteria: text("audit_criteria"),
+  exceptions: jsonb("exceptions").default('[]'), // Approved exceptions
+  attachments: jsonb("attachments").default('[]'), // Supporting documents
+  distributionList: jsonb("distribution_list").default('[]'), // Who needs to be notified
+  acknowledgmentRequired: boolean("acknowledgment_required").default(true),
+  trainingRequired: boolean("training_required").default(true),
+  isTemplate: boolean("is_template").default(false),
+  templateSource: varchar("template_source"), // If derived from template
+  customizations: jsonb("customizations").default('{}'), // Org-specific modifications
+  tags: jsonb("tags").default('[]'), // For categorization and search
+  searchKeywords: jsonb("search_keywords").default('[]'), // For search optimization
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Employee Training Tracking and Compliance Verification
+export const hipaaTraining = pgTable("hipaa_training", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  organizationId: varchar("organization_id").notNull(),
+  trainingId: varchar("training_id").notNull().unique(), // e.g., "HIPAA-TRN-2024-001"
+  trainingType: varchar("training_type").notNull(), // initial, refresher, specialized, incident_based, role_specific
+  trainingCategory: varchar("training_category").notNull(), // general_awareness, technical_safeguards, administrative, physical, breach_response
+  title: varchar("title").notNull(),
+  description: text("description").notNull(),
+  content: text("content"), // Training materials or reference
+  duration: integer("duration"), // Training duration in minutes
+  format: varchar("format").notNull(), // online, in_person, hybrid, self_study, webinar
+  provider: varchar("provider"), // Internal, external vendor, certification body
+  instructorId: varchar("instructor_id").references(() => users.id),
+  targetAudience: jsonb("target_audience").notNull(), // Array of roles/departments
+  prerequisites: jsonb("prerequisites").default('[]'), // Required prior training
+  learningObjectives: jsonb("learning_objectives").notNull(),
+  assessmentRequired: boolean("assessment_required").default(true),
+  passingScore: integer("passing_score").default(80), // Minimum score to pass
+  certificationAwarded: boolean("certification_awarded").default(false),
+  certificationValidityPeriod: integer("certification_validity_period").default(365), // Days
+  mandatory: boolean("mandatory").default(true),
+  recurringInterval: integer("recurring_interval").default(365), // Days between required refresher training
+  relatedPolicies: jsonb("related_policies").default('[]'), // Associated policies
+  complianceRequirement: varchar("compliance_requirement"), // HIPAA section, state law, etc.
+  materials: jsonb("materials").default('[]'), // Training materials and resources
+  quiz: jsonb("quiz"), // Assessment questions and answers
+  feedback: jsonb("feedback").default('[]'), // Training feedback and improvements
+  completionCriteria: jsonb("completion_criteria").notNull(), // What constitutes completion
+  status: varchar("status").notNull().default("active"), // active, inactive, deprecated, under_review
+  version: varchar("version").notNull().default("1.0"),
+  createdBy: varchar("created_by").notNull().references(() => users.id),
+  approvedBy: varchar("approved_by").references(() => users.id),
+  lastUpdated: timestamp("last_updated").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Individual Training Records and Compliance Status
+export const hipaaTrainingRecords = pgTable("hipaa_training_records", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  organizationId: varchar("organization_id").notNull(),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  trainingId: varchar("training_id").notNull().references(() => hipaaTraining.trainingId),
+  enrollmentDate: timestamp("enrollment_date").defaultNow(),
+  startDate: timestamp("start_date"),
+  completionDate: timestamp("completion_date"),
+  dueDate: timestamp("due_date").notNull(), // When training must be completed
+  status: varchar("status").notNull().default("assigned"), // assigned, in_progress, completed, overdue, exempted, failed
+  attemptNumber: integer("attempt_number").default(1),
+  score: integer("score"), // Assessment score if applicable
+  passingStatus: varchar("passing_status"), // passed, failed, pending, exempt
+  timeSpent: integer("time_spent").default(0), // Minutes spent in training
+  progressPercentage: integer("progress_percentage").default(0),
+  certificateIssued: boolean("certificate_issued").default(false),
+  certificateNumber: varchar("certificate_number"),
+  certificateExpiryDate: timestamp("certificate_expiry_date"),
+  exemptionReason: text("exemption_reason"), // If exempted from training
+  exemptedBy: varchar("exempted_by").references(() => users.id),
+  extensionGranted: boolean("extension_granted").default(false),
+  extensionReason: text("extension_reason"),
+  extendedDueDate: timestamp("extended_due_date"),
+  supervisorApproval: varchar("supervisor_approval").references(() => users.id),
+  hrApproval: varchar("hr_approval").references(() => users.id),
+  completionNotes: text("completion_notes"),
+  feedbackProvided: text("feedback_provided"), // User feedback on training
+  assessmentResults: jsonb("assessment_results"), // Detailed quiz/assessment results
+  complianceStatus: varchar("compliance_status").notNull().default("pending"), // compliant, non_compliant, grace_period, overdue
+  nextDueDate: timestamp("next_due_date"), // For recurring training
+  remindersSent: integer("reminders_sent").default(0),
+  lastReminderDate: timestamp("last_reminder_date"),
+  digitalSignature: varchar("digital_signature"), // For completion verification
+  ipAddress: varchar("ip_address"), // Where training was completed
+  deviceInfo: jsonb("device_info"), // Device used for training
+  proctorNotes: text("proctor_notes"), // If proctored training
+  auditTrail: jsonb("audit_trail").default('[]'), // Detailed audit log of training activities
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Business Associate Agreements (BAA) Management
+export const hipaaBusinessAssociates = pgTable("hipaa_business_associates", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  organizationId: varchar("organization_id").notNull(),
+  baId: varchar("ba_id").notNull().unique(), // e.g., "BA-2024-001"
+  companyName: varchar("company_name").notNull(),
+  legalName: varchar("legal_name"), // Full legal entity name
+  businessType: varchar("business_type").notNull(), // vendor, subcontractor, consultant, cloud_provider, saas_provider
+  serviceCategory: varchar("service_category").notNull(), // it_services, cloud_storage, analytics, consulting, legal, accounting
+  servicesProvided: text("services_provided").notNull(),
+  phiAccessType: varchar("phi_access_type").notNull(), // create, receive, maintain, transmit, access, none
+  phiDataTypes: jsonb("phi_data_types").notNull(), // Types of PHI they handle
+  dataFlowDescription: text("data_flow_description").notNull(),
+  primaryContact: jsonb("primary_contact").notNull(), // Name, email, phone
+  legalContact: jsonb("legal_contact"), // Legal representative
+  technicalContact: jsonb("technical_contact"), // Technical lead
+  complianceContact: jsonb("compliance_contact"), // Compliance officer
+  contractNumber: varchar("contract_number"),
+  masterServiceAgreement: varchar("master_service_agreement"),
+  baAgreementDate: timestamp("ba_agreement_date").notNull(),
+  effectiveDate: timestamp("effective_date").notNull(),
+  expirationDate: timestamp("expiration_date"),
+  autoRenewal: boolean("auto_renewal").default(false),
+  renewalTerms: text("renewal_terms"),
+  terminationNoticePeriod: integer("termination_notice_period").default(30), // Days
+  agreementVersion: varchar("agreement_version").notNull().default("1.0"),
+  agreementStatus: varchar("agreement_status").notNull().default("active"), // draft, under_negotiation, signed, active, expired, terminated, suspended
+  signedBy: varchar("signed_by"), // Who signed for the organization
+  baSignedBy: varchar("ba_signed_by"), // Who signed for the BA
+  digitalSignatures: jsonb("digital_signatures"), // Digital signature data
+  contractValue: numeric("contract_value", { precision: 12, scale: 2 }),
+  paymentTerms: varchar("payment_terms"),
+  insuranceRequired: boolean("insurance_required").default(true),
+  insuranceAmount: numeric("insurance_amount", { precision: 12, scale: 2 }),
+  cybersecurityInsurance: boolean("cybersecurity_insurance").default(true),
+  securityRequirements: jsonb("security_requirements").notNull(), // Required security controls
+  complianceCertifications: jsonb("compliance_certifications").default('[]'), // SOC2, HIPAA, etc.
+  auditRights: boolean("audit_rights").default(true),
+  auditFrequency: varchar("audit_frequency").default("annual"), // monthly, quarterly, annual, on_demand
+  lastAudit: timestamp("last_audit"),
+  nextAuditDue: timestamp("next_audit_due"),
+  auditResults: jsonb("audit_results").default('[]'), // Historical audit findings
+  incidentNotificationRequirement: integer("incident_notification_requirement").default(24), // Hours
+  breachNotificationRequirement: integer("breach_notification_requirement").default(24), // Hours
+  dataRetentionPeriod: integer("data_retention_period"), // Days
+  dataDestructionRequired: boolean("data_destruction_required").default(true),
+  dataDestructionMethod: varchar("data_destruction_method"), // secure_deletion, cryptographic_erasure, physical_destruction
+  subcontractorAllowed: boolean("subcontractor_allowed").default(false),
+  subcontractorApprovalRequired: boolean("subcontractor_approval_required").default(true),
+  subcontractors: jsonb("subcontractors").default('[]'), // List of approved subcontractors
+  geographicRestrictions: jsonb("geographic_restrictions").default('[]'), // Where data can be processed
+  governingLaw: varchar("governing_law").notNull(),
+  disputeResolution: varchar("dispute_resolution").default("arbitration"),
+  limitationOfLiability: text("limitation_of_liability"),
+  indemnificationTerms: text("indemnification_terms"),
+  returnDestructionTerms: text("return_destruction_terms"),
+  riskLevel: varchar("risk_level").notNull().default("medium"), // low, medium, high, critical
+  riskAssessment: text("risk_assessment"),
+  mitigationMeasures: jsonb("mitigation_measures").default('[]'),
+  performanceMetrics: jsonb("performance_metrics").default('[]'),
+  slaRequirements: jsonb("sla_requirements").default('[]'),
+  escalationProcedures: text("escalation_procedures"),
+  communicationProtocol: text("communication_protocol"),
+  changeManagementProcess: text("change_management_process"),
+  businessContinuityRequirements: text("business_continuity_requirements"),
+  documentReferences: jsonb("document_references").default('[]'), // Related documents
+  attachments: jsonb("attachments").default('[]'), // Contract attachments
+  tags: jsonb("tags").default('[]'), // For categorization
+  notes: text("notes"),
+  managedBy: varchar("managed_by").notNull().references(() => users.id), // Contract manager
+  legalReviewBy: varchar("legal_review_by").references(() => users.id),
+  complianceApprovedBy: varchar("compliance_approved_by").references(() => users.id),
+  lastReviewed: timestamp("last_reviewed"),
+  nextReviewDue: timestamp("next_review_due"),
+  remindersSent: integer("reminders_sent").default(0),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// 2. PHYSICAL SAFEGUARDS
+
+// Workstation Security Requirements and Compliance
+export const hipaaWorkstationSecurity = pgTable("hipaa_workstation_security", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  organizationId: varchar("organization_id").notNull(),
+  workstationId: varchar("workstation_id").notNull().unique(),
+  deviceType: varchar("device_type").notNull(), // desktop, laptop, mobile, tablet, thin_client, kiosk
+  location: varchar("location").notNull(), // office, home, remote, clinic, hospital
+  department: varchar("department"),
+  assignedTo: varchar("assigned_to").references(() => users.id),
+  alternateUsers: jsonb("alternate_users").default('[]'), // Approved alternate users
+  operatingSystem: varchar("operating_system").notNull(),
+  securityConfiguration: jsonb("security_configuration").notNull(), // Security settings
+  encryptionStatus: varchar("encryption_status").notNull().default("required"), // required, enabled, disabled, not_applicable
+  encryptionType: varchar("encryption_type"), // full_disk, file_level, folder_level
+  passwordComplexity: jsonb("password_complexity").notNull(), // Password requirements
+  autoLockTimeout: integer("auto_lock_timeout").default(15), // Minutes
+  screensaverTimeout: integer("screensaver_timeout").default(10), // Minutes
+  remoteAccessAllowed: boolean("remote_access_allowed").default(false),
+  remoteAccessMethod: varchar("remote_access_method"), // vpn, rdp, citrix, teamviewer
+  vpnRequired: boolean("vpn_required").default(true),
+  antivirusInstalled: boolean("antivirus_installed").default(true),
+  antivirusProvider: varchar("antivirus_provider"),
+  antivirusLastUpdate: timestamp("antivirus_last_update"),
+  firewallEnabled: boolean("firewall_enabled").default(true),
+  firewallConfiguration: jsonb("firewall_configuration"),
+  automaticUpdatesEnabled: boolean("automatic_updates_enabled").default(true),
+  lastSecurityUpdate: timestamp("last_security_update"),
+  physicalSecurityMeasures: jsonb("physical_security_measures").notNull(), // Lock, cable, etc.
+  cameraBlocking: boolean("camera_blocking").default(true),
+  microphoneControl: boolean("microphone_control").default(true),
+  usbPortControl: varchar("usb_port_control").default("restricted"), // disabled, restricted, monitored, unrestricted
+  removableMediaPolicy: varchar("removable_media_policy").default("prohibited"), // prohibited, encrypted_only, approved_only, unrestricted
+  wirelessSecurity: jsonb("wireless_security"), // WiFi security settings
+  bluetoothEnabled: boolean("bluetooth_enabled").default(false),
+  printerSecurity: jsonb("printer_security"), // Network printer security
+  monitorPrivacy: varchar("monitor_privacy").default("required"), // required, recommended, not_required
+  cleanDeskPolicy: boolean("clean_desk_policy").default(true),
+  visitorRestrictions: text("visitor_restrictions"),
+  maintenanceSchedule: jsonb("maintenance_schedule"),
+  lastMaintenance: timestamp("last_maintenance"),
+  nextMaintenance: timestamp("next_maintenance"),
+  complianceStatus: varchar("compliance_status").notNull().default("pending"), // compliant, non_compliant, partial, pending_review
+  lastComplianceCheck: timestamp("last_compliance_check"),
+  nextComplianceCheck: timestamp("next_compliance_check"),
+  violations: jsonb("violations").default('[]'), // Compliance violations
+  remediationRequired: boolean("remediation_required").default(false),
+  remediationPlan: text("remediation_plan"),
+  remediationDeadline: timestamp("remediation_deadline"),
+  auditHistory: jsonb("audit_history").default('[]'),
+  incidentHistory: jsonb("incident_history").default('[]'),
+  riskAssessment: text("risk_assessment"),
+  mitigationMeasures: jsonb("mitigation_measures").default('[]'),
+  approvedBy: varchar("approved_by").references(() => users.id),
+  approvalDate: timestamp("approval_date"),
+  status: varchar("status").notNull().default("active"), // active, inactive, decommissioned, maintenance
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Media Controls and Disposal Procedures
+export const hipaaMediaControls = pgTable("hipaa_media_controls", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  organizationId: varchar("organization_id").notNull(),
+  mediaId: varchar("media_id").notNull().unique(),
+  mediaType: varchar("media_type").notNull(), // hard_drive, ssd, usb_drive, optical_disk, tape, mobile_device, paper, cloud_storage
+  mediaSubtype: varchar("media_subtype"), // internal, external, removable, network_attached
+  description: text("description").notNull(),
+  serialNumber: varchar("serial_number"),
+  assetTag: varchar("asset_tag"),
+  location: varchar("location").notNull(),
+  department: varchar("department"),
+  custodian: varchar("custodian").notNull().references(() => users.id), // Person responsible
+  alternateCustodians: jsonb("alternate_custodians").default('[]'),
+  phiContained: boolean("phi_contained").notNull().default(false),
+  phiTypes: jsonb("phi_types").default('[]'), // Types of PHI stored
+  dataClassification: varchar("data_classification").notNull(), // public, internal, confidential, restricted, phi
+  encryptionRequired: boolean("encryption_required").default(true),
+  encryptionStatus: varchar("encryption_status").notNull().default("pending"), // encrypted, unencrypted, in_progress, not_applicable
+  encryptionMethod: varchar("encryption_method"), // aes256, bitlocker, filevault, pgp
+  encryptionKeyId: varchar("encryption_key_id"), // Reference to key management
+  accessControls: jsonb("access_controls").notNull(), // Who can access
+  approvedUsers: jsonb("approved_users").default('[]'),
+  accessLog: jsonb("access_log").default('[]'), // Access history
+  usagePolicy: text("usage_policy").notNull(),
+  handlingProcedures: text("handling_procedures").notNull(),
+  transportationRequirements: text("transportation_requirements"),
+  storageRequirements: text("storage_requirements"),
+  backupRequired: boolean("backup_required").default(true),
+  backupLocation: varchar("backup_location"),
+  backupFrequency: varchar("backup_frequency"), // daily, weekly, monthly
+  lastBackup: timestamp("last_backup"),
+  retentionPeriod: integer("retention_period"), // Days to retain
+  disposalMethod: varchar("disposal_method").notNull(), // secure_deletion, cryptographic_erasure, physical_destruction, degaussing
+  disposalScheduled: boolean("disposal_scheduled").default(false),
+  scheduledDisposalDate: timestamp("scheduled_disposal_date"),
+  disposalProvider: varchar("disposal_provider"), // Certified disposal company
+  disposalCertificateRequired: boolean("disposal_certificate_required").default(true),
+  auditRequired: boolean("audit_required").default(true),
+  auditFrequency: varchar("audit_frequency").default("quarterly"), // monthly, quarterly, annual
+  lastAudit: timestamp("last_audit"),
+  nextAuditDue: timestamp("next_audit_due"),
+  auditResults: jsonb("audit_results").default('[]'),
+  violations: jsonb("violations").default('[]'),
+  incidentHistory: jsonb("incident_history").default('[]'),
+  riskLevel: varchar("risk_level").notNull().default("medium"), // low, medium, high, critical
+  riskFactors: jsonb("risk_factors").default('[]'),
+  mitigationMeasures: jsonb("mitigation_measures").default('[]'),
+  complianceStatus: varchar("compliance_status").notNull().default("pending"), // compliant, non_compliant, partial, under_review
+  complianceNotes: text("compliance_notes"),
+  status: varchar("status").notNull().default("active"), // active, inactive, maintenance, disposed, lost, stolen
+  lifecycleStage: varchar("lifecycle_stage").notNull().default("in_use"), // new, in_use, maintenance, end_of_life, disposed
+  acquisitionDate: timestamp("acquisition_date"),
+  deploymentDate: timestamp("deployment_date"),
+  warrantyExpiration: timestamp("warranty_expiration"),
+  maintenanceSchedule: jsonb("maintenance_schedule"),
+  lastMaintenance: timestamp("last_maintenance"),
+  nextMaintenance: timestamp("next_maintenance"),
+  vendorInformation: jsonb("vendor_information"), // Vendor details
+  supportContact: jsonb("support_contact"), // Vendor support
+  documentReferences: jsonb("document_references").default('[]'), // Related documents
+  attachments: jsonb("attachments").default('[]'),
+  tags: jsonb("tags").default('[]'),
+  notes: text("notes"),
+  createdBy: varchar("created_by").notNull().references(() => users.id),
+  lastModifiedBy: varchar("last_modified_by").references(() => users.id),
+  approvedBy: varchar("approved_by").references(() => users.id),
+  approvalDate: timestamp("approval_date"),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Facility Access Controls and Monitoring
+export const hipaaFacilityAccess = pgTable("hipaa_facility_access", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  organizationId: varchar("organization_id").notNull(),
+  facilityId: varchar("facility_id").notNull().unique(),
+  facilityName: varchar("facility_name").notNull(),
+  facilityType: varchar("facility_type").notNull(), // office, clinic, hospital, data_center, warehouse, home_office
+  address: text("address").notNull(),
+  coordinates: jsonb("coordinates"), // Latitude, longitude
+  accessLevel: varchar("access_level").notNull(), // public, restricted, confidential, high_security
+  phiAreas: jsonb("phi_areas").default('[]'), // Areas where PHI is stored/processed
+  securityZones: jsonb("security_zones").notNull(), // Different security zones
+  accessControlSystem: varchar("access_control_system").notNull(), // key_card, biometric, pin, combination, manual
+  biometricEnabled: boolean("biometric_enabled").default(false),
+  biometricType: varchar("biometric_type"), // fingerprint, facial, iris, palm
+  keyCardSystem: boolean("key_card_system").default(true),
+  keyCardProvider: varchar("key_card_provider"),
+  pinRequired: boolean("pin_required").default(false),
+  multiFactorAuth: boolean("multi_factor_auth").default(false),
+  tailgatingPrevention: boolean("tailgating_prevention").default(true),
+  manTrapInstalled: boolean("man_trap_installed").default(false),
+  visitorManagement: boolean("visitor_management").default(true),
+  visitorEscortRequired: boolean("visitor_escort_required").default(true),
+  visitorBadgeRequired: boolean("visitor_badge_required").default(true),
+  visitorLogRequired: boolean("visitor_log_required").default(true),
+  contractorAccess: boolean("contractor_access").default(false),
+  contractorEscortRequired: boolean("contractor_escort_required").default(true),
+  afterHoursAccess: boolean("after_hours_access").default(false),
+  afterHoursApprovalRequired: boolean("after_hours_approval_required").default(true),
+  weekendAccess: boolean("weekend_access").default(false),
+  holidayAccess: boolean("holiday_access").default(false),
+  emergencyAccess: boolean("emergency_access").default(true),
+  emergencyAccessProcedure: text("emergency_access_procedure"),
+  lockdownProcedure: text("lockdown_procedure"),
+  surveillanceSystem: boolean("surveillance_system").default(true),
+  cameraCount: integer("camera_count").default(0),
+  cameraLocations: jsonb("camera_locations").default('[]'),
+  recordingRetention: integer("recording_retention").default(90), // Days
+  motionDetection: boolean("motion_detection").default(true),
+  alertSystem: boolean("alert_system").default(true),
+  alarmSystem: boolean("alarm_system").default(true),
+  alarmMonitoring: varchar("alarm_monitoring"), // self_monitored, third_party, security_company
+  securityGuards: boolean("security_guards").default(false),
+  guardSchedule: jsonb("guard_schedule"),
+  patrolSchedule: jsonb("patrol_schedule"),
+  incidentResponse: text("incident_response").notNull(),
+  evacuationPlan: text("evacuation_plan"),
+  fireSuppressionSystem: boolean("fire_suppression_system").default(true),
+  environmentalControls: jsonb("environmental_controls"), // Temperature, humidity, etc.
+  powerBackup: boolean("power_backup").default(true),
+  networkSecurity: jsonb("network_security"), // Network access controls
+  physicalBarriers: jsonb("physical_barriers"), // Walls, doors, locks, etc.
+  signage: jsonb("signage"), // Security and privacy signage
+  lightingRequirements: text("lighting_requirements"),
+  maintenanceAccess: text("maintenance_access"),
+  cleaningSchedule: jsonb("cleaning_schedule"),
+  authorizedPersonnel: jsonb("authorized_personnel").notNull(), // Who has access
+  accessRoles: jsonb("access_roles").notNull(), // Role-based access definitions
+  temporaryAccess: jsonb("temporary_access").default('[]'), // Temporary access grants
+  suspendedAccess: jsonb("suspended_access").default('[]'), // Suspended access
+  accessReviewSchedule: varchar("access_review_schedule").default("quarterly"),
+  lastAccessReview: timestamp("last_access_review"),
+  nextAccessReview: timestamp("next_access_review"),
+  accessViolations: jsonb("access_violations").default('[]'),
+  securityIncidents: jsonb("security_incidents").default('[]'),
+  vulnerabilityAssessments: jsonb("vulnerability_assessments").default('[]'),
+  lastSecurityAssessment: timestamp("last_security_assessment"),
+  nextSecurityAssessment: timestamp("next_security_assessment"),
+  complianceStatus: varchar("compliance_status").notNull().default("pending"), // compliant, non_compliant, partial, under_review
+  auditHistory: jsonb("audit_history").default('[]'),
+  lastAudit: timestamp("last_audit"),
+  nextAuditDue: timestamp("next_audit_due"),
+  riskLevel: varchar("risk_level").notNull().default("medium"), // low, medium, high, critical
+  riskFactors: jsonb("risk_factors").default('[]'),
+  mitigationMeasures: jsonb("mitigation_measures").default('[]'),
+  insuranceCoverage: boolean("insurance_coverage").default(true),
+  emergencyContacts: jsonb("emergency_contacts").notNull(),
+  facilityManager: varchar("facility_manager").notNull().references(() => users.id),
+  securityOfficer: varchar("security_officer").references(() => users.id),
+  maintenanceContact: jsonb("maintenance_contact"),
+  vendorContacts: jsonb("vendor_contacts").default('[]'),
+  operatingHours: jsonb("operating_hours").notNull(),
+  specialInstructions: text("special_instructions"),
+  documentReferences: jsonb("document_references").default('[]'),
+  attachments: jsonb("attachments").default('[]'),
+  status: varchar("status").notNull().default("active"), // active, inactive, maintenance, renovating, closed
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// 3. ENHANCED TECHNICAL SAFEGUARDS
+
+// Tamper-Proof Audit Logs with Digital Signatures
+export const hipaaSecureAuditLogs = pgTable("hipaa_secure_audit_logs", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  organizationId: varchar("organization_id").notNull(),
+  logId: varchar("log_id").notNull().unique(), // Sequential log ID
+  chainHash: varchar("chain_hash").notNull().unique(), // Blockchain-style hash chain
+  previousLogHash: varchar("previous_log_hash"), // Hash of previous log entry
+  digitalSignature: varchar("digital_signature").notNull(), // Digital signature for integrity
+  signatureAlgorithm: varchar("signature_algorithm").notNull().default("RSA-SHA256"),
+  keyId: varchar("key_id").notNull(), // Signing key identifier
+  timestampServer: varchar("timestamp_server"), // RFC 3161 timestamp server
+  rfc3161Timestamp: varchar("rfc3161_timestamp"), // Certified timestamp
+  userId: varchar("user_id").references(() => users.id),
+  userRole: varchar("user_role"),
+  sessionId: varchar("session_id"), // User session identifier
+  ipAddress: varchar("ip_address").notNull(),
+  userAgent: text("user_agent"),
+  deviceFingerprint: varchar("device_fingerprint"), // Device identification
+  geolocation: jsonb("geolocation"), // Location data if available
+  action: varchar("action").notNull(), // create, read, update, delete, access, login, logout
+  actionCategory: varchar("action_category").notNull(), // phi_access, administrative, system, authentication
+  resource: varchar("resource").notNull(), // What was accessed/modified
+  resourceType: varchar("resource_type").notNull(), // patient_record, phi_data, system_config, user_account
+  resourceId: varchar("resource_id"), // Specific resource identifier
+  phiInvolved: boolean("phi_involved").notNull().default(false),
+  phiTypes: jsonb("phi_types").default('[]'), // Types of PHI accessed
+  phiCategories: jsonb("phi_categories").default('[]'), // PHI categories
+  minimumNecessary: boolean("minimum_necessary").default(false), // Was minimum necessary standard followed
+  accessJustification: text("access_justification"), // Why access was needed
+  accessApprovedBy: varchar("access_approved_by").references(() => users.id),
+  emergencyAccess: boolean("emergency_access").default(false),
+  emergencyJustification: text("emergency_justification"),
+  dataBeforeChange: jsonb("data_before_change"), // Pre-change data (encrypted)
+  dataAfterChange: jsonb("data_after_change"), // Post-change data (encrypted)
+  changeType: varchar("change_type"), // field_update, record_creation, record_deletion, access_grant
+  changeReason: text("change_reason"),
+  systemGenerated: boolean("system_generated").default(false), // Automated vs manual action
+  batchOperation: boolean("batch_operation").default(false),
+  batchId: varchar("batch_id"), // For batch operations
+  transactionId: varchar("transaction_id"), // Database transaction ID
+  requestMethod: varchar("request_method"), // GET, POST, PUT, DELETE
+  requestUrl: text("request_url"),
+  requestHeaders: jsonb("request_headers"), // Relevant headers
+  requestBody: jsonb("request_body"), // Request payload (sanitized)
+  responseCode: integer("response_code"),
+  responseSize: integer("response_size"), // Response size in bytes
+  queryExecutionTime: integer("query_execution_time"), // Milliseconds
+  databaseQueries: jsonb("database_queries"), // Executed queries (sanitized)
+  fileAccessed: varchar("file_accessed"), // File path if file access
+  printJobs: jsonb("print_jobs"), // Print job details if applicable
+  emailSent: jsonb("email_sent"), // Email details if PHI was emailed
+  exportDetails: jsonb("export_details"), // Data export details
+  apiEndpoint: varchar("api_endpoint"), // API endpoint accessed
+  apiVersion: varchar("api_version"),
+  clientApplication: varchar("client_application"), // Application making the request
+  integrationType: varchar("integration_type"), // hl7, fhir, api, database, manual
+  workflowStep: varchar("workflow_step"), // Which step in a workflow
+  businessProcess: varchar("business_process"), // Which business process
+  complianceFramework: varchar("compliance_framework").default("HIPAA"), // HIPAA, HITECH, state_law
+  regulatoryRequirement: varchar("regulatory_requirement"), // Specific requirement
+  alertTriggered: boolean("alert_triggered").default(false),
+  alertType: varchar("alert_type"), // suspicious_activity, policy_violation, access_anomaly
+  alertSeverity: varchar("alert_severity"), // low, medium, high, critical
+  alertDescription: text("alert_description"),
+  automaticResponse: boolean("automatic_response").default(false),
+  responseActions: jsonb("response_actions").default('[]'), // Automated responses taken
+  riskScore: integer("risk_score"), // Calculated risk score 0-100
+  anomalyScore: numeric("anomaly_score", { precision: 5, scale: 2 }), // ML anomaly detection score
+  contextualData: jsonb("contextual_data"), // Additional context
+  correlationId: varchar("correlation_id"), // For correlating related events
+  parentLogId: varchar("parent_log_id"), // Parent audit log entry
+  childLogIds: jsonb("child_log_ids").default('[]'), // Child audit log entries
+  status: varchar("status").notNull().default("active"), // active, archived, investigated, resolved
+  investigationRequired: boolean("investigation_required").default(false),
+  investigatedBy: varchar("investigated_by").references(() => users.id),
+  investigationNotes: text("investigation_notes"),
+  investigationDate: timestamp("investigation_date"),
+  resolutionStatus: varchar("resolution_status"), // resolved, ongoing, escalated, false_positive
+  archivalDate: timestamp("archival_date"),
+  retentionExpiry: timestamp("retention_expiry").notNull(), // 6+ year retention
+  legalHold: boolean("legal_hold").default(false),
+  legalHoldReason: text("legal_hold_reason"),
+  exportedToAuthorities: boolean("exported_to_authorities").default(false),
+  exportDate: timestamp("export_date"),
+  exportedBy: varchar("exported_by").references(() => users.id),
+  exportReason: text("export_reason"),
+  immutable: boolean("immutable").notNull().default(true), // Cannot be modified
+  integrityVerified: boolean("integrity_verified").default(true),
+  lastIntegrityCheck: timestamp("last_integrity_check"),
+  integrityCheckResults: jsonb("integrity_check_results"),
+  tamperEvidence: jsonb("tamper_evidence"), // Evidence of tampering attempts
+  backupCopies: integer("backup_copies").default(0), // Number of backup copies
+  backupLocations: jsonb("backup_locations").default('[]'),
+  eventTime: timestamp("event_time").notNull(), // When the actual event occurred
+  logTime: timestamp("log_time").defaultNow(), // When the log was created
+  processingTime: timestamp("processing_time"), // When log was processed/indexed
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => [
+  // Indexes for efficient querying
+  index("idx_hipaa_audit_user_time").on(table.userId, table.eventTime),
+  index("idx_hipaa_audit_action_time").on(table.action, table.eventTime),
+  index("idx_hipaa_audit_phi_time").on(table.phiInvolved, table.eventTime),
+  index("idx_hipaa_audit_chain_hash").on(table.chainHash),
+  index("idx_hipaa_audit_resource_time").on(table.resource, table.eventTime),
+  index("idx_hipaa_audit_alert_time").on(table.alertTriggered, table.eventTime),
+]);
+
+// Emergency Access Procedures and Tracking
+export const hipaaEmergencyAccess = pgTable("hipaa_emergency_access", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  organizationId: varchar("organization_id").notNull(),
+  emergencyId: varchar("emergency_id").notNull().unique(),
+  emergencyType: varchar("emergency_type").notNull(), // medical, system_failure, natural_disaster, security_incident, business_continuity
+  emergencySeverity: varchar("emergency_severity").notNull(), // low, medium, high, critical, catastrophic
+  emergencyDescription: text("emergency_description").notNull(),
+  requestedBy: varchar("requested_by").notNull().references(() => users.id),
+  requestedFor: varchar("requested_for").references(() => users.id), // May be different from requester
+  requestingRole: varchar("requesting_role").notNull(),
+  justification: text("justification").notNull(),
+  businessNeed: text("business_need").notNull(),
+  expectedDuration: integer("expected_duration").notNull(), // Minutes
+  resourcesRequested: jsonb("resources_requested").notNull(), // What access is needed
+  phiTypesNeeded: jsonb("phi_types_needed").default('[]'),
+  accessLevel: varchar("access_level").notNull(), // read, write, admin, full
+  normalAccessAvailable: boolean("normal_access_available").default(false),
+  alternativesSought: text("alternatives_sought"), // What alternatives were considered
+  minimumNecessaryJustification: text("minimum_necessary_justification").notNull(),
+  approvalRequired: boolean("approval_required").default(true),
+  approvalLevel: varchar("approval_level").default("manager"), // manager, security_officer, admin, emergency_contact
+  approvedBy: varchar("approved_by").references(() => users.id),
+  alternateApprovers: jsonb("alternate_approvers").default('[]'), // Backup approvers
+  approvalTimestamp: timestamp("approval_timestamp"),
+  approvalMethod: varchar("approval_method"), // verbal, email, system, written
+  verbalApprovalBy: varchar("verbal_approval_by"),
+  verbalApprovalWitness: varchar("verbal_approval_witness"),
+  writtenConfirmationRequired: boolean("written_confirmation_required").default(true),
+  writtenConfirmationReceived: timestamp("written_confirmation_received"),
+  emergencyContactsNotified: boolean("emergency_contacts_notified").default(false),
+  notificationMethod: varchar("notification_method"), // phone, email, text, pager
+  notificationTimestamp: timestamp("notification_timestamp"),
+  accessGranted: boolean("access_granted").default(false),
+  accessStartTime: timestamp("access_start_time"),
+  accessEndTime: timestamp("access_end_time"),
+  actualDuration: integer("actual_duration"), // Actual duration in minutes
+  accessRevokedBy: varchar("access_revoked_by").references(() => users.id),
+  autoRevocation: boolean("auto_revocation").default(true),
+  extendedAccess: boolean("extended_access").default(false),
+  extensionRequests: jsonb("extension_requests").default('[]'),
+  monitoringRequired: boolean("monitoring_required").default(true),
+  monitoringFrequency: integer("monitoring_frequency").default(15), // Minutes between checks
+  monitoringLogs: jsonb("monitoring_logs").default('[]'),
+  supervisorNotified: boolean("supervisor_notified").default(true),
+  complianceOfficerNotified: boolean("compliance_officer_notified").default(true),
+  auditTrail: jsonb("audit_trail").default('[]'), // Detailed audit trail
+  actionsPerformed: jsonb("actions_performed").default('[]'), // What was actually done
+  dataAccessed: jsonb("data_accessed").default('[]'), // What data was accessed
+  modifications: jsonb("modifications").default('[]'), // Any changes made
+  printActivity: jsonb("print_activity").default('[]'), // Printing during emergency access
+  downloadActivity: jsonb("download_activity").default('[]'), // Downloads during access
+  emailActivity: jsonb("email_activity").default('[]'), // Emails sent
+  unusualActivity: jsonb("unusual_activity").default('[]'), // Any suspicious activity
+  postAccessReview: boolean("post_access_review").default(true),
+  reviewedBy: varchar("reviewed_by").references(() => users.id),
+  reviewDate: timestamp("review_date"),
+  reviewFindings: text("review_findings"),
+  reviewRecommendations: text("review_recommendations"),
+  violations: jsonb("violations").default('[]'), // Any policy violations
+  correctiveActions: jsonb("corrective_actions").default('[]'),
+  lessonsLearned: text("lessons_learned"),
+  policyUpdatesRequired: boolean("policy_updates_required").default(false),
+  trainingRequired: boolean("training_required").default(false),
+  incidentReportFiled: boolean("incident_report_filed").default(false),
+  incidentReportId: varchar("incident_report_id"),
+  regulatoryNotificationRequired: boolean("regulatory_notification_required").default(false),
+  regulatoryNotificationSent: boolean("regulatory_notification_sent").default(false),
+  status: varchar("status").notNull().default("requested"), // requested, approved, active, completed, reviewed, closed
+  resolution: varchar("resolution"), // successful, unsuccessful, partial, aborted
+  outcomeDescription: text("outcome_description"),
+  followUpRequired: boolean("follow_up_required").default(false),
+  followUpActions: jsonb("follow_up_actions").default('[]'),
+  documentReferences: jsonb("document_references").default('[]'),
+  attachments: jsonb("attachments").default('[]'),
+  tags: jsonb("tags").default('[]'),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// 4. BREACH NOTIFICATION AND INCIDENT RESPONSE
+
+// HIPAA Breach Incidents and Notification Management
+export const hipaaBreachIncidents = pgTable("hipaa_breach_incidents", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  organizationId: varchar("organization_id").notNull(),
+  breachId: varchar("breach_id").notNull().unique(), // e.g., "BREACH-2024-001"
+  incidentTitle: varchar("incident_title").notNull(),
+  incidentDescription: text("incident_description").notNull(),
+  breachType: varchar("breach_type").notNull(), // unauthorized_access, theft, loss, hacking, improper_disposal, other
+  breachCategory: varchar("breach_category").notNull(), // electronic, paper, portable_device, network, email
+  breachLocation: varchar("breach_location").notNull(), // onsite, offsite, cloud, mobile, email, network
+  discoveryDate: timestamp("discovery_date").notNull(), // When breach was discovered
+  breachDate: timestamp("breach_date").notNull(), // When breach actually occurred
+  reportedToManagement: timestamp("reported_to_management"),
+  reportedToSecurityOfficer: timestamp("reported_to_security_officer"),
+  reportedToPrivacyOfficer: timestamp("reported_to_privacy_officer"),
+  discoveredBy: varchar("discovered_by").references(() => users.id),
+  discoveryMethod: varchar("discovery_method").notNull(), // monitoring, audit, complaint, self_report, external_notification
+  involvedPersons: jsonb("involved_persons").default('[]'), // Staff involved
+  affectedIndividuals: integer("affected_individuals").notNull().default(0), // Number of individuals affected
+  affectedIndividualsList: jsonb("affected_individuals_list").default('[]'), // List of affected individuals (encrypted)
+  phiTypes: jsonb("phi_types").notNull(), // Types of PHI involved
+  phiSensitivity: varchar("phi_sensitivity").notNull(), // low, medium, high, critical
+  dataElements: jsonb("data_elements").notNull(), // Specific data elements involved
+  rootCause: text("root_cause"), // Root cause analysis
+  contributingFactors: jsonb("contributing_factors").default('[]'),
+  vulnerabilityExploited: text("vulnerability_exploited"),
+  safeguardsInPlace: jsonb("safeguards_in_place").default('[]'), // What safeguards were in place
+  safeguardsFailure: text("safeguards_failure"), // Why safeguards failed
+  immediateActions: jsonb("immediate_actions").default('[]'), // Immediate response actions
+  containmentActions: jsonb("containment_actions").default('[]'),
+  remediationActions: jsonb("remediation_actions").default('[]'),
+  preventiveActions: jsonb("preventive_actions").default('[]'),
+  investigationAssigned: varchar("investigation_assigned").references(() => users.id),
+  investigationStarted: timestamp("investigation_started"),
+  investigationCompleted: timestamp("investigation_completed"),
+  investigationFindings: text("investigation_findings"),
+  riskAssessment: text("risk_assessment"),
+  riskToIndividuals: varchar("risk_to_individuals").notNull(), // low, medium, high
+  probabilityOfCompromise: varchar("probability_of_compromise").notNull(), // low, medium, high
+  impactAssessment: text("impact_assessment"),
+  notificationRequired: boolean("notification_required").default(true),
+  notificationThreshold: varchar("notification_threshold"), // under_500, over_500, media_attention
+  individualNotificationRequired: boolean("individual_notification_required").default(true),
+  individualNotificationMethod: varchar("individual_notification_method"), // mail, email, phone, substitute_notice
+  individualNotificationDate: timestamp("individual_notification_date"),
+  individualNotificationSent: integer("individual_notification_sent").default(0),
+  individualNotificationText: text("individual_notification_text"),
+  mediaNotificationRequired: boolean("media_notification_required").default(false),
+  mediaNotificationDate: timestamp("media_notification_date"),
+  mediaNotificationText: text("media_notification_text"),
+  hhsNotificationRequired: boolean("hhs_notification_required").default(true),
+  hhsNotificationDate: timestamp("hhs_notification_date"),
+  hhsNotificationText: text("hhs_notification_text"),
+  hhsNotificationMethod: varchar("hhs_notification_method"), // online, paper
+  stateNotificationRequired: boolean("state_notification_required").default(false),
+  stateNotificationDate: timestamp("state_notification_date"),
+  lawEnforcementNotified: boolean("law_enforcement_notified").default(false),
+  lawEnforcementDate: timestamp("law_enforcement_date"),
+  regulatoryNotifications: jsonb("regulatory_notifications").default('[]'),
+  businessAssociateInvolved: boolean("business_associate_involved").default(false),
+  businessAssociateId: varchar("business_associate_id").references(() => hipaaBusinessAssociates.baId),
+  businessAssociateNotified: timestamp("business_associate_notified"),
+  insuranceNotified: boolean("insurance_notified").default(false),
+  insuranceClaimFiled: boolean("insurance_claim_filed").default(false),
+  legalCounselConsulted: boolean("legal_counsel_consulted").default(false),
+  legalCounselDate: timestamp("legal_counsel_date"),
+  publicRelationsInvolved: boolean("public_relations_involved").default(false),
+  mediaInquiries: integer("media_inquiries").default(0),
+  mediaResponse: text("media_response"),
+  costEstimate: numeric("cost_estimate", { precision: 12, scale: 2 }), // Estimated cost of breach
+  actualCosts: jsonb("actual_costs").default('[]'), // Breakdown of actual costs
+  lessonsLearned: text("lessons_learned"),
+  correctiveActions: jsonb("corrective_actions").default('[]'),
+  systemChanges: jsonb("system_changes").default('[]'),
+  policyChanges: jsonb("policy_changes").default('[]'),
+  trainingChanges: jsonb("training_changes").default('[]'),
+  followUpRequired: boolean("follow_up_required").default(true),
+  followUpActions: jsonb("follow_up_actions").default('[]'),
+  closeoutDate: timestamp("closeout_date"),
+  closeoutApprovedBy: varchar("closeout_approved_by").references(() => users.id),
+  annualReportIncluded: boolean("annual_report_included").default(true),
+  status: varchar("status").notNull().default("investigating"), // investigating, contained, notified, closed
+  severity: varchar("severity").notNull(), // low, medium, high, critical
+  priority: varchar("priority").notNull().default("high"), // low, medium, high, critical
+  documentReferences: jsonb("document_references").default('[]'),
+  attachments: jsonb("attachments").default('[]'),
+  tags: jsonb("tags").default('[]'),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// 5. RISK ASSESSMENT AND MANAGEMENT
+
+// HIPAA Risk Assessments
+export const hipaaRiskAssessments = pgTable("hipaa_risk_assessments", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  organizationId: varchar("organization_id").notNull(),
+  assessmentId: varchar("assessment_id").notNull().unique(),
+  assessmentType: varchar("assessment_type").notNull(), // comprehensive, targeted, follow_up, annual, incident_driven
+  assessmentTitle: varchar("assessment_title").notNull(),
+  assessmentDescription: text("assessment_description").notNull(),
+  scope: text("scope").notNull(), // What is being assessed
+  methodology: text("methodology").notNull(), // How assessment is conducted
+  assessmentPeriod: jsonb("assessment_period").notNull(), // Start and end dates
+  conductedBy: varchar("conducted_by").references(() => users.id),
+  assessmentTeam: jsonb("assessment_team").default('[]'), // Team members
+  externalConsultants: jsonb("external_consultants").default('[]'),
+  assetsAssessed: jsonb("assets_assessed").notNull(), // IT assets, processes, etc.
+  threatsIdentified: jsonb("threats_identified").notNull(), // Security threats
+  vulnerabilities: jsonb("vulnerabilities").notNull(), // Identified vulnerabilities
+  safeguardsEvaluated: jsonb("safeguards_evaluated").notNull(), // Current safeguards
+  riskFindings: jsonb("risk_findings").notNull(), // Detailed risk analysis
+  riskMatrix: jsonb("risk_matrix").notNull(), // Risk scoring matrix
+  overallRiskLevel: varchar("overall_risk_level").notNull(), // low, medium, high, critical
+  priorityRisks: jsonb("priority_risks").default('[]'), // Top risks requiring attention
+  recommendedActions: jsonb("recommended_actions").notNull(), // Recommendations
+  costBenefitAnalysis: text("cost_benefit_analysis"),
+  implementationPlan: text("implementation_plan"),
+  mitigationStrategies: jsonb("mitigation_strategies").default('[]'),
+  residualRisks: jsonb("residual_risks").default('[]'), // Remaining risks after mitigation
+  acceptedRisks: jsonb("accepted_risks").default('[]'), // Risks accepted by management
+  status: varchar("status").notNull().default("in_progress"), // draft, in_progress, completed, approved, implemented
+  approvedBy: varchar("approved_by").references(() => users.id),
+  approvalDate: timestamp("approval_date"),
+  nextReviewDate: timestamp("next_review_date"),
+  followUpAssessments: jsonb("follow_up_assessments").default('[]'),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// 6. ACCESS CONTROL ENHANCEMENTS
+
+// Time-based Access Restrictions and Tracking
+export const hipaaTimeBasedAccess = pgTable("hipaa_time_based_access", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  organizationId: varchar("organization_id").notNull(),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  resourceType: varchar("resource_type").notNull(), // phi_data, system_admin, reports, backups
+  resourceId: varchar("resource_id"), // Specific resource if applicable
+  accessPattern: varchar("access_pattern").notNull(), // business_hours, scheduled, temporary, emergency
+  allowedDays: jsonb("allowed_days").notNull(), // Days of week when access is allowed
+  allowedTimeRanges: jsonb("allowed_time_ranges").notNull(), // Time ranges per day
+  timezone: varchar("timezone").notNull().default("UTC"),
+  startDate: timestamp("start_date").notNull(),
+  endDate: timestamp("end_date"), // null for permanent restrictions
+  maxSessionDuration: integer("max_session_duration").default(480), // Minutes
+  idleTimeout: integer("idle_timeout").default(30), // Minutes
+  warningBeforeTimeout: integer("warning_before_timeout").default(5), // Minutes
+  gracePeriod: integer("grace_period").default(0), // Minutes for emergency access
+  automaticLogoff: boolean("automatic_logoff").default(true),
+  exceptions: jsonb("exceptions").default('[]'), // Special circumstances
+  approvedBy: varchar("approved_by").notNull().references(() => users.id),
+  justification: text("justification").notNull(),
+  businessNeed: text("business_need").notNull(),
+  status: varchar("status").notNull().default("active"), // active, inactive, suspended, expired
+  violationCount: integer("violation_count").default(0),
+  lastViolation: timestamp("last_violation"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Access Request and Approval Workflows
+export const hipaaAccessRequests = pgTable("hipaa_access_requests", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  organizationId: varchar("organization_id").notNull(),
+  requestId: varchar("request_id").notNull().unique(),
+  requestedBy: varchar("requested_by").notNull().references(() => users.id),
+  requestedFor: varchar("requested_for").references(() => users.id), // May be different from requester
+  requestType: varchar("request_type").notNull(), // new_access, modify_access, emergency_access, temporary_access
+  accessType: varchar("access_type").notNull(), // phi_read, phi_write, phi_export, system_admin, reports
+  resourcesRequested: jsonb("resources_requested").notNull(),
+  phiTypesRequested: jsonb("phi_types_requested").default('[]'),
+  accessLevel: varchar("access_level").notNull(), // read, write, admin, full
+  accessDuration: varchar("access_duration"), // permanent, temporary, emergency
+  startDate: timestamp("start_date"),
+  endDate: timestamp("end_date"),
+  businessJustification: text("business_justification").notNull(),
+  supervisorApproval: varchar("supervisor_approval").references(() => users.id),
+  supervisorApprovalDate: timestamp("supervisor_approval_date"),
+  securityOfficerApproval: varchar("security_officer_approval").references(() => users.id),
+  securityOfficerApprovalDate: timestamp("security_officer_approval_date"),
+  minimumNecessaryJustification: text("minimum_necessary_justification").notNull(),
+  riskAssessment: text("risk_assessment"),
+  mitigationMeasures: jsonb("mitigation_measures").default('[]'),
+  trainingRequirements: jsonb("training_requirements").default('[]'),
+  monitoringRequirements: jsonb("monitoring_requirements").default('[]'),
+  reviewFrequency: varchar("review_frequency").default("quarterly"),
+  automaticExpiry: boolean("automatic_expiry").default(true),
+  status: varchar("status").notNull().default("pending"), // pending, approved, denied, implemented, expired, revoked
+  implementedBy: varchar("implemented_by").references(() => users.id),
+  implementationDate: timestamp("implementation_date"),
+  denialReason: text("denial_reason"),
+  deniedBy: varchar("denied_by").references(() => users.id),
+  denialDate: timestamp("denial_date"),
+  appealFiled: boolean("appeal_filed").default(false),
+  appealReason: text("appeal_reason"),
+  appealDecision: text("appeal_decision"),
+  auditTrail: jsonb("audit_trail").default('[]'),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// 7. DATA ENCRYPTION AND KEY MANAGEMENT
+
+// Encryption Key Management
+export const hipaaEncryptionKeys = pgTable("hipaa_encryption_keys", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  organizationId: varchar("organization_id").notNull(),
+  keyId: varchar("key_id").notNull().unique(),
+  keyType: varchar("key_type").notNull(), // database, file, transport, signing, master
+  algorithm: varchar("algorithm").notNull(), // AES256, RSA2048, etc.
+  keySize: integer("key_size").notNull(), // Key size in bits
+  keyUsage: varchar("key_usage").notNull(), // encrypt, decrypt, sign, verify
+  keyStatus: varchar("key_status").notNull().default("active"), // active, inactive, expired, compromised, archived
+  createdDate: timestamp("created_date").notNull(),
+  expiryDate: timestamp("expiry_date"),
+  rotationSchedule: integer("rotation_schedule").default(365), // Days
+  lastRotation: timestamp("last_rotation"),
+  nextRotation: timestamp("next_rotation"),
+  keyLocation: varchar("key_location").notNull(), // hsm, kms, vault, local
+  hsmType: varchar("hsm_type"), // Hardware Security Module type
+  accessControlList: jsonb("access_control_list").notNull(), // Who can use this key
+  keyEscrow: boolean("key_escrow").default(false), // Is key escrowed
+  escrowLocation: varchar("escrow_location"),
+  backupCopies: integer("backup_copies").default(0),
+  backupLocations: jsonb("backup_locations").default('[]'),
+  usageCount: integer("usage_count").default(0),
+  maxUsage: integer("max_usage"), // Maximum number of uses
+  createdBy: varchar("created_by").notNull().references(() => users.id),
+  approvedBy: varchar("approved_by").references(() => users.id),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// ===== HIPAA COMPLIANCE INSERT SCHEMAS AND TYPE DEFINITIONS =====
+
+export const insertHipaaSecurityOfficerSchema = createInsertSchema(hipaaSecurityOfficers).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertHipaaPolicySchema = createInsertSchema(hipaaPolicies).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertHipaaTrainingSchema = createInsertSchema(hipaaTraining).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertHipaaTrainingRecordSchema = createInsertSchema(hipaaTrainingRecords).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertHipaaBusinessAssociateSchema = createInsertSchema(hipaaBusinessAssociates).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertHipaaWorkstationSecuritySchema = createInsertSchema(hipaaWorkstationSecurity).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertHipaaMediaControlSchema = createInsertSchema(hipaaMediaControls).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertHipaaFacilityAccessSchema = createInsertSchema(hipaaFacilityAccess).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertHipaaSecureAuditLogSchema = createInsertSchema(hipaaSecureAuditLogs).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertHipaaEmergencyAccessSchema = createInsertSchema(hipaaEmergencyAccess).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertHipaaBreachIncidentSchema = createInsertSchema(hipaaBreachIncidents).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertHipaaRiskAssessmentSchema = createInsertSchema(hipaaRiskAssessments).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertHipaaTimeBasedAccessSchema = createInsertSchema(hipaaTimeBasedAccess).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertHipaaAccessRequestSchema = createInsertSchema(hipaaAccessRequests).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertHipaaEncryptionKeySchema = createInsertSchema(hipaaEncryptionKeys).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+// HIPAA Compliance Type Exports
+export type HipaaSecurityOfficer = typeof hipaaSecurityOfficers.$inferSelect;
+export type InsertHipaaSecurityOfficer = z.infer<typeof insertHipaaSecurityOfficerSchema>;
+export type HipaaPolicy = typeof hipaaPolicies.$inferSelect;
+export type InsertHipaaPolicy = z.infer<typeof insertHipaaPolicySchema>;
+export type HipaaTraining = typeof hipaaTraining.$inferSelect;
+export type InsertHipaaTraining = z.infer<typeof insertHipaaTrainingSchema>;
+export type HipaaTrainingRecord = typeof hipaaTrainingRecords.$inferSelect;
+export type InsertHipaaTrainingRecord = z.infer<typeof insertHipaaTrainingRecordSchema>;
+export type HipaaBusinessAssociate = typeof hipaaBusinessAssociates.$inferSelect;
+export type InsertHipaaBusinessAssociate = z.infer<typeof insertHipaaBusinessAssociateSchema>;
+export type HipaaWorkstationSecurity = typeof hipaaWorkstationSecurity.$inferSelect;
+export type InsertHipaaWorkstationSecurity = z.infer<typeof insertHipaaWorkstationSecuritySchema>;
+export type HipaaMediaControl = typeof hipaaMediaControls.$inferSelect;
+export type InsertHipaaMediaControl = z.infer<typeof insertHipaaMediaControlSchema>;
+export type HipaaFacilityAccess = typeof hipaaFacilityAccess.$inferSelect;
+export type InsertHipaaFacilityAccess = z.infer<typeof insertHipaaFacilityAccessSchema>;
+export type HipaaSecureAuditLog = typeof hipaaSecureAuditLogs.$inferSelect;
+export type InsertHipaaSecureAuditLog = z.infer<typeof insertHipaaSecureAuditLogSchema>;
+export type HipaaEmergencyAccess = typeof hipaaEmergencyAccess.$inferSelect;
+export type InsertHipaaEmergencyAccess = z.infer<typeof insertHipaaEmergencyAccessSchema>;
+export type HipaaBreachIncident = typeof hipaaBreachIncidents.$inferSelect;
+export type InsertHipaaBreachIncident = z.infer<typeof insertHipaaBreachIncidentSchema>;
+export type HipaaRiskAssessment = typeof hipaaRiskAssessments.$inferSelect;
+export type InsertHipaaRiskAssessment = z.infer<typeof insertHipaaRiskAssessmentSchema>;
+export type HipaaTimeBasedAccess = typeof hipaaTimeBasedAccess.$inferSelect;
+export type InsertHipaaTimeBasedAccess = z.infer<typeof insertHipaaTimeBasedAccessSchema>;
+export type HipaaAccessRequest = typeof hipaaAccessRequests.$inferSelect;
+export type InsertHipaaAccessRequest = z.infer<typeof insertHipaaAccessRequestSchema>;
+export type HipaaEncryptionKey = typeof hipaaEncryptionKeys.$inferSelect;
+export type InsertHipaaEncryptionKey = z.infer<typeof insertHipaaEncryptionKeySchema>;
+
 // Type exports for TypeScript usage
 export type UnifiedSystemStatus = z.infer<typeof UnifiedSystemStatusSchema>;
 export type CrossSystemMetrics = z.infer<typeof CrossSystemMetricsSchema>;
