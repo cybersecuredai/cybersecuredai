@@ -1249,6 +1249,530 @@ export const epidemiologicalData = pgTable("epidemiological_data", {
   check("chk_ed_longitude_range", sql`longitude IS NULL OR (longitude >= -180 AND longitude <= 180)`),
 ]);
 
+// ===== ENHANCED CONTACT TRACING SYSTEM TABLES =====
+
+// Contact Tracing Location History - Privacy-compliant location tracking
+export const contactTracingLocationHistory = pgTable("contact_tracing_location_history", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  locationId: varchar("location_id").notNull().unique(), // CTL-YYYYMMDD-XXXX format
+  
+  // User and Device Information  
+  userId: varchar("user_id").references(() => users.id),
+  deviceId: varchar("device_id").notNull(), // Anonymous device identifier
+  sessionId: varchar("session_id"), // App session identifier
+  
+  // Location Data (Encrypted)
+  latitude: numeric("latitude", { precision: 10, scale: 8 }).notNull(),
+  longitude: numeric("longitude", { precision: 11, scale: 8 }).notNull(),
+  accuracy: numeric("accuracy", { precision: 8, scale: 2 }), // GPS accuracy in meters
+  altitude: numeric("altitude", { precision: 8, scale: 2 }),
+  speed: numeric("speed", { precision: 6, scale: 2 }), // Speed in m/s
+  bearing: numeric("bearing", { precision: 6, scale: 2 }), // Direction of travel
+  
+  // Temporal Information
+  timestamp: timestamp("timestamp").notNull(),
+  timezoneName: varchar("timezone_name"),
+  localTime: timestamp("local_time"),
+  dwellTime: integer("dwell_time"), // Time spent at location in minutes
+  
+  // Location Context
+  locationType: varchar("location_type"), // home, work, school, healthcare, retail, transport, outdoor, indoor
+  locationName: varchar("location_name"), // Encrypted location description
+  address: text("address"), // Encrypted address (if available)
+  venueId: varchar("venue_id"), // Reference to known venues
+  floorLevel: integer("floor_level"), // Building floor (if indoor)
+  buildingId: varchar("building_id"), // Building identifier
+  
+  // Privacy and Consent Controls
+  consentGiven: boolean("consent_given").notNull().default(false),
+  consentType: varchar("consent_type").notNull().default("explicit"), // explicit, implied, emergency
+  consentTimestamp: timestamp("consent_timestamp"),
+  dataProcessingPurpose: varchar("data_processing_purpose").notNull().default("contact_tracing"),
+  retentionPeriod: integer("retention_period").notNull().default(30), // Days
+  automaticDeletionDate: timestamp("automatic_deletion_date").notNull(),
+  
+  // Data Minimization and Anonymization
+  isAnonymized: boolean("is_anonymized").default(false),
+  anonymizationMethod: varchar("anonymization_method"), // k_anonymity, l_diversity, differential_privacy
+  privacyBudget: numeric("privacy_budget", { precision: 10, scale: 8 }), // For differential privacy
+  spatialCloaking: integer("spatial_cloaking"), // Spatial cloaking radius in meters
+  temporalCloaking: integer("temporal_cloaking"), // Temporal cloaking window in minutes
+  
+  // Data Quality and Validation
+  dataQuality: varchar("data_quality").notNull().default("high"), // high, medium, low, invalid
+  validationStatus: varchar("validation_status").notNull().default("validated"), // validated, suspicious, invalid
+  outlierScore: numeric("outlier_score", { precision: 6, scale: 4 }), // Anomaly detection score
+  
+  // Security and Encryption
+  encryptionStatus: varchar("encryption_status").notNull().default("aes256_gcm"),
+  encryptionKeyId: varchar("encryption_key_id"),
+  dataClassification: varchar("data_classification").notNull().default("highly_sensitive"),
+  
+  // System Integration
+  sourceSystem: varchar("source_system").notNull().default("mobile_app"), // mobile_app, web_app, iot_device, manual_entry
+  collectionMethod: varchar("collection_method"), // gps, wifi, bluetooth, cell_tower, manual
+  batteryLevel: integer("battery_level"), // Device battery level at collection
+  
+  // Audit and Compliance
+  collectedBy: varchar("collected_by").references(() => users.id),
+  accessLog: jsonb("access_log").default('[]'),
+  
+  metadata: jsonb("metadata"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => [
+  index("idx_ctlh_user_timestamp").on(table.userId, table.timestamp),
+  index("idx_ctlh_device_time").on(table.deviceId, table.timestamp),
+  index("idx_ctlh_location").on(table.latitude, table.longitude),
+  index("idx_ctlh_session").on(table.sessionId, table.timestamp),
+  index("idx_ctlh_consent").on(table.consentGiven, table.consentType),
+  index("idx_ctlh_retention").on(table.automaticDeletionDate),
+  index("idx_ctlh_quality").on(table.dataQuality, table.validationStatus),
+  // Geospatial validation constraints
+  check("chk_ctlh_latitude_range", sql`latitude >= -90 AND latitude <= 90`),
+  check("chk_ctlh_longitude_range", sql`longitude >= -180 AND longitude <= 180`),
+  check("chk_ctlh_accuracy_positive", sql`accuracy IS NULL OR accuracy >= 0`),
+  check("chk_ctlh_retention_positive", sql`retention_period > 0 AND retention_period <= 90`),
+]);
+
+// Contact Proximity Detection - Automated contact detection algorithms
+export const contactProximityDetection = pgTable("contact_proximity_detection", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  detectionId: varchar("detection_id").notNull().unique(), // CPD-YYYYMMDD-XXXX format
+  
+  // Contact Pair Information
+  contactPair: varchar("contact_pair").notNull(), // Hash of sorted device IDs
+  device1Id: varchar("device1_id").notNull(),
+  device2Id: varchar("device2_id").notNull(),
+  user1Id: varchar("user1_id").references(() => users.id),
+  user2Id: varchar("user2_id").references(() => users.id),
+  
+  // Detection Event Details
+  detectionTimestamp: timestamp("detection_timestamp").notNull(),
+  contactStartTime: timestamp("contact_start_time").notNull(),
+  contactEndTime: timestamp("contact_end_time").notNull(),
+  contactDuration: integer("contact_duration").notNull(), // Duration in seconds
+  
+  // Proximity Measurements
+  minimumDistance: numeric("minimum_distance", { precision: 8, scale: 2 }), // Minimum distance in meters
+  averageDistance: numeric("average_distance", { precision: 8, scale: 2 }), // Average distance in meters
+  maximumDistance: numeric("maximum_distance", { precision: 8, scale: 2 }), // Maximum distance in meters
+  distanceMeasurements: jsonb("distance_measurements"), // Array of timestamped distance measurements
+  
+  // Detection Methods and Confidence
+  detectionMethod: varchar("detection_method").notNull(), // bluetooth, wifi, gps, cell_tower, manual, hybrid
+  bluetoothRssi: jsonb("bluetooth_rssi"), // RSSI measurements over time
+  wifiSignalStrength: jsonb("wifi_signal_strength"),
+  gpsAccuracy: numeric("gps_accuracy", { precision: 8, scale: 2 }), // GPS accuracy during contact
+  confidenceScore: numeric("confidence_score", { precision: 6, scale: 4 }).notNull(), // 0.0 to 1.0
+  
+  // Environmental Context
+  environment: varchar("environment"), // indoor, outdoor, vehicle, public_transport
+  location: varchar("location"), // Encrypted location description
+  latitude: numeric("latitude", { precision: 10, scale: 8 }),
+  longitude: numeric("longitude", { precision: 11, scale: 8 }),
+  venue: varchar("venue"), // Encrypted venue name
+  
+  // Risk Assessment
+  riskLevel: varchar("risk_level").notNull(), // critical, high, medium, low, minimal
+  riskScore: numeric("risk_score", { precision: 6, scale: 4 }), // Calculated risk score
+  riskFactors: jsonb("risk_factors"), // Array of risk factors
+  exposureProbability: numeric("exposure_probability", { precision: 6, scale: 4 }),
+  
+  // Contact Classification
+  contactType: varchar("contact_type").notNull(), // close_contact, casual_contact, fleeting_contact
+  contactClassification: varchar("contact_classification"), // face_to_face, proximity, shared_space
+  maskWearing: boolean("mask_wearing"),
+  ventilation: varchar("ventilation"), // good, moderate, poor, unknown
+  activityType: varchar("activity_type"), // conversation, meal, meeting, transport, other
+  
+  // Data Quality and Validation
+  dataQuality: varchar("data_quality").notNull().default("high"), // high, medium, low
+  validationStatus: varchar("validation_status").notNull().default("pending"), // validated, pending, rejected
+  falsePositiveFlag: boolean("false_positive_flag").default(false),
+  manualReview: boolean("manual_review").default(false),
+  
+  // Algorithm Information
+  algorithmVersion: varchar("algorithm_version").notNull(),
+  algorithmParameters: jsonb("algorithm_parameters"),
+  processingTimestamp: timestamp("processing_timestamp").defaultNow(),
+  
+  // Integration with Contact Tracing
+  contactTracingRecordId: varchar("contact_tracing_record_id").references(() => contactTracing.id),
+  alertTriggered: boolean("alert_triggered").default(false),
+  notificationSent: boolean("notification_sent").default(false),
+  
+  // Privacy and Security
+  encryptionStatus: varchar("encryption_status").notNull().default("aes256_gcm"),
+  dataClassification: varchar("data_classification").notNull().default("highly_sensitive"),
+  accessLevel: varchar("access_level").notNull().default("contact_tracer_only"),
+  automaticDeletionDate: timestamp("automatic_deletion_date").notNull(),
+  
+  // Audit Information
+  processedBy: varchar("processed_by").references(() => users.id),
+  reviewedBy: varchar("reviewed_by").references(() => users.id),
+  accessLog: jsonb("access_log").default('[]'),
+  
+  metadata: jsonb("metadata"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => [
+  index("idx_cpd_contact_pair_time").on(table.contactPair, table.contactStartTime),
+  index("idx_cpd_devices").on(table.device1Id, table.device2Id),
+  index("idx_cpd_risk_level").on(table.riskLevel, table.contactDuration),
+  index("idx_cpd_detection_time").on(table.detectionTimestamp),
+  index("idx_cpd_location").on(table.latitude, table.longitude),
+  index("idx_cpd_contact_tracing").on(table.contactTracingRecordId),
+  index("idx_cpd_retention").on(table.automaticDeletionDate),
+  // Validation constraints
+  check("chk_cpd_risk_level", sql`risk_level IN ('critical', 'high', 'medium', 'low', 'minimal')`),
+  check("chk_cpd_contact_type", sql`contact_type IN ('close_contact', 'casual_contact', 'fleeting_contact')`),
+  check("chk_cpd_confidence_range", sql`confidence_score >= 0.0 AND confidence_score <= 1.0`),
+  check("chk_cpd_duration_positive", sql`contact_duration > 0`),
+  check("chk_cpd_distance_positive", sql`minimum_distance >= 0 AND average_distance >= 0 AND maximum_distance >= 0`),
+]);
+
+// Contact Tracing Notification Templates - Multi-channel notification system
+export const contactTracingNotificationTemplates = pgTable("contact_tracing_notification_templates", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  templateId: varchar("template_id").notNull().unique(), // CTN-TEMPLATE-XXXX format
+  
+  // Template Information
+  templateName: varchar("template_name").notNull(),
+  templateDescription: text("template_description"),
+  templateCategory: varchar("template_category").notNull(), // exposure_notification, quarantine_instruction, testing_reminder, status_update, emergency_alert
+  templateType: varchar("template_type").notNull(), // email, sms, push_notification, in_app, voice_call
+  
+  // Risk Level and Targeting
+  riskLevel: varchar("risk_level").notNull(), // critical, high, medium, low, minimal
+  targetAudience: varchar("target_audience").notNull(), // contacts, cases, general_public, health_officials
+  languageCode: varchar("language_code").notNull().default("en-US"), // ISO language code
+  
+  // Template Content
+  subject: varchar("subject"), // For email/push notifications
+  title: varchar("title"), // For in-app notifications
+  messageBody: text("message_body").notNull(),
+  htmlBody: text("html_body"), // HTML version for email
+  smsBody: text("sms_body"), // SMS-specific shorter version
+  pushBody: text("push_body"), // Push notification body
+  voiceScript: text("voice_script"), // Voice call script
+  
+  // Personalization and Variables
+  variableFields: jsonb("variable_fields").default('[]'), // Available merge fields
+  personalizationRules: jsonb("personalization_rules"),
+  conditionalContent: jsonb("conditional_content"), // Content blocks based on conditions
+  
+  // Delivery Configuration
+  priority: varchar("priority").notNull().default("normal"), // urgent, high, normal, low
+  deliveryMethod: varchar("delivery_method").notNull().default("immediate"), // immediate, scheduled, batch
+  retryPolicy: jsonb("retry_policy"), // Retry configuration
+  escalationRules: jsonb("escalation_rules"), // When to escalate to higher priority
+  
+  // Privacy and Compliance
+  privacyCompliant: boolean("privacy_compliant").notNull().default(true),
+  containsPhi: boolean("contains_phi").default(false),
+  requiresConsent: boolean("requires_consent").default(true),
+  disclaimerText: text("disclaimer_text"),
+  privacyNotice: text("privacy_notice"),
+  optOutInstructions: text("opt_out_instructions"),
+  
+  // Regulatory Compliance
+  hipaaCompliant: boolean("hipaa_compliant").notNull().default(true),
+  ferpaCompliant: boolean("ferpa_compliant").default(false),
+  gdprCompliant: boolean("gdpr_compliant").default(true),
+  regulatoryNotes: text("regulatory_notes"),
+  
+  // A/B Testing and Optimization
+  abTestGroup: varchar("ab_test_group"), // A, B, C, etc.
+  effectivenessMetrics: jsonb("effectiveness_metrics"),
+  openRate: numeric("open_rate", { precision: 5, scale: 4 }),
+  clickThroughRate: numeric("click_through_rate", { precision: 5, scale: 4 }),
+  responseRate: numeric("response_rate", { precision: 5, scale: 4 }),
+  
+  // Template Management
+  isActive: boolean("is_active").notNull().default(true),
+  version: varchar("version").notNull().default("1.0"),
+  parentTemplateId: varchar("parent_template_id"), // Reference to parent template for versioning
+  approvalStatus: varchar("approval_status").notNull().default("pending"), // pending, approved, rejected
+  approvedBy: varchar("approved_by").references(() => users.id),
+  approvalDate: timestamp("approval_date"),
+  
+  // Integration Configuration
+  sendgridTemplateId: varchar("sendgrid_template_id"), // SendGrid integration
+  twilioTemplateId: varchar("twilio_template_id"), // Twilio SMS integration
+  firebaseTopicArn: varchar("firebase_topic_arn"), // Firebase push notifications
+  webhookUrls: jsonb("webhook_urls"), // Webhook integrations
+  
+  // Usage Analytics
+  usageCount: integer("usage_count").default(0),
+  lastUsedDate: timestamp("last_used_date"),
+  successRate: numeric("success_rate", { precision: 5, scale: 4 }),
+  
+  // Audit and Management
+  createdBy: varchar("created_by").notNull().references(() => users.id),
+  lastModifiedBy: varchar("last_modified_by").references(() => users.id),
+  reviewHistory: jsonb("review_history").default('[]'),
+  
+  metadata: jsonb("metadata"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => [
+  index("idx_ctnt_category_risk").on(table.templateCategory, table.riskLevel),
+  index("idx_ctnt_type_active").on(table.templateType, table.isActive),
+  index("idx_ctnt_language").on(table.languageCode, table.isActive),
+  index("idx_ctnt_approval").on(table.approvalStatus, table.isActive),
+  index("idx_ctnt_usage").on(table.usageCount, table.lastUsedDate),
+  // Validation constraints
+  check("chk_ctnt_risk_level", sql`risk_level IN ('critical', 'high', 'medium', 'low', 'minimal')`),
+  check("chk_ctnt_template_type", sql`template_type IN ('email', 'sms', 'push_notification', 'in_app', 'voice_call')`),
+  check("chk_ctnt_priority", sql`priority IN ('urgent', 'high', 'normal', 'low')`),
+  check("chk_ctnt_approval_status", sql`approval_status IN ('pending', 'approved', 'rejected')`),
+]);
+
+// Contact Tracing Notification Logs - Multi-channel delivery tracking
+export const contactTracingNotificationLogs = pgTable("contact_tracing_notification_logs", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  notificationId: varchar("notification_id").notNull().unique(), // CTLOG-YYYYMMDD-XXXX format
+  
+  // Recipient and Contact Information  
+  recipientId: varchar("recipient_id").references(() => users.id),
+  contactTracingRecordId: varchar("contact_tracing_record_id").references(() => contactTracing.id),
+  proximityDetectionId: varchar("proximity_detection_id").references(() => contactProximityDetection.id),
+  incidentId: varchar("incident_id").references(() => publicHealthIncidents.id),
+  
+  // Template and Content Information
+  templateId: varchar("template_id").notNull().references(() => contactTracingNotificationTemplates.templateId),
+  templateVersion: varchar("template_version").notNull(),
+  notificationType: varchar("notification_type").notNull(), // email, sms, push_notification, in_app, voice_call
+  notificationCategory: varchar("notification_category").notNull(), // exposure_notification, quarantine_instruction, testing_reminder, status_update, emergency_alert
+  
+  // Delivery Information
+  deliveryMethod: varchar("delivery_method").notNull(), // sendgrid, twilio, firebase, webhook, manual
+  recipientAddress: varchar("recipient_address").notNull(), // Email, phone, device token (encrypted)
+  priority: varchar("priority").notNull(), // urgent, high, normal, low
+  
+  // Delivery Status and Timing
+  deliveryStatus: varchar("delivery_status").notNull().default("pending"), // pending, sent, delivered, failed, bounced, rejected
+  sentTimestamp: timestamp("sent_timestamp"),
+  deliveredTimestamp: timestamp("delivered_timestamp"),
+  failedTimestamp: timestamp("failed_timestamp"),
+  readTimestamp: timestamp("read_timestamp"),
+  respondedTimestamp: timestamp("responded_timestamp"),
+  
+  // Delivery Attempts and Retries
+  attemptCount: integer("attempt_count").default(0),
+  maxAttempts: integer("max_attempts").default(3),
+  nextRetryTimestamp: timestamp("next_retry_timestamp"),
+  retryDelayMinutes: integer("retry_delay_minutes").default(15),
+  
+  // Content and Personalization
+  finalSubject: varchar("final_subject"), // Final subject after personalization
+  finalMessage: text("final_message"), // Final message content after personalization
+  personalizationData: jsonb("personalization_data"), // Data used for personalization
+  languageUsed: varchar("language_used").default("en-US"),
+  
+  // Response and Engagement
+  opened: boolean("opened").default(false),
+  clicked: boolean("clicked").default(false),
+  responded: boolean("responded").default(false),
+  responseData: jsonb("response_data"), // User response content
+  engagementScore: numeric("engagement_score", { precision: 5, scale: 4 }),
+  
+  // External System Integration
+  externalMessageId: varchar("external_message_id"), // ID from external service (SendGrid, Twilio, etc.)
+  externalStatus: varchar("external_status"), // Status from external service
+  externalResponse: jsonb("external_response"), // Full response from external service
+  webhookData: jsonb("webhook_data"), // Webhook delivery confirmation data
+  
+  // Error and Failure Information
+  errorCode: varchar("error_code"),
+  errorMessage: text("error_message"),
+  errorDetails: jsonb("error_details"),
+  bounceReason: varchar("bounce_reason"), // hard_bounce, soft_bounce, spam, invalid_address
+  
+  // Privacy and Compliance
+  privacyLevel: varchar("privacy_level").notNull().default("high"), // high, medium, low
+  containsPhi: boolean("contains_phi").default(false),
+  encryptionStatus: varchar("encryption_status").notNull().default("aes256_gcm"),
+  consentVerified: boolean("consent_verified").default(false),
+  optOutRequested: boolean("opt_out_requested").default(false),
+  
+  // Analytics and Tracking
+  campaignId: varchar("campaign_id"), // For grouping related notifications
+  abTestGroup: varchar("ab_test_group"), // A/B testing group
+  trackingPixel: boolean("tracking_pixel").default(false),
+  utmParameters: jsonb("utm_parameters"), // UTM tracking parameters
+  
+  // Cost and Billing
+  deliveryCost: numeric("delivery_cost", { precision: 8, scale: 4 }), // Cost in USD
+  billingUnit: varchar("billing_unit"), // message, character, minute
+  billingQuantity: numeric("billing_quantity", { precision: 10, scale: 2 }),
+  
+  // Escalation and Follow-up
+  escalated: boolean("escalated").default(false),
+  escalationReason: varchar("escalation_reason"),
+  escalatedTo: varchar("escalated_to").references(() => users.id),
+  escalationTimestamp: timestamp("escalation_timestamp"),
+  followUpRequired: boolean("follow_up_required").default(false),
+  followUpDate: timestamp("follow_up_date"),
+  
+  // Audit and Security
+  sentBy: varchar("sent_by").references(() => users.id),
+  approvedBy: varchar("approved_by").references(() => users.id),
+  ipAddress: varchar("ip_address"),
+  userAgent: text("user_agent"),
+  accessLog: jsonb("access_log").default('[]'),
+  
+  metadata: jsonb("metadata"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => [
+  index("idx_ctnl_recipient_status").on(table.recipientId, table.deliveryStatus),
+  index("idx_ctnl_contact_record").on(table.contactTracingRecordId),
+  index("idx_ctnl_template").on(table.templateId, table.templateVersion),
+  index("idx_ctnl_delivery_time").on(table.sentTimestamp, table.deliveryStatus),
+  index("idx_ctnl_priority_status").on(table.priority, table.deliveryStatus),
+  index("idx_ctnl_retry").on(table.nextRetryTimestamp, table.attemptCount),
+  index("idx_ctnl_engagement").on(table.opened, table.clicked, table.responded),
+  index("idx_ctnl_campaign").on(table.campaignId, table.abTestGroup),
+  index("idx_ctnl_escalation").on(table.escalated, table.followUpRequired),
+  // Validation constraints
+  check("chk_ctnl_delivery_status", sql`delivery_status IN ('pending', 'sent', 'delivered', 'failed', 'bounced', 'rejected')`),
+  check("chk_ctnl_notification_type", sql`notification_type IN ('email', 'sms', 'push_notification', 'in_app', 'voice_call')`),
+  check("chk_ctnl_priority", sql`priority IN ('urgent', 'high', 'normal', 'low')`),
+  check("chk_ctnl_attempt_count", sql`attempt_count >= 0 AND attempt_count <= max_attempts`),
+]);
+
+// Privacy Consent Management - Enhanced user consent and opt-out management
+export const contactTracingPrivacyConsent = pgTable("contact_tracing_privacy_consent", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  consentId: varchar("consent_id").notNull().unique(), // CTC-YYYYMMDD-XXXX format
+  
+  // User and Device Information
+  userId: varchar("user_id").references(() => users.id),
+  deviceId: varchar("device_id").notNull(), // Anonymous device identifier
+  sessionId: varchar("session_id"), // App session when consent was given
+  
+  // Consent Details
+  consentType: varchar("consent_type").notNull(), // explicit, implied, emergency, legal_requirement, parental, guardian
+  consentStatus: varchar("consent_status").notNull().default("given"), // given, withdrawn, expired, pending, declined
+  consentMethod: varchar("consent_method").notNull(), // web_form, mobile_app, verbal, written, electronic_signature, biometric
+  consentTimestamp: timestamp("consent_timestamp").notNull(),
+  
+  // Specific Consent Categories
+  locationTrackingConsent: boolean("location_tracking_consent").default(false),
+  proximityDetectionConsent: boolean("proximity_detection_consent").default(false),
+  notificationConsent: boolean("notification_consent").default(false),
+  dataProcessingConsent: boolean("data_processing_consent").default(false),
+  dataShareConsent: boolean("data_share_consent").default(false),
+  researchConsent: boolean("research_consent").default(false),
+  
+  // Consent Scope and Purpose
+  consentPurposes: jsonb("consent_purposes").notNull(), // Array of purposes: contact_tracing, public_health, research, etc.
+  dataCategories: jsonb("data_categories").notNull(), // Array of data types consented to
+  processingActivities: jsonb("processing_activities"), // Specific processing activities consented to
+  retentionPeriod: integer("retention_period").default(30), // Consent valid for X days
+  consentExpiry: timestamp("consent_expiry"),
+  
+  // Geographic and Jurisdictional Scope
+  jurisdictionApplicable: varchar("jurisdiction_applicable"), // US, EU, CA, etc.
+  legalBasis: varchar("legal_basis").notNull(), // consent, legal_obligation, public_health, vital_interests
+  regulatoryFramework: jsonb("regulatory_framework"), // HIPAA, GDPR, CCPA, etc.
+  crossBorderDataTransfer: boolean("cross_border_data_transfer").default(false),
+  
+  // Withdrawal and Opt-out Management
+  withdrawalAllowed: boolean("withdrawal_allowed").default(true),
+  withdrawalMethod: varchar("withdrawal_method"), // app, web, phone, email, in_person
+  withdrawalTimestamp: timestamp("withdrawal_timestamp"),
+  withdrawalReason: varchar("withdrawal_reason"), // user_request, privacy_concern, no_longer_needed, other
+  gracePeriodDays: integer("grace_period_days").default(7), // Days before data deletion after withdrawal
+  
+  // Granular Consent Controls
+  shareWithHealthAuthorities: boolean("share_with_health_authorities").default(false),
+  shareWithHealthcare: boolean("share_with_healthcare").default(false),
+  shareWithResearchers: boolean("share_with_researchers").default(false),
+  shareWithFamilyMembers: boolean("share_with_family_members").default(false),
+  anonymizedDataUse: boolean("anonymized_data_use").default(false),
+  contactByHealthOfficials: boolean("contact_by_health_officials").default(false),
+  
+  // Notification Preferences
+  emailNotifications: boolean("email_notifications").default(false),
+  smsNotifications: boolean("sms_notifications").default(false),
+  pushNotifications: boolean("push_notifications").default(false),
+  emergencyContactOverride: boolean("emergency_contact_override").default(true), // Can contact in emergencies even if opted out
+  
+  // Parental and Guardian Consent (for minors)
+  isMinor: boolean("is_minor").default(false),
+  parentGuardianId: varchar("parent_guardian_id").references(() => users.id),
+  parentGuardianConsent: boolean("parent_guardian_consent").default(false),
+  parentGuardianSignature: text("parent_guardian_signature"), // Digital signature
+  ageVerificationMethod: varchar("age_verification_method"), // self_reported, id_verification, parental_verification
+  
+  // Consent Documentation
+  consentText: text("consent_text").notNull(), // Full consent text presented to user
+  consentVersion: varchar("consent_version").notNull(), // Version of consent form
+  privacyPolicyVersion: varchar("privacy_policy_version"), // Privacy policy version at time of consent
+  consentLanguage: varchar("consent_language").default("en-US"),
+  consentFormUrl: varchar("consent_form_url"), // URL to consent form
+  digitalSignature: text("digital_signature"), // User's digital signature
+  
+  // Technical Details
+  ipAddress: varchar("ip_address"),
+  userAgent: text("user_agent"),
+  browserFingerprint: varchar("browser_fingerprint"),
+  deviceFingerprint: varchar("device_fingerprint"),
+  locationAtConsent: varchar("location_at_consent"), // Encrypted location when consent was given
+  
+  // Audit and Compliance
+  consentWitness: varchar("consent_witness").references(() => users.id), // Staff member who witnessed consent
+  verificationStatus: varchar("verification_status").default("pending"), // verified, pending, rejected, requires_review
+  verifiedBy: varchar("verified_by").references(() => users.id),
+  verificationTimestamp: timestamp("verification_timestamp"),
+  complianceNotes: text("compliance_notes"),
+  
+  // Consent Analytics
+  consentChannel: varchar("consent_channel"), // How user found consent form
+  consentCampaign: varchar("consent_campaign"), // Marketing campaign that led to consent
+  consentSource: varchar("consent_source"), // app, website, in_person, phone, etc.
+  consentDuration: integer("consent_duration"), // Time spent reading consent (seconds)
+  
+  // System Integration
+  externalConsentId: varchar("external_consent_id"), // ID from external consent management system
+  syncedWithCRM: boolean("synced_with_crm").default(false),
+  syncedWithHIS: boolean("synced_with_his").default(false), // Health Information System
+  
+  // Data Subject Rights (GDPR/CCPA)
+  dataPortabilityRequested: boolean("data_portability_requested").default(false),
+  dataPortabilityFulfilled: boolean("data_portability_fulfilled").default(false),
+  accessRequestReceived: boolean("access_request_received").default(false),
+  accessRequestFulfilled: boolean("access_request_fulfilled").default(false),
+  correctionRequested: boolean("correction_requested").default(false),
+  deletionRequested: boolean("deletion_requested").default(false),
+  
+  // Audit Trail
+  accessLog: jsonb("access_log").default('[]'),
+  modificationLog: jsonb("modification_log").default('[]'),
+  consentHistory: jsonb("consent_history").default('[]'), // History of consent changes
+  
+  metadata: jsonb("metadata"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => [
+  index("idx_ctpc_user_status").on(table.userId, table.consentStatus),
+  index("idx_ctpc_device_consent").on(table.deviceId, table.consentStatus),
+  index("idx_ctpc_consent_type").on(table.consentType, table.consentTimestamp),
+  index("idx_ctpc_expiry").on(table.consentExpiry, table.consentStatus),
+  index("idx_ctpc_withdrawal").on(table.withdrawalAllowed, table.withdrawalTimestamp),
+  index("idx_ctpc_parent_guardian").on(table.parentGuardianId, table.isMinor),
+  index("idx_ctpc_verification").on(table.verificationStatus, table.verifiedBy),
+  index("idx_ctpc_data_subject_rights").on(table.dataPortabilityRequested, table.accessRequestReceived, table.deletionRequested),
+  // Validation constraints
+  check("chk_ctpc_consent_status", sql`consent_status IN ('given', 'withdrawn', 'expired', 'pending', 'declined')`),
+  check("chk_ctpc_consent_type", sql`consent_type IN ('explicit', 'implied', 'emergency', 'legal_requirement', 'parental', 'guardian')`),
+  check("chk_ctpc_consent_method", sql`consent_method IN ('web_form', 'mobile_app', 'verbal', 'written', 'electronic_signature', 'biometric')`),
+  check("chk_ctpc_retention_period", sql`retention_period > 0 AND retention_period <= 365`),
+]);
+
 // Email subscribers for marketing resources
 export const subscribers = pgTable("subscribers", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -1392,6 +1916,43 @@ export const insertContactTracingSchema = createInsertSchema(contactTracing).omi
   updatedAt: true,
 });
 
+// Enhanced Contact Tracing System Insert Schemas
+export const insertContactTracingLocationHistorySchema = createInsertSchema(contactTracingLocationHistory).omit({
+  id: true,
+  locationId: true, // Auto-generated
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertContactProximityDetectionSchema = createInsertSchema(contactProximityDetection).omit({
+  id: true,
+  detectionId: true, // Auto-generated
+  processingTimestamp: true, // Auto-generated
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertContactTracingNotificationTemplateSchema = createInsertSchema(contactTracingNotificationTemplates).omit({
+  id: true,
+  templateId: true, // Auto-generated
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertContactTracingNotificationLogSchema = createInsertSchema(contactTracingNotificationLogs).omit({
+  id: true,
+  notificationId: true, // Auto-generated
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertContactTracingPrivacyConsentSchema = createInsertSchema(contactTracingPrivacyConsent).omit({
+  id: true,
+  consentId: true, // Auto-generated
+  createdAt: true,
+  updatedAt: true,
+});
+
 export const insertHealthFacilitySchema = createInsertSchema(healthFacilities).omit({
   id: true,
   facilityId: true, // Auto-generated
@@ -1424,6 +1985,19 @@ export type DiseaseSurveillance = typeof diseaseSurveillance.$inferSelect;
 export type InsertDiseaseSurveillance = z.infer<typeof insertDiseaseSurveillanceSchema>;
 export type ContactTracing = typeof contactTracing.$inferSelect;
 export type InsertContactTracing = z.infer<typeof insertContactTracingSchema>;
+
+// Enhanced Contact Tracing System Types
+export type ContactTracingLocationHistory = typeof contactTracingLocationHistory.$inferSelect;
+export type InsertContactTracingLocationHistory = z.infer<typeof insertContactTracingLocationHistorySchema>;
+export type ContactProximityDetection = typeof contactProximityDetection.$inferSelect;
+export type InsertContactProximityDetection = z.infer<typeof insertContactProximityDetectionSchema>;
+export type ContactTracingNotificationTemplate = typeof contactTracingNotificationTemplates.$inferSelect;
+export type InsertContactTracingNotificationTemplate = z.infer<typeof insertContactTracingNotificationTemplateSchema>;
+export type ContactTracingNotificationLog = typeof contactTracingNotificationLogs.$inferSelect;
+export type InsertContactTracingNotificationLog = z.infer<typeof insertContactTracingNotificationLogSchema>;
+export type ContactTracingPrivacyConsent = typeof contactTracingPrivacyConsent.$inferSelect;
+export type InsertContactTracingPrivacyConsent = z.infer<typeof insertContactTracingPrivacyConsentSchema>;
+
 export type HealthFacility = typeof healthFacilities.$inferSelect;
 export type InsertHealthFacility = z.infer<typeof insertHealthFacilitySchema>;
 export type PublicHealthAlert = typeof publicHealthAlerts.$inferSelect;

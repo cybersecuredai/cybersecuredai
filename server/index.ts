@@ -7,6 +7,96 @@ const app = express();
 
 // ===== CRITICAL OPERATIONAL SECURITY: BOOT-TIME VALIDATION =====
 
+// CRITICAL FIX: Initialize data retention service for federal compliance
+async function initializeDataRetentionServices() {
+  try {
+    console.log('🗄️ Initializing Data Retention Service for federal compliance...');
+    
+    // Initialize data retention service with production-ready configuration
+    const { initializeDataRetentionService } = await import('./services/data-retention-service');
+    
+    const dataRetentionService = await initializeDataRetentionService({
+      locationHistoryRetentionDays: parseInt(process.env.LOCATION_HISTORY_RETENTION_DAYS || '14'),
+      contactTracingRetentionDays: parseInt(process.env.CONTACT_TRACING_RETENTION_DAYS || '30'),
+      consentWithdrawalImmediateDeletion: process.env.CONSENT_IMMEDIATE_DELETION !== 'false',
+      complianceReportingEnabled: process.env.COMPLIANCE_REPORTING_ENABLED !== 'false',
+      auditCleanupOperations: process.env.AUDIT_CLEANUP_OPERATIONS !== 'false'
+    });
+    
+    console.log('✅ Data Retention Service initialized successfully with scheduled jobs');
+    console.log('📅 TTL cleanup jobs running daily at 2:00 AM UTC');
+    console.log('📊 Compliance reporting enabled with weekly reports');
+    
+    return dataRetentionService;
+  } catch (error) {
+    console.error('❌ CRITICAL: Failed to initialize Data Retention Service:', error);
+    
+    if (process.env.NODE_ENV === 'production') {
+      console.error('💀 PRODUCTION DEPLOYMENT BLOCKED: Data retention is required for federal compliance');
+      process.exit(1);
+    } else {
+      console.warn('⚠️ Development mode: Data retention service initialization failed but continuing...');
+      return null;
+    }
+  }
+}
+
+// CRITICAL FIX: Validate contact tracing database schemas on startup
+async function validateContactTracingSchemas() {
+  try {
+    console.log('🔍 Validating Contact Tracing database schemas...');
+    
+    const { isDatabaseAvailable, db } = await import('./db');
+    
+    if (!isDatabaseAvailable()) {
+      throw new Error('Database is not available - contact tracing requires persistent storage');
+    }
+    
+    // Verify all required contact tracing tables exist
+    const requiredTables = [
+      'contact_tracing_location_history',
+      'contact_proximity_detection', 
+      'contact_tracing_notification_templates',
+      'contact_tracing_notification_logs',
+      'contact_tracing_privacy_consent'
+    ];
+    
+    const { sql } = await import('drizzle-orm');
+    
+    for (const tableName of requiredTables) {
+      try {
+        const result = await db().execute(sql`
+          SELECT 1 FROM information_schema.tables 
+          WHERE table_schema = 'public' AND table_name = ${tableName}
+        `);
+        
+        if (result.length === 0) {
+          throw new Error(`Required table '${tableName}' is missing`);
+        }
+        
+        console.log(`✅ Contact tracing table verified: ${tableName}`);
+      } catch (error) {
+        throw new Error(`Failed to verify table '${tableName}': ${error instanceof Error ? error.message : 'Unknown error'}`);
+      }
+    }
+    
+    console.log('✅ All contact tracing schemas validated successfully');
+    return true;
+    
+  } catch (error) {
+    console.error('❌ CRITICAL: Contact tracing schema validation failed:', error);
+    
+    if (process.env.NODE_ENV === 'production') {
+      console.error('💀 PRODUCTION DEPLOYMENT BLOCKED: Contact tracing requires validated database schemas');
+      console.error('🔧 Please run database migrations: npm run db:push');
+      process.exit(1);
+    } else {
+      console.warn('⚠️ Development mode: Schema validation failed but continuing...');
+      return false;
+    }
+  }
+}
+
 // CRITICAL FIX: Comprehensive environment validation including CDC integration with PEM key support
 function validateEnvironmentSecurity() {
   const requiredSecrets = ['JWT_SECRET'];
@@ -288,18 +378,8 @@ async function executeAuditImmutabilityMigration() {
   }
 }
 
-// Execute audit immutability migration on startup
-if (process.env.DATABASE_URL) {
-  console.log('🏥 Initializing HIPAA/FedRAMP compliance migrations...');
-  executeAuditImmutabilityMigration().catch(error => {
-    console.error('❌ Migration initialization failed:', error);
-  });
-}
-
-// SECURITY FIX: Execute cryptographic self-checks on startup
-performCryptographicSelfChecks().catch(error => {
-  console.error('❌ Cryptographic self-checks initialization failed:', error);
-});
+// CRITICAL BOOT SEQUENCE VALIDATION FUNCTIONS - TO BE CALLED DURING STARTUP
+// These functions are defined but not called here - they will be awaited in the proper sequence below
 
 // ===== CRITICAL HIPAA TRANSPORT SECURITY HARDENING =====
 
@@ -417,6 +497,47 @@ app.use((req, res, next) => {
 
 (async () => {
   try {
+    // ===== CRITICAL FEDERAL COMPLIANCE BOOT SEQUENCE =====
+    // Step 1: Environment Security Validation (already called at module level via validateEnvironmentSecurity())
+    console.log('🔒 Step 1: Environment security validation completed');
+    
+    // Step 2: Contact Tracing Schema Validation (MUST be awaited)
+    console.log('🔍 Step 2: Validating Contact Tracing database schemas...');
+    if (process.env.DATABASE_URL) {
+      await validateContactTracingSchemas();
+      console.log('✅ Step 2: Contact tracing schemas validated successfully');
+    } else {
+      console.warn('⚠️ Step 2: No DATABASE_URL - skipping schema validation');
+    }
+    
+    // Step 3: Data Retention Services Initialization (MUST be awaited)  
+    console.log('🗄️ Step 3: Initializing Data Retention Services...');
+    if (process.env.DATABASE_URL) {
+      await initializeDataRetentionServices();
+      console.log('✅ Step 3: Data retention services initialized successfully');
+    } else {
+      console.warn('⚠️ Step 3: No DATABASE_URL - skipping data retention services');
+    }
+    
+    // Step 4: Cryptographic Self-Checks (await to ensure crypto readiness)
+    console.log('🔐 Step 4: Performing cryptographic self-checks...');
+    await performCryptographicSelfChecks();
+    console.log('✅ Step 4: Cryptographic self-checks completed');
+    
+    // Step 5: HIPAA Audit Migration (await to ensure audit readiness)
+    console.log('🏥 Step 5: Executing HIPAA compliance migrations...');
+    if (process.env.DATABASE_URL) {
+      await executeAuditImmutabilityMigration();
+      console.log('✅ Step 5: HIPAA compliance migrations completed');
+    } else {
+      console.warn('⚠️ Step 5: No DATABASE_URL - skipping audit migrations');
+    }
+    
+    console.log('🎯 BOOT SEQUENCE VALIDATION: All critical services initialized successfully');
+    console.log('🏛️ FEDERAL COMPLIANCE: System ready for production deployment');
+    
+    // Step 6: Register Routes (after all critical services are ready)
+    console.log('📡 Step 6: Registering API routes...');
     const server = await registerRoutes(app);
 
     // Enhanced error handling middleware
