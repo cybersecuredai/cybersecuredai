@@ -7,11 +7,13 @@ const app = express();
 
 // ===== CRITICAL OPERATIONAL SECURITY: BOOT-TIME VALIDATION =====
 
-// CRITICAL FIX: Comprehensive environment validation
+// CRITICAL FIX: Comprehensive environment validation including CDC integration
 function validateEnvironmentSecurity() {
   const requiredSecrets = ['JWT_SECRET', 'FIPS_ENCRYPTION_KEY', 'FIPS_SIGNING_KEY'];
+  const cdcRequiredSecrets = ['CDC_CLIENT_ID', 'CDC_CLIENT_SECRET', 'CDC_BASE_URL'];
   const missingSecrets: string[] = [];
   const weakSecrets: string[] = [];
+  const cdcMissingSecrets: string[] = [];
   
   if (process.env.NODE_ENV === 'production') {
     console.log('🔐 Running production security validation...');
@@ -30,11 +32,37 @@ function validateEnvironmentSecurity() {
       }
     }
     
+    // CRITICAL FIX: Validate CDC configuration in production
+    for (const secret of cdcRequiredSecrets) {
+      const value = process.env[secret];
+      if (!value) {
+        cdcMissingSecrets.push(secret);
+      } else if (secret === 'CDC_BASE_URL' && !value.startsWith('https://')) {
+        weakSecrets.push(`${secret} (must use HTTPS for secure CDC communication)`);
+      } else if (secret === 'CDC_CLIENT_ID' && value.length < 8) {
+        weakSecrets.push(`${secret} (minimum 8 characters required)`);
+      } else if (secret === 'CDC_CLIENT_SECRET' && value.length < 16) {
+        weakSecrets.push(`${secret} (minimum 16 characters required for secure CDC authentication)`);
+      }
+    }
+    
     // Validate critical errors
     if (missingSecrets.length > 0) {
       console.error('🚨 CRITICAL SECURITY FAILURE: Missing required environment variables:');
       missingSecrets.forEach(secret => console.error(`   - ${secret}`));
       console.error('💀 APPLICATION CANNOT START SECURELY');
+      process.exit(1);
+    }
+    
+    // CRITICAL FIX: Fail-closed for missing CDC configuration in production
+    if (cdcMissingSecrets.length > 0) {
+      console.error('🚨 CRITICAL CDC CONFIGURATION FAILURE: Missing required CDC environment variables:');
+      cdcMissingSecrets.forEach(secret => console.error(`   - ${secret}`));
+      console.error('💀 CDC INTEGRATION CANNOT START - PRODUCTION DEPLOYMENT BLOCKED');
+      console.error('🔧 Required CDC configuration:');
+      console.error('   - CDC_CLIENT_ID: Your CDC OAuth client ID');
+      console.error('   - CDC_CLIENT_SECRET: Your CDC OAuth client secret');
+      console.error('   - CDC_BASE_URL: CDC API base URL (https://api.cdc.gov for production)');
       process.exit(1);
     }
     
