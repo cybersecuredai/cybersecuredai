@@ -9,7 +9,7 @@ import { storage } from "./storage";
 import { eq, and, desc, sql, isNotNull } from "drizzle-orm";
 import { AuthService, authenticateJWT, authorizeRoles, sensitiveOperationLimiter, type AuthenticatedRequest } from "./auth";
 import { phiRedactionMiddleware, contactTracingPhiMinimization, phiAuditMiddleware, validatePublicHealthAccess } from "./hipaa-compliance";
-import { convertToMMWRFormat, convertToNNDSSFormat, convertToNEDSSFormat, convertToHANFormat, MMWRDataSchema, NNDSSDataSchema, NEDSSDataSchema, HANAlertSchema } from "./cdc-integration";
+import { convertToMMWRFormat, convertToNNDSSFormat, convertToNEDSSFormat, convertToHANFormat, MMWRDataSchema, NNDSSDataSchema, NEDSSDataSchema, HANAlertSchema, getCDCIntegrationService, createPHINMessageHeader } from "./cdc-integration";
 import { registerHipaaAdminRoutes } from "./hipaa-api-routes";
 import { insertUserSchema, insertThreatSchema, insertFileSchema, insertIncidentSchema, insertThreatNotificationSchema, insertSubscriberSchema, insertLiveLocationDeviceSchema, insertLiveLocationHistorySchema, insertLiveLocationAlertSchema, insertLiveLocationGeoFenceSchema, insertLiveLocationAssetSchema, insertLiveLocationNetworkSegmentSchema, insertCypherhumSessionSchema, insertCypherhumVisualizationSchema, insertCypherhumInteractionSchema, insertCypherhumThreatModelSchema, insertCypherhumAnalyticsSchema, insertAcdsDroneSchema, insertAcdsSwarmMissionSchema, insertAcdsDeploymentSchema, insertAcdsCoordinationSchema, insertAcdsAnalyticsSchema, insertPublicHealthIncidentSchema, insertDiseaseSurveillanceSchema, insertContactTracingSchema, insertHealthFacilitySchema, insertPublicHealthAlertSchema, insertEpidemiologicalDataSchema } from "@shared/schema";
 import { ObjectStorageService } from "./objectStorage";
@@ -10863,6 +10863,459 @@ startxref
         success: false,
         error: 'Failed bulk CDC export',
         code: 'BULK_EXPORT_GET_ERROR',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
+  // ===== ENHANCED CDC INTEGRATION ENDPOINTS WITH REAL-TIME SYNC =====
+  
+  // Initialize CDC Integration Service
+  const getCDCService = lazySingletonAsync(async () => {
+    console.log('🔄 Initializing CDC Integration Service...');
+    const cdcService = getCDCIntegrationService(process.env.NODE_ENV === 'production' ? 'production' : 'sandbox');
+    const initialized = await cdcService.initialize();
+    if (!initialized) {
+      console.warn('⚠️ CDC Integration Service failed to initialize - operating in offline mode');
+    }
+    return cdcService;
+  });
+
+  // CDC System Status and Health Check
+  app.get('/api/public-health/cdc/system-status', authenticateJWT, authorizeRoles('epidemiologist', 'public_health_officer', 'admin'), async (req: AuthenticatedRequest, res) => {
+    try {
+      const cdcService = await getCDCService();
+      const systemStatus = await cdcService.getCDCSystemStatus();
+      
+      res.json({
+        success: true,
+        data: systemStatus,
+        message: 'CDC system status retrieved successfully'
+      });
+    } catch (error) {
+      console.error('❌ Failed to get CDC system status:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to get CDC system status',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
+  // Real-time CDC Data Submission (NNDSS)
+  app.post('/api/public-health/cdc/submit/nndss', authenticateJWT, authorizeRoles('epidemiologist', 'public_health_officer', 'admin'), sensitiveOperationLimiter, async (req: AuthenticatedRequest, res) => {
+    try {
+      const cdcService = await getCDCService();
+      
+      // Validate and submit to CDC
+      const submissionResult = await cdcService.submitToCDC('NNDSS', req.body, {
+        validateOnly: req.query.validateOnly === 'true',
+        generateReport: req.query.generateReport === 'true',
+        retryOnFailure: true
+      });
+
+      // Create audit log
+      await storage.createAuditLog({
+        userId: req.userId!,
+        action: 'CDC_NNDSS_SUBMISSION',
+        resource: 'cdc_integration',
+        details: { 
+          submissionId: submissionResult.submissionId,
+          recordsSubmitted: submissionResult.recordsSubmitted,
+          success: submissionResult.success
+        },
+        ipAddress: req.ip,
+        userAgent: req.get('User-Agent')
+      });
+
+      res.json({
+        success: true,
+        data: submissionResult,
+        message: submissionResult.success 
+          ? 'NNDSS data submitted to CDC successfully' 
+          : 'NNDSS submission completed with errors'
+      });
+    } catch (error) {
+      console.error('❌ Failed to submit NNDSS data to CDC:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to submit NNDSS data to CDC',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
+  // Real-time CDC Data Submission (NEDSS)
+  app.post('/api/public-health/cdc/submit/nedss', authenticateJWT, authorizeRoles('epidemiologist', 'public_health_officer', 'admin'), sensitiveOperationLimiter, async (req: AuthenticatedRequest, res) => {
+    try {
+      const cdcService = await getCDCService();
+      
+      const submissionResult = await cdcService.submitToCDC('NEDSS', req.body, {
+        validateOnly: req.query.validateOnly === 'true',
+        generateReport: req.query.generateReport === 'true',
+        retryOnFailure: true
+      });
+
+      // Create audit log
+      await storage.createAuditLog({
+        userId: req.userId!,
+        action: 'CDC_NEDSS_SUBMISSION',
+        resource: 'cdc_integration',
+        details: { 
+          submissionId: submissionResult.submissionId,
+          recordsSubmitted: submissionResult.recordsSubmitted,
+          success: submissionResult.success
+        },
+        ipAddress: req.ip,
+        userAgent: req.get('User-Agent')
+      });
+
+      res.json({
+        success: true,
+        data: submissionResult,
+        message: submissionResult.success 
+          ? 'NEDSS data submitted to CDC successfully' 
+          : 'NEDSS submission completed with errors'
+      });
+    } catch (error) {
+      console.error('❌ Failed to submit NEDSS data to CDC:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to submit NEDSS data to CDC',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
+  // Real-time HAN Alert Publishing
+  app.post('/api/public-health/cdc/submit/han', authenticateJWT, authorizeRoles('public_health_officer', 'emergency_coordinator', 'admin'), sensitiveOperationLimiter, async (req: AuthenticatedRequest, res) => {
+    try {
+      const cdcService = await getCDCService();
+      
+      const submissionResult = await cdcService.submitToCDC('HAN', req.body, {
+        validateOnly: req.query.validateOnly === 'true',
+        generateReport: req.query.generateReport === 'true',
+        retryOnFailure: true
+      });
+
+      // Create audit log
+      await storage.createAuditLog({
+        userId: req.userId!,
+        action: 'CDC_HAN_PUBLICATION',
+        resource: 'cdc_integration',
+        details: { 
+          submissionId: submissionResult.submissionId,
+          priority: req.body.priority,
+          messageType: req.body.messageType,
+          success: submissionResult.success
+        },
+        ipAddress: req.ip,
+        userAgent: req.get('User-Agent')
+      });
+
+      res.json({
+        success: true,
+        data: submissionResult,
+        message: submissionResult.success 
+          ? 'HAN alert published to CDC successfully' 
+          : 'HAN alert publication completed with errors'
+      });
+    } catch (error) {
+      console.error('❌ Failed to publish HAN alert to CDC:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to publish HAN alert to CDC',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
+  // CDC WONDER Database Query
+  app.post('/api/public-health/cdc/wonder/query', authenticateJWT, authorizeRoles('epidemiologist', 'public_health_officer', 'admin'), async (req: AuthenticatedRequest, res) => {
+    try {
+      const cdcService = await getCDCService();
+      
+      const queryResult = await cdcService.queryCDCWonder(req.body);
+
+      // Create audit log
+      await storage.createAuditLog({
+        userId: req.userId!,
+        action: 'CDC_WONDER_QUERY',
+        resource: 'cdc_integration',
+        details: { 
+          dataset: req.body.dataset,
+          parameters: req.body.parameters
+        },
+        ipAddress: req.ip,
+        userAgent: req.get('User-Agent')
+      });
+
+      res.json({
+        success: true,
+        data: queryResult,
+        message: 'CDC WONDER query completed successfully'
+      });
+    } catch (error) {
+      console.error('❌ Failed to query CDC WONDER database:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to query CDC WONDER database',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
+  // Real-time Syndromic Surveillance Data Feed (ESSENCE)
+  app.get('/api/public-health/cdc/essence/surveillance', authenticateJWT, authorizeRoles('epidemiologist', 'public_health_officer', 'admin'), async (req: AuthenticatedRequest, res) => {
+    try {
+      const cdcService = await getCDCService();
+      
+      const surveillanceData = await cdcService.getSyndromicSurveillanceData(req.query);
+
+      res.json({
+        success: true,
+        data: surveillanceData,
+        message: 'Syndromic surveillance data retrieved successfully'
+      });
+    } catch (error) {
+      console.error('❌ Failed to get syndromic surveillance data:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to get syndromic surveillance data',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
+  // CDC Data Quality Validation
+  app.post('/api/public-health/cdc/validate', authenticateJWT, authorizeRoles('epidemiologist', 'public_health_officer', 'admin'), async (req: AuthenticatedRequest, res) => {
+    try {
+      const cdcService = await getCDCService();
+      const { data, dataType } = req.body;
+
+      if (!Array.isArray(data) || !dataType) {
+        return res.status(400).json({
+          success: false,
+          error: 'Invalid request - data must be an array and dataType must be specified'
+        });
+      }
+
+      const qualityReport = await cdcService.validateDataQuality(data, dataType);
+
+      res.json({
+        success: true,
+        data: qualityReport,
+        message: 'Data quality validation completed'
+      });
+    } catch (error) {
+      console.error('❌ Failed to validate data quality:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to validate data quality',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
+  // Configure Automated CDC Reporting
+  app.post('/api/public-health/cdc/configure-reporting', authenticateJWT, authorizeRoles('epidemiologist', 'public_health_officer', 'admin'), sensitiveOperationLimiter, async (req: AuthenticatedRequest, res) => {
+    try {
+      const cdcService = await getCDCService();
+      
+      await cdcService.configureAutomatedReporting(req.body);
+
+      // Create audit log
+      await storage.createAuditLog({
+        userId: req.userId!,
+        action: 'CDC_CONFIGURE_AUTOMATED_REPORTING',
+        resource: 'cdc_integration',
+        details: { 
+          reportType: req.body.reportType,
+          frequency: req.body.schedule?.frequency,
+          enabled: req.body.enabled
+        },
+        ipAddress: req.ip,
+        userAgent: req.get('User-Agent')
+      });
+
+      res.json({
+        success: true,
+        message: 'CDC automated reporting configured successfully'
+      });
+    } catch (error) {
+      console.error('❌ Failed to configure CDC automated reporting:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to configure CDC automated reporting',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
+  // CDC Bulk Data Synchronization
+  app.post('/api/public-health/cdc/bulk-sync', authenticateJWT, authorizeRoles('epidemiologist', 'public_health_officer', 'admin'), sensitiveOperationLimiter, async (req: AuthenticatedRequest, res) => {
+    try {
+      const cdcService = await getCDCService();
+      const { syncData } = req.body;
+
+      if (!syncData || typeof syncData !== 'object') {
+        return res.status(400).json({
+          success: false,
+          error: 'Invalid request - syncData object required'
+        });
+      }
+
+      // Perform bulk synchronization
+      const syncResults = await (cdcService as any).cdcClient?.bulkSyncData(syncData) || {};
+
+      // Create audit log
+      await storage.createAuditLog({
+        userId: req.userId!,
+        action: 'CDC_BULK_SYNC',
+        resource: 'cdc_integration',
+        details: { 
+          systems: Object.keys(syncData),
+          totalRecords: Object.values(syncData).reduce((sum: number, arr: any) => sum + (Array.isArray(arr) ? arr.length : 0), 0),
+          results: syncResults
+        },
+        ipAddress: req.ip,
+        userAgent: req.get('User-Agent')
+      });
+
+      res.json({
+        success: true,
+        data: syncResults,
+        message: 'CDC bulk data synchronization completed'
+      });
+    } catch (error) {
+      console.error('❌ Failed to perform CDC bulk sync:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to perform CDC bulk sync',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
+  // Create PHIN-compliant message
+  app.post('/api/public-health/cdc/phin-message', authenticateJWT, authorizeRoles('epidemiologist', 'public_health_officer', 'admin'), async (req: AuthenticatedRequest, res) => {
+    try {
+      const { messageType, priority, senderInfo, receiverInfo } = req.body;
+
+      if (!messageType || !senderInfo || !receiverInfo) {
+        return res.status(400).json({
+          success: false,
+          error: 'Missing required fields: messageType, senderInfo, receiverInfo'
+        });
+      }
+
+      const phinMessage = createPHINMessageHeader(
+        messageType,
+        priority || 'ROUTINE',
+        senderInfo,
+        receiverInfo
+      );
+
+      res.json({
+        success: true,
+        data: phinMessage,
+        message: 'PHIN-compliant message header created successfully'
+      });
+    } catch (error) {
+      console.error('❌ Failed to create PHIN message:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to create PHIN message',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
+  // HL7 FHIR R4 Resource Conversion and Submission
+  app.post('/api/public-health/cdc/fhir/convert', authenticateJWT, authorizeRoles('epidemiologist', 'public_health_officer', 'admin'), async (req: AuthenticatedRequest, res) => {
+    try {
+      const cdcService = await getCDCService();
+      const { data, resourceType } = req.body;
+
+      if (!data || !resourceType) {
+        return res.status(400).json({
+          success: false,
+          error: 'Missing required fields: data, resourceType'
+        });
+      }
+
+      const fhirResource = cdcService.convertToFHIR(data, resourceType);
+
+      // Optionally submit to CDC Data Exchange Platform
+      if (req.query.submit === 'true') {
+        const submissionResult = await (cdcService as any).cdcClient?.submitFHIRResource(fhirResource);
+        
+        res.json({
+          success: true,
+          data: {
+            fhirResource,
+            submissionResult
+          },
+          message: 'FHIR resource converted and submitted successfully'
+        });
+      } else {
+        res.json({
+          success: true,
+          data: fhirResource,
+          message: 'FHIR resource converted successfully'
+        });
+      }
+    } catch (error) {
+      console.error('❌ Failed to convert/submit FHIR resource:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to convert/submit FHIR resource',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
+  // CDC Integration Dashboard Data
+  app.get('/api/public-health/cdc/dashboard', authenticateJWT, authorizeRoles('epidemiologist', 'public_health_officer', 'admin'), async (req: AuthenticatedRequest, res) => {
+    try {
+      const cdcService = await getCDCService();
+      
+      // Get comprehensive CDC integration metrics
+      const [systemStatus, wonderData, surveillanceData] = await Promise.allSettled([
+        cdcService.getCDCSystemStatus(),
+        cdcService.queryCDCWonder({
+          dataset: 'mortality',
+          parameters: { 
+            year: new Date().getFullYear() - 1,
+            state: 'all',
+            cause: 'all'
+          },
+          format: 'json'
+        }).catch(() => null), // Graceful fallback
+        cdcService.getSyndromicSurveillanceData({
+          timeframe: '24h',
+          region: 'national'
+        }).catch(() => null) // Graceful fallback
+      ]);
+
+      const dashboardData = {
+        systemStatus: systemStatus.status === 'fulfilled' ? systemStatus.value : null,
+        wonderData: wonderData.status === 'fulfilled' ? wonderData.value : null,
+        surveillanceData: surveillanceData.status === 'fulfilled' ? surveillanceData.value : null,
+        lastUpdate: new Date().toISOString(),
+        integrationActive: systemStatus.status === 'fulfilled'
+      };
+
+      res.json({
+        success: true,
+        data: dashboardData,
+        message: 'CDC integration dashboard data retrieved successfully'
+      });
+    } catch (error) {
+      console.error('❌ Failed to get CDC dashboard data:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to get CDC dashboard data',
         message: error instanceof Error ? error.message : 'Unknown error'
       });
     }

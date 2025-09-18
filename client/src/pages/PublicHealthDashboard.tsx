@@ -285,6 +285,29 @@ export default function PublicHealthDashboard() {
     enabled: hasPublicHealthAccess,
   });
 
+  // ===== CDC INTEGRATION DATA FEEDS =====
+  
+  // Fetch CDC integration dashboard data - Real-time CDC feeds
+  const { data: cdcDashboardData, isLoading: isCDCLoading } = useQuery({
+    queryKey: ['/api/public-health/cdc/dashboard'],
+    refetchInterval: isWebSocketConnected ? 300000 : 30000, // 5 min with WebSocket, 30s fallback
+    enabled: hasPublicHealthAccess,
+  });
+
+  // Fetch CDC system status - Real-time CDC system monitoring
+  const { data: cdcSystemStatus, isLoading: isCDCStatusLoading } = useQuery({
+    queryKey: ['/api/public-health/cdc/system-status'],
+    refetchInterval: 60000, // Check CDC systems every minute
+    enabled: hasPublicHealthAccess,
+  });
+
+  // Fetch real-time syndromic surveillance data from CDC ESSENCE
+  const { data: syndromicSurveillanceData, isLoading: isSyndromicLoading } = useQuery({
+    queryKey: ['/api/public-health/cdc/essence/surveillance'],
+    refetchInterval: isWebSocketConnected ? 300000 : 60000, // 5 min with WebSocket, 1 min fallback
+    enabled: hasPublicHealthAccess,
+  });
+
   // WebSocket connection for real-time updates with secure authentication
   useEffect(() => {
     if (!hasPublicHealthAccess || !user) return;
@@ -782,6 +805,10 @@ export default function PublicHealthDashboard() {
           <TabsTrigger value="alerts" className="flex items-center gap-2" data-testid="tab-alerts">
             <Bell className="h-4 w-4" />
             Alerts
+          </TabsTrigger>
+          <TabsTrigger value="cdc" className="flex items-center gap-2" data-testid="tab-cdc">
+            <Database className="h-4 w-4" />
+            CDC Integration
           </TabsTrigger>
         </TabsList>
 
