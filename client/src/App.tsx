@@ -69,6 +69,8 @@ const ACDSDashboard = lazy(() => import("@/pages/ACDSDashboard"));
 const ThreatMap5D = lazy(() => import("@/pages/ThreatMap5D"));
 // Revolutionary CypherHUM 5D Holographic AI Interface with Live Avatar - lazy loaded due to heavy dependencies
 const CypherHumInterface = lazy(() => import("@/pages/CypherHumInterface"));
+// Public Health Dashboard - comprehensive disease surveillance and outbreak management
+const PublicHealthDashboard = lazy(() => import("@/pages/PublicHealthDashboard"));
 
 // Marketing Website Pages - Lazy loaded
 const Home = lazy(() => import("@/pages/Home"));
@@ -192,7 +194,8 @@ function Router() {
                           location.startsWith('/cydef-dashboard') ||
                           location.startsWith('/live-location-dashboard') ||
                           location.startsWith('/acds-dashboard') ||
-                          location.startsWith('/cypherhum-interface');
+                          location.startsWith('/cypherhum-interface') ||
+                          location.startsWith('/public-health-dashboard');
 
     // Show onboarding if user exists, is on a platform page, and lacks proper auth setup
     if (user && isPlatformPage && !isLoading) {
@@ -371,6 +374,15 @@ function Router() {
         <Layout>
           <LazyErrorBoundary>
             <CypherHumInterface />
+          </LazyErrorBoundary>
+        </Layout>
+      </Route>
+      
+      {/* Public Health Dashboard - Disease Surveillance and Outbreak Management */}
+      <Route path="/public-health-dashboard">
+        <Layout>
+          <LazyErrorBoundary>
+            <PublicHealthDashboard />
           </LazyErrorBoundary>
         </Layout>
       </Route>

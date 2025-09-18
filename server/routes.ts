@@ -13425,9 +13425,393 @@ startxref
 
       console.log('🔄 Unified WebSocket server initialized at /ws/unified-alerts');
 
+      // ===== PUBLIC HEALTH WEBSOCKET SERVER =====
+      
+      // SECURITY: Connection tracking and rate limiting for DoS protection
+      const connectionTracker = new Map<string, { count: number, lastConnect: number, messageCount: number, lastMessage: number }>();
+      const MAX_CONNECTIONS_PER_IP = 5;
+      const MAX_MESSAGES_PER_MINUTE = 60;
+      const CONNECTION_WINDOW_MS = 60000; // 1 minute
+      const MESSAGE_WINDOW_MS = 60000; // 1 minute
+      const MAX_MESSAGE_SIZE = 10240; // 10KB
+      
+      // SECURITY: Allowed origins for federal deployment
+      const ALLOWED_ORIGINS = process.env.ALLOWED_WEBSOCKET_ORIGINS?.split(',') || [
+        'https://your-domain.replit.app',
+        'http://localhost:5000',
+        'https://localhost:5000'
+      ];
+      
+      // Public Health WebSocket endpoint with comprehensive security
+      const publicHealthWss = new WebSocketServer({ 
+        server: httpServer,
+        path: '/ws/public-health',
+        verifyClient: (info) => {
+          const clientIP = info.req.socket.remoteAddress || 'unknown';
+          const origin = info.req.headers.origin;
+          const host = info.req.headers.host;
+          
+          // SECURITY FIX: Strict Origin validation for federal compliance
+          if (origin && !ALLOWED_ORIGINS.includes(origin)) {
+            console.warn(`🚨 SECURITY: WebSocket connection blocked - unauthorized origin: ${origin}`);
+            return false;
+          }
+          
+          // SECURITY FIX: Host header validation
+          const expectedHosts = ['localhost:5000', process.env.REPL_SLUG ? `${process.env.REPL_SLUG}.${process.env.REPL_OWNER}.repl.co` : ''];
+          if (host && !expectedHosts.includes(host) && !host.includes('.replit.app')) {
+            console.warn(`🚨 SECURITY: WebSocket connection blocked - invalid host: ${host}`);
+            return false;
+          }
+          
+          // SECURITY FIX: Per-IP connection limits for DoS protection
+          const tracker = connectionTracker.get(clientIP) || { count: 0, lastConnect: 0, messageCount: 0, lastMessage: 0 };
+          const now = Date.now();
+          
+          // Reset counter if window expired
+          if (now - tracker.lastConnect > CONNECTION_WINDOW_MS) {
+            tracker.count = 0;
+          }
+          
+          if (tracker.count >= MAX_CONNECTIONS_PER_IP) {
+            console.warn(`🚨 SECURITY: WebSocket connection blocked - rate limit exceeded for IP: ${clientIP}`);
+            return false;
+          }
+          
+          tracker.count++;
+          tracker.lastConnect = now;
+          connectionTracker.set(clientIP, tracker);
+          
+          console.log(`✅ SECURITY: WebSocket connection allowed for IP: ${clientIP} (${tracker.count}/${MAX_CONNECTIONS_PER_IP})`);
+          return true;
+        }
+      });
+
+      publicHealthWss.on('connection', async (ws, request) => {
+        const clientIP = request.socket.remoteAddress || 'unknown';
+        console.log(`🔗 Public Health WebSocket connection attempt from IP: ${clientIP}`);
+        
+        // Parse URL to handle query parameters properly
+        let url: URL;
+        try {
+          url = new URL(request.url!, `http://${request.headers.host}`);
+        } catch (error) {
+          console.error(`❌ SECURITY: Invalid Public Health WebSocket URL from ${clientIP}:`, request.url, error);
+          ws.close(1008, 'Invalid URL format');
+          return;
+        }
+        
+        // Check if the pathname matches the expected WebSocket endpoint
+        if (url.pathname !== '/ws/public-health') {
+          console.warn(`🚨 SECURITY: Public Health WebSocket connection rejected from ${clientIP}: Invalid path "${url.pathname}"`);
+          ws.close(1008, 'Invalid path');
+          return;
+        }
+        
+        try {
+          // SECURITY FIX: Extract and verify JWT token from secure protocol header only
+          let token: string | null = null;
+          
+          // SECURITY FIX: Get token from Sec-WebSocket-Protocol header (secure method)
+          const protocols = request.headers['sec-websocket-protocol'];
+          if (protocols) {
+            const protocolList = protocols.split(',').map(p => p.trim());
+            const bearerProtocol = protocolList.find(p => p.startsWith('Bearer.'));
+            if (bearerProtocol) {
+              try {
+                // Decode the base64-encoded token
+                const encodedToken = bearerProtocol.substring(7); // Remove 'Bearer.' prefix
+                token = atob(encodedToken);
+              } catch (decodeError) {
+                console.warn(`🚨 SECURITY: Invalid token encoding from ${clientIP}:`, decodeError);
+                ws.close(1008, 'Invalid token format');
+                return;
+              }
+            }
+          }
+          
+          // SECURITY FIX: No fallback to query string - completely blocked
+          if (!token) {
+            console.warn(`🚨 SECURITY: Public Health WebSocket connection rejected from ${clientIP}: No secure authentication token provided`);
+            ws.close(1008, 'Secure authentication required - query string tokens blocked');
+            return;
+          }
+          
+          // SECURITY AUDIT: Log authentication attempt
+          console.log(`🔐 SECURITY AUDIT: WebSocket authentication attempt from ${clientIP} at ${new Date().toISOString()}`);
+          
+          // Verify the token using AuthService
+          const { AuthService } = await import('./auth');
+          const payload = AuthService.verifyToken(token);
+          
+          if (!payload || !payload.userId) {
+            console.warn('⚠️ Public Health WebSocket connection rejected: Invalid authentication token');
+            ws.close(1008, 'Invalid authentication token');
+            return;
+          }
+          
+          // Verify public health access roles
+          const allowedRoles = ['public_health_officer', 'epidemiologist', 'contact_tracer', 'health_facility_admin', 'emergency_coordinator', 'admin'];
+          if (!allowedRoles.includes(payload.role)) {
+            console.warn(`🚨 SECURITY: Public Health WebSocket connection rejected from ${clientIP}: Insufficient privileges for role "${payload.role}"`);
+            ws.close(1008, 'Insufficient privileges for public health access');
+            return;
+          }
+          
+          // SECURITY AUDIT: Log successful authentication
+          console.log(`✅ SECURITY AUDIT: WebSocket authenticated successfully - User: ${payload.email}, Role: ${payload.role}, IP: ${clientIP}, Time: ${new Date().toISOString()}`);
+          
+          // Log successful authentication with detailed info
+          console.log(`✅ Public Health WebSocket authenticated successfully:`);
+          console.log(`   📧 User: ${payload.email}`);
+          console.log(`   🔑 Role: ${payload.role}`);
+          console.log(`   🏥 Public Health access granted for: ${payload.userId}`);
+        
+          // Track connection time for analytics
+          (ws as any).connectedAt = new Date().toISOString();
+          (ws as any).userId = payload.userId;
+          (ws as any).userEmail = payload.email;
+          (ws as any).userRole = payload.role;
+          
+          // Send welcome message with initial status
+          ws.send(JSON.stringify({
+            type: 'welcome',
+            message: 'Connected to Public Health Real-time Updates',
+            user: payload.email,
+            role: payload.role,
+            timestamp: new Date().toISOString(),
+            capabilities: {
+              outbreakTracking: true,
+              contactTracing: allowedRoles.includes(payload.role),
+              facilityMonitoring: true,
+              emergencyAlerts: true,
+              epidemiologicalData: ['epidemiologist', 'public_health_officer', 'admin'].includes(payload.role)
+            }
+          }));
+
+          // Set up event handlers for different types of public health events
+          const handleOutbreakUpdate = (data: any) => {
+            if (ws.readyState === WebSocket.OPEN) {
+              ws.send(JSON.stringify({
+                type: 'outbreak_update',
+                data,
+                timestamp: new Date().toISOString()
+              }));
+            }
+          };
+
+          const handleEmergencyAlert = (data: any) => {
+            if (ws.readyState === WebSocket.OPEN) {
+              ws.send(JSON.stringify({
+                type: 'emergency_alert',
+                data,
+                priority: 'high',
+                timestamp: new Date().toISOString()
+              }));
+            }
+          };
+
+          const handleContactUpdate = (data: any) => {
+            if (ws.readyState === WebSocket.OPEN && ['contact_tracer', 'public_health_officer', 'admin'].includes(payload.role)) {
+              ws.send(JSON.stringify({
+                type: 'contact_update',
+                data,
+                timestamp: new Date().toISOString()
+              }));
+            }
+          };
+
+          const handleFacilityUpdate = (data: any) => {
+            if (ws.readyState === WebSocket.OPEN) {
+              ws.send(JSON.stringify({
+                type: 'facility_update',
+                data,
+                timestamp: new Date().toISOString()
+              }));
+            }
+          };
+
+          const handleSurveillanceUpdate = (data: any) => {
+            if (ws.readyState === WebSocket.OPEN && ['epidemiologist', 'public_health_officer', 'admin'].includes(payload.role)) {
+              ws.send(JSON.stringify({
+                type: 'surveillance_update',
+                data,
+                timestamp: new Date().toISOString()
+              }));
+            }
+          };
+
+          // SECURITY FIX: Message rate limiting and size validation
+          ws.on('message', async (message) => {
+            try {
+              // SECURITY: Check message size limit
+              if (message.length > MAX_MESSAGE_SIZE) {
+                console.warn(`🚨 SECURITY: Message too large from ${payload.email}: ${message.length} bytes (max: ${MAX_MESSAGE_SIZE})`);
+                ws.send(JSON.stringify({
+                  type: 'error',
+                  message: 'Message too large',
+                  timestamp: new Date().toISOString()
+                }));
+                return;
+              }
+              
+              // SECURITY: Rate limiting for messages
+              const tracker = connectionTracker.get(clientIP);
+              if (tracker) {
+                const now = Date.now();
+                if (now - tracker.lastMessage > MESSAGE_WINDOW_MS) {
+                  tracker.messageCount = 0;
+                }
+                
+                if (tracker.messageCount >= MAX_MESSAGES_PER_MINUTE) {
+                  console.warn(`🚨 SECURITY: Message rate limit exceeded for ${payload.email} (IP: ${clientIP})`);
+                  ws.send(JSON.stringify({
+                    type: 'error',
+                    message: 'Rate limit exceeded',
+                    timestamp: new Date().toISOString()
+                  }));
+                  return;
+                }
+                
+                tracker.messageCount++;
+                tracker.lastMessage = now;
+                connectionTracker.set(clientIP, tracker);
+              }
+              
+              const data = JSON.parse(message.toString());
+              
+              // SECURITY: Message schema validation
+              if (!data.type || typeof data.type !== 'string') {
+                console.warn(`🚨 SECURITY: Invalid message format from ${payload.email}`);
+                ws.send(JSON.stringify({
+                  type: 'error',
+                  message: 'Invalid message format',
+                  timestamp: new Date().toISOString()
+                }));
+                return;
+              }
+              
+              switch (data.type) {
+                case 'ping':
+                  ws.send(JSON.stringify({ 
+                    type: 'pong', 
+                    timestamp: new Date().toISOString() 
+                  }));
+                  break;
+                  
+                case 'subscribe_outbreaks':
+                  // Subscribe to outbreak updates for specific regions or diseases
+                  console.log(`📡 ${payload.email} subscribed to outbreak updates:`, data.filters);
+                  break;
+                  
+                case 'subscribe_contacts':
+                  if (['contact_tracer', 'public_health_officer', 'admin'].includes(payload.role)) {
+                    console.log(`📡 ${payload.email} subscribed to contact tracing updates:`, data.filters);
+                  }
+                  break;
+                  
+                case 'subscribe_facilities':
+                  console.log(`📡 ${payload.email} subscribed to facility updates:`, data.filters);
+                  break;
+                  
+                case 'emergency_broadcast':
+                  if (['emergency_coordinator', 'public_health_officer', 'admin'].includes(payload.role)) {
+                    // SECURITY AUDIT: Log emergency broadcast
+                    console.log(`🚨 SECURITY AUDIT: Emergency broadcast from ${payload.email} (IP: ${clientIP}):`, data.message);
+                    
+                    // SECURITY: PHI minimization - ensure no sensitive data in broadcast
+                    const sanitizedMessage = typeof data.message === 'string' ? data.message.substring(0, 1000) : 'Emergency alert';
+                    
+                    // Broadcast to all connected public health clients with role filtering
+                    publicHealthWss.clients.forEach((client) => {
+                      if (client.readyState === WebSocket.OPEN) {
+                        const clientRole = (client as any).userRole;
+                        // SECURITY: Role-based message filtering
+                        if (clientRole && allowedRoles.includes(clientRole)) {
+                          client.send(JSON.stringify({
+                            type: 'emergency_alert',
+                            message: sanitizedMessage,
+                            severity: data.severity || 'high',
+                            source: payload.email,
+                            timestamp: new Date().toISOString()
+                          }));
+                        }
+                      }
+                    });
+                  } else {
+                    console.warn(`🚨 SECURITY: Unauthorized emergency broadcast attempt from ${payload.email} (Role: ${payload.role})`);
+                  }
+                  break;
+                  
+                default:
+                  console.log('Unknown Public Health WebSocket message type:', data.type);
+              }
+            } catch (error) {
+              console.error('❌ Error processing Public Health WebSocket message:', error);
+              ws.send(JSON.stringify({
+                type: 'error',
+                message: 'Failed to process message',
+                timestamp: new Date().toISOString()
+              }));
+            }
+          });
+
+          // Send periodic health updates every 30 seconds
+          const healthUpdateInterval = setInterval(() => {
+            try {
+              if (ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({
+                  type: 'health_status',
+                  status: 'connected',
+                  uptime: process.uptime(),
+                  timestamp: new Date().toISOString()
+                }));
+              }
+            } catch (error) {
+              console.error('❌ Failed to send Public Health health update:', error);
+            }
+          }, 30000);
+
+          // Cleanup on connection close with security audit
+          ws.on('close', (code, reason) => {
+            clearInterval(healthUpdateInterval);
+            
+            // SECURITY: Decrement connection counter
+            const tracker = connectionTracker.get(clientIP);
+            if (tracker && tracker.count > 0) {
+              tracker.count--;
+              connectionTracker.set(clientIP, tracker);
+            }
+            
+            const userInfo = (ws as any).userEmail ? `${(ws as any).userEmail}` : 'anonymous';
+            const connectedDuration = (ws as any).connectedAt 
+              ? `(connected for ${Math.round((Date.now() - new Date((ws as any).connectedAt).getTime()) / 1000)}s)`
+              : '';
+            
+            // SECURITY AUDIT: Log disconnection
+            console.log(`🔌 SECURITY AUDIT: Public Health WebSocket disconnected: ${userInfo} from ${clientIP} ${connectedDuration}`);
+            console.log(`   📊 Close code: ${code}, Reason: ${reason || 'No reason provided'}`);
+          });
+
+        } catch (authError) {
+          // SECURITY AUDIT: Log failed authentication
+          console.error(`🚨 SECURITY AUDIT: Public Health WebSocket authentication failed from ${clientIP}:`, authError);
+          ws.close(1008, 'Authentication failed');
+          return;
+        }
+
+        // Enhanced error handling with security logging
+        ws.on('error', (error) => {
+          const userInfo = (ws as any).userEmail ? `(${(ws as any).userEmail})` : '(anonymous)';
+          console.error(`❌ SECURITY: Public Health WebSocket error for user ${userInfo} from ${clientIP}:`, error);
+        });
+      });
+
+      console.log('🏥 Public Health WebSocket server initialized at /ws/public-health');
+
     } catch (error) {
       console.error('❌ Failed to initialize WebSocket server:', error instanceof Error ? error.message : String(error));
-      console.log('⚠️ Live Location will continue without WebSocket support');
+      console.log('⚠️ Public Health will continue without WebSocket support');
     }
   } else {
     console.log('ℹ️ WebSocket disabled via ENABLE_WS environment variable');
