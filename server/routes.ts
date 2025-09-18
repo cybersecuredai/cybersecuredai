@@ -8,7 +8,9 @@ import { auth } from "express-openid-connect";
 import { storage } from "./storage";
 import { eq, and, desc, sql, isNotNull } from "drizzle-orm";
 import { AuthService, authenticateJWT, authorizeRoles, sensitiveOperationLimiter, type AuthenticatedRequest } from "./auth";
-import { insertUserSchema, insertThreatSchema, insertFileSchema, insertIncidentSchema, insertThreatNotificationSchema, insertSubscriberSchema, insertLiveLocationDeviceSchema, insertLiveLocationHistorySchema, insertLiveLocationAlertSchema, insertLiveLocationGeoFenceSchema, insertLiveLocationAssetSchema, insertLiveLocationNetworkSegmentSchema, insertCypherhumSessionSchema, insertCypherhumVisualizationSchema, insertCypherhumInteractionSchema, insertCypherhumThreatModelSchema, insertCypherhumAnalyticsSchema, insertAcdsDroneSchema, insertAcdsSwarmMissionSchema, insertAcdsDeploymentSchema, insertAcdsCoordinationSchema, insertAcdsAnalyticsSchema } from "@shared/schema";
+import { phiRedactionMiddleware, contactTracingPhiMinimization, phiAuditMiddleware, validatePublicHealthAccess } from "./hipaa-compliance";
+import { convertToMMWRFormat, convertToNNDSSFormat, convertToNEDSSFormat, convertToHANFormat, MMWRDataSchema, NNDSSDataSchema, NEDSSDataSchema, HANAlertSchema } from "./cdc-integration";
+import { insertUserSchema, insertThreatSchema, insertFileSchema, insertIncidentSchema, insertThreatNotificationSchema, insertSubscriberSchema, insertLiveLocationDeviceSchema, insertLiveLocationHistorySchema, insertLiveLocationAlertSchema, insertLiveLocationGeoFenceSchema, insertLiveLocationAssetSchema, insertLiveLocationNetworkSegmentSchema, insertCypherhumSessionSchema, insertCypherhumVisualizationSchema, insertCypherhumInteractionSchema, insertCypherhumThreatModelSchema, insertCypherhumAnalyticsSchema, insertAcdsDroneSchema, insertAcdsSwarmMissionSchema, insertAcdsDeploymentSchema, insertAcdsCoordinationSchema, insertAcdsAnalyticsSchema, insertPublicHealthIncidentSchema, insertDiseaseSurveillanceSchema, insertContactTracingSchema, insertHealthFacilitySchema, insertPublicHealthAlertSchema, insertEpidemiologicalDataSchema } from "@shared/schema";
 import { ObjectStorageService } from "./objectStorage";
 // Engine types only - no instantiation imports
 import type { VerificationContext } from "./engines/zero-trust";
@@ -9531,6 +9533,1336 @@ startxref
         success: false, 
         error: 'Failed to get multi-generational system overview',
         message: error.message 
+      });
+    }
+  });
+
+  // =============================================================================
+  // PUBLIC HEALTH API ENDPOINTS - HIPAA COMPLIANT WITH PHI REDACTION
+  // =============================================================================
+  
+  // Apply HIPAA PHI middleware to all public health endpoints
+  app.use('/api/public-health', phiAuditMiddleware);
+  app.use('/api/public-health', phiRedactionMiddleware);
+
+  // ===== 1. PUBLIC HEALTH INCIDENTS MANAGEMENT =====
+
+  // Create new health incident/outbreak
+  app.post('/api/public-health/incidents', authenticateJWT, authorizeRoles('public_health_officer', 'admin'), sensitiveOperationLimiter, async (req: AuthenticatedRequest, res) => {
+    try {
+      const validatedData = insertPublicHealthIncidentSchema.parse(req.body);
+      const incident = await storage.createPublicHealthIncident(validatedData);
+      
+      // Create audit log
+      await storage.createAuditLog({
+        userId: req.userId!,
+        action: 'CREATE_HEALTH_INCIDENT',
+        resource: 'public_health_incidents',
+        details: { incidentId: incident.id, incidentType: incident.incidentType },
+        ipAddress: req.ip,
+        userAgent: req.get('User-Agent')
+      });
+
+      res.status(201).json({ success: true, data: incident, code: 'PUBLIC_HEALTH_INCIDENT_CREATED' });
+    } catch (error) {
+      console.error('❌ Failed to create health incident:', error);
+      res.status(400).json({ 
+        success: false,
+        error: 'Failed to create health incident',
+        message: error instanceof Error ? error.message : 'Unknown error',
+        code: 'INCIDENT_CREATION_FAILED',
+        data: null
+      });
+    }
+  });
+
+  // List incidents with filtering
+  app.get('/api/public-health/incidents', authenticateJWT, authorizeRoles('public_health_officer', 'epidemiologist', 'emergency_coordinator', 'admin'), async (req: AuthenticatedRequest, res) => {
+    try {
+      const filters: any = {};
+      
+      if (req.query.status) filters.status = req.query.status as string;
+      if (req.query.severity) filters.severity = req.query.severity as string;
+      if (req.query.region) filters.region = req.query.region as string;
+      if (req.query.startDate) filters.startDate = new Date(req.query.startDate as string);
+      if (req.query.endDate) filters.endDate = new Date(req.query.endDate as string);
+
+      const incidents = await storage.getPublicHealthIncidents(filters);
+      
+      res.json({ success: true, data: incidents, count: incidents.length, code: 'PUBLIC_HEALTH_INCIDENTS_RETRIEVED' });
+    } catch (error) {
+      console.error('❌ Failed to get health incidents:', error);
+      res.status(500).json({ 
+        success: false,
+        error: 'Failed to get health incidents',
+        message: error instanceof Error ? error.message : 'Unknown error',
+        code: 'INCIDENTS_RETRIEVAL_FAILED',
+        data: null
+      });
+    }
+  });
+
+  // Get specific incident details
+  app.get('/api/public-health/incidents/:id', authenticateJWT, authorizeRoles('public_health_officer', 'epidemiologist', 'emergency_coordinator', 'admin'), async (req: AuthenticatedRequest, res) => {
+    try {
+      const incident = await storage.getPublicHealthIncident(req.params.id);
+      
+      if (!incident) {
+        return res.status(404).json({ success: false, error: 'Health incident not found', code: 'INCIDENT_NOT_FOUND', data: null });
+      }
+
+      res.json({ success: true, data: incident, code: 'PUBLIC_HEALTH_INCIDENT_RETRIEVED' });
+    } catch (error) {
+      console.error('❌ Failed to get health incident:', error);
+      res.status(500).json({ 
+        success: false,
+        error: 'Failed to get health incident',
+        message: error instanceof Error ? error.message : 'Unknown error',
+        code: 'INCIDENT_RETRIEVAL_FAILED',
+        data: null
+      });
+    }
+  });
+
+  // Update incident status/details
+  app.put('/api/public-health/incidents/:id', authenticateJWT, authorizeRoles('public_health_officer', 'admin'), sensitiveOperationLimiter, async (req: AuthenticatedRequest, res) => {
+    try {
+      const incident = await storage.updatePublicHealthIncident(req.params.id, req.body);
+      
+      // Create audit log
+      await storage.createAuditLog({
+        userId: req.userId!,
+        action: 'UPDATE_HEALTH_INCIDENT',
+        resource: 'public_health_incidents',
+        details: { incidentId: req.params.id, updates: req.body },
+        ipAddress: req.ip,
+        userAgent: req.get('User-Agent')
+      });
+
+      res.json({ success: true, data: incident, code: 'PUBLIC_HEALTH_INCIDENT_UPDATED' });
+    } catch (error) {
+      console.error('❌ Failed to update health incident:', error);
+      res.status(500).json({ 
+        success: false,
+        error: 'Failed to update health incident',
+        message: error instanceof Error ? error.message : 'Unknown error',
+        code: 'INCIDENT_UPDATE_FAILED',
+        data: null
+      });
+    }
+  });
+
+  // Delete incident (admin only)
+  app.delete('/api/public-health/incidents/:id', authenticateJWT, authorizeRoles('admin'), sensitiveOperationLimiter, async (req: AuthenticatedRequest, res) => {
+    try {
+      await storage.deletePublicHealthIncident(req.params.id);
+      
+      // Create audit log
+      await storage.createAuditLog({
+        userId: req.userId!,
+        action: 'DELETE_HEALTH_INCIDENT',
+        resource: 'public_health_incidents',
+        details: { incidentId: req.params.id },
+        ipAddress: req.ip,
+        userAgent: req.get('User-Agent')
+      });
+
+      res.json({ success: true, message: 'Health incident deleted successfully', code: 'PUBLIC_HEALTH_INCIDENT_DELETED', data: null });
+    } catch (error) {
+      console.error('❌ Failed to delete health incident:', error);
+      res.status(500).json({ 
+        success: false,
+        error: 'Failed to delete health incident',
+        message: error instanceof Error ? error.message : 'Unknown error',
+        code: 'INCIDENT_DELETION_FAILED',
+        data: null
+      });
+    }
+  });
+
+  // Escalate incident to CDC
+  app.post('/api/public-health/incidents/:id/escalate', authenticateJWT, authorizeRoles('public_health_officer', 'admin'), sensitiveOperationLimiter, async (req: AuthenticatedRequest, res) => {
+    try {
+      const incident = await storage.escalateIncidentToCDC(req.params.id, req.body);
+      
+      // Create audit log
+      await storage.createAuditLog({
+        userId: req.userId!,
+        action: 'ESCALATE_INCIDENT_CDC',
+        resource: 'public_health_incidents',
+        details: { incidentId: req.params.id, escalationData: req.body },
+        ipAddress: req.ip,
+        userAgent: req.get('User-Agent')
+      });
+
+      res.json({ success: true, data: incident, message: 'Incident escalated to CDC successfully', code: 'INCIDENT_ESCALATED_TO_CDC' });
+    } catch (error) {
+      console.error('❌ Failed to escalate incident to CDC:', error);
+      res.status(500).json({ 
+        success: false,
+        error: 'Failed to escalate incident to CDC',
+        message: error instanceof Error ? error.message : 'Unknown error',
+        code: 'INCIDENT_ESCALATION_FAILED',
+        data: null
+      });
+    }
+  });
+
+  // ===== 2. DISEASE SURVEILLANCE OPERATIONS =====
+
+  // Create surveillance record
+  app.post('/api/public-health/surveillance', authenticateJWT, authorizeRoles('epidemiologist', 'public_health_officer', 'admin'), sensitiveOperationLimiter, async (req: AuthenticatedRequest, res) => {
+    try {
+      const validatedData = insertDiseaseSurveillanceSchema.parse(req.body);
+      const surveillance = await storage.createDiseaseSurveillanceRecord(validatedData);
+      
+      // Create audit log
+      await storage.createAuditLog({
+        userId: req.userId!,
+        action: 'CREATE_DISEASE_SURVEILLANCE',
+        resource: 'disease_surveillance',
+        details: { surveillanceId: surveillance.id, diseaseCode: surveillance.diseaseCode },
+        ipAddress: req.ip,
+        userAgent: req.get('User-Agent')
+      });
+
+      res.status(201).json({ success: true, data: surveillance, code: 'DISEASE_SURVEILLANCE_CREATED' });
+    } catch (error) {
+      console.error('❌ Failed to create surveillance record:', error);
+      res.status(400).json({ 
+        success: false,
+        error: 'Failed to create surveillance record',
+        message: error instanceof Error ? error.message : 'Unknown error',
+        code: 'SURVEILLANCE_CREATION_FAILED',
+        data: null
+      });
+    }
+  });
+
+  // List surveillance data with filters
+  app.get('/api/public-health/surveillance', authenticateJWT, authorizeRoles('epidemiologist', 'public_health_officer', 'admin'), async (req: AuthenticatedRequest, res) => {
+    try {
+      const filters: any = {};
+      
+      if (req.query.diseaseType) filters.diseaseType = req.query.diseaseType as string;
+      if (req.query.status) filters.status = req.query.status as string;
+      if (req.query.startDate) filters.startDate = new Date(req.query.startDate as string);
+      if (req.query.endDate) filters.endDate = new Date(req.query.endDate as string);
+
+      const surveillanceRecords = await storage.getDiseaseSurveillanceRecords(filters);
+      
+      res.json({ success: true, data: surveillanceRecords, count: surveillanceRecords.length });
+    } catch (error) {
+      console.error('❌ Failed to get surveillance records:', error);
+      res.status(500).json({ 
+        success: false,
+        error: 'Failed to get surveillance records',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
+  // Get surveillance details
+  app.get('/api/public-health/surveillance/:id', authenticateJWT, authorizeRoles('epidemiologist', 'public_health_officer', 'admin'), async (req: AuthenticatedRequest, res) => {
+    try {
+      const surveillance = await storage.getDiseaseSurveillanceRecord(req.params.id);
+      
+      if (!surveillance) {
+        return res.status(404).json({ success: false, error: 'Surveillance record not found' });
+      }
+
+      res.json({ success: true, data: surveillance });
+    } catch (error) {
+      console.error('❌ Failed to get surveillance record:', error);
+      res.status(500).json({ 
+        success: false,
+        error: 'Failed to get surveillance record',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
+  // Update surveillance data
+  app.put('/api/public-health/surveillance/:id', authenticateJWT, authorizeRoles('epidemiologist', 'public_health_officer', 'admin'), sensitiveOperationLimiter, async (req: AuthenticatedRequest, res) => {
+    try {
+      const surveillance = await storage.updateDiseaseSurveillanceRecord(req.params.id, req.body);
+      
+      // Create audit log
+      await storage.createAuditLog({
+        userId: req.userId!,
+        action: 'UPDATE_DISEASE_SURVEILLANCE',
+        resource: 'disease_surveillance',
+        details: { surveillanceId: req.params.id, updates: req.body },
+        ipAddress: req.ip,
+        userAgent: req.get('User-Agent')
+      });
+
+      res.json({ success: true, data: surveillance });
+    } catch (error) {
+      console.error('❌ Failed to update surveillance record:', error);
+      res.status(500).json({ 
+        success: false,
+        error: 'Failed to update surveillance record',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
+  // Get disease-specific data
+  app.get('/api/public-health/surveillance/diseases/:diseaseType', authenticateJWT, authorizeRoles('epidemiologist', 'public_health_officer', 'admin'), async (req: AuthenticatedRequest, res) => {
+    try {
+      const surveillanceRecords = await storage.getSurveillanceByDiseaseType(req.params.diseaseType);
+      
+      res.json({ success: true, data: surveillanceRecords, count: surveillanceRecords.length });
+    } catch (error) {
+      console.error('❌ Failed to get disease-specific surveillance data:', error);
+      res.status(500).json({ 
+        success: false,
+        error: 'Failed to get disease-specific surveillance data',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
+  // Get disease trend analytics
+  app.get('/api/public-health/surveillance/trends', authenticateJWT, authorizeRoles('epidemiologist', 'public_health_officer', 'admin'), async (req: AuthenticatedRequest, res) => {
+    try {
+      const filters: any = {};
+      
+      if (req.query.diseaseType) filters.diseaseType = req.query.diseaseType as string;
+      if (req.query.startDate && req.query.endDate) {
+        filters.timeRange = {
+          start: new Date(req.query.startDate as string),
+          end: new Date(req.query.endDate as string)
+        };
+      }
+
+      const trends = await storage.getDiseaseTrends(filters);
+      
+      res.json({ success: true, data: trends });
+    } catch (error) {
+      console.error('❌ Failed to get disease trends:', error);
+      res.status(500).json({ 
+        success: false,
+        error: 'Failed to get disease trends',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
+  // ===== 3. CONTACT TRACING MANAGEMENT =====
+  
+  // Apply additional PHI minimization for contact tracing endpoints
+  app.use('/api/public-health/contact-tracing', contactTracingPhiMinimization);
+
+  // Create contact tracing record
+  app.post('/api/public-health/contact-tracing', authenticateJWT, authorizeRoles('contact_tracer', 'public_health_officer', 'admin'), sensitiveOperationLimiter, async (req: AuthenticatedRequest, res) => {
+    try {
+      const validatedData = insertContactTracingSchema.parse(req.body);
+      const contact = await storage.createContactTracingRecord(validatedData);
+      
+      // Create audit log
+      await storage.createAuditLog({
+        userId: req.userId!,
+        action: 'CREATE_CONTACT_TRACING',
+        resource: 'contact_tracing',
+        details: { contactId: contact.id, contactType: contact.contactType },
+        ipAddress: req.ip,
+        userAgent: req.get('User-Agent')
+      });
+
+      res.status(201).json({ success: true, data: contact });
+    } catch (error) {
+      console.error('❌ Failed to create contact tracing record:', error);
+      res.status(400).json({ 
+        success: false,
+        error: 'Failed to create contact tracing record',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
+  // List contact records with privacy controls
+  app.get('/api/public-health/contact-tracing', authenticateJWT, authorizeRoles('contact_tracer', 'public_health_officer', 'admin'), async (req: AuthenticatedRequest, res) => {
+    try {
+      const filters: any = {};
+      
+      if (req.query.incidentId) filters.incidentId = req.query.incidentId as string;
+      if (req.query.status) filters.status = req.query.status as string;
+      if (req.query.contactType) filters.contactType = req.query.contactType as string;
+
+      const contacts = await storage.getContactTracingRecords(filters);
+      
+      res.json({ success: true, data: contacts, count: contacts.length });
+    } catch (error) {
+      console.error('❌ Failed to get contact tracing records:', error);
+      res.status(500).json({ 
+        success: false,
+        error: 'Failed to get contact tracing records',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
+  // Get contact details (role-based access)
+  app.get('/api/public-health/contact-tracing/:id', authenticateJWT, authorizeRoles('contact_tracer', 'public_health_officer', 'admin'), async (req: AuthenticatedRequest, res) => {
+    try {
+      const contact = await storage.getContactTracingRecord(req.params.id);
+      
+      if (!contact) {
+        return res.status(404).json({ success: false, error: 'Contact tracing record not found' });
+      }
+
+      res.json({ success: true, data: contact });
+    } catch (error) {
+      console.error('❌ Failed to get contact tracing record:', error);
+      res.status(500).json({ 
+        success: false,
+        error: 'Failed to get contact tracing record',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
+  // Update contact status
+  app.put('/api/public-health/contact-tracing/:id', authenticateJWT, authorizeRoles('contact_tracer', 'public_health_officer', 'admin'), sensitiveOperationLimiter, async (req: AuthenticatedRequest, res) => {
+    try {
+      const contact = await storage.updateContactTracingRecord(req.params.id, req.body);
+      
+      // Create audit log
+      await storage.createAuditLog({
+        userId: req.userId!,
+        action: 'UPDATE_CONTACT_TRACING',
+        resource: 'contact_tracing',
+        details: { contactId: req.params.id, updates: req.body },
+        ipAddress: req.ip,
+        userAgent: req.get('User-Agent')
+      });
+
+      res.json({ success: true, data: contact });
+    } catch (error) {
+      console.error('❌ Failed to update contact tracing record:', error);
+      res.status(500).json({ 
+        success: false,
+        error: 'Failed to update contact tracing record',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
+  // Send notification to contact
+  app.post('/api/public-health/contact-tracing/:id/notify', authenticateJWT, authorizeRoles('contact_tracer', 'public_health_officer', 'admin'), sensitiveOperationLimiter, async (req: AuthenticatedRequest, res) => {
+    try {
+      const success = await storage.notifyContact(req.params.id, req.body);
+      
+      // Create audit log
+      await storage.createAuditLog({
+        userId: req.userId!,
+        action: 'NOTIFY_CONTACT',
+        resource: 'contact_tracing',
+        details: { contactId: req.params.id, notificationData: req.body },
+        ipAddress: req.ip,
+        userAgent: req.get('User-Agent')
+      });
+
+      if (success) {
+        res.json({ success: true, message: 'Contact notification sent successfully' });
+      } else {
+        res.status(400).json({ success: false, error: 'Failed to send contact notification' });
+      }
+    } catch (error) {
+      console.error('❌ Failed to notify contact:', error);
+      res.status(500).json({ 
+        success: false,
+        error: 'Failed to notify contact',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
+  // Get exposure list
+  app.get('/api/public-health/contact-tracing/exposed/:incidentId', authenticateJWT, authorizeRoles('contact_tracer', 'public_health_officer', 'admin'), async (req: AuthenticatedRequest, res) => {
+    try {
+      const exposedContacts = await storage.getExposedContactsByIncident(req.params.incidentId);
+      
+      res.json({ success: true, data: exposedContacts, count: exposedContacts.length });
+    } catch (error) {
+      console.error('❌ Failed to get exposed contacts:', error);
+      res.status(500).json({ 
+        success: false,
+        error: 'Failed to get exposed contacts',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
+  // ===== 4. HEALTH FACILITIES MONITORING =====
+
+  // Register health facility
+  app.post('/api/public-health/facilities', authenticateJWT, authorizeRoles('health_facility_admin', 'public_health_officer', 'admin'), sensitiveOperationLimiter, async (req: AuthenticatedRequest, res) => {
+    try {
+      const validatedData = insertHealthFacilitySchema.parse(req.body);
+      const facility = await storage.createHealthFacility(validatedData);
+      
+      // Create audit log
+      await storage.createAuditLog({
+        userId: req.userId!,
+        action: 'REGISTER_HEALTH_FACILITY',
+        resource: 'health_facilities',
+        details: { facilityId: facility.id, facilityName: facility.facilityName },
+        ipAddress: req.ip,
+        userAgent: req.get('User-Agent')
+      });
+
+      res.status(201).json({ success: true, data: facility });
+    } catch (error) {
+      console.error('❌ Failed to register health facility:', error);
+      res.status(400).json({ 
+        success: false,
+        error: 'Failed to register health facility',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
+  // List facilities with status/capacity
+  app.get('/api/public-health/facilities', authenticateJWT, authorizeRoles('health_facility_admin', 'public_health_officer', 'emergency_coordinator', 'admin'), async (req: AuthenticatedRequest, res) => {
+    try {
+      const filters: any = {};
+      
+      if (req.query.facilityType) filters.facilityType = req.query.facilityType as string;
+      if (req.query.status) filters.status = req.query.status as string;
+      if (req.query.region) filters.region = req.query.region as string;
+
+      const facilities = await storage.getHealthFacilities(filters);
+      
+      res.json({ success: true, data: facilities, count: facilities.length });
+    } catch (error) {
+      console.error('❌ Failed to get health facilities:', error);
+      res.status(500).json({ 
+        success: false,
+        error: 'Failed to get health facilities',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
+  // Get facility details
+  app.get('/api/public-health/facilities/:id', authenticateJWT, authorizeRoles('health_facility_admin', 'public_health_officer', 'emergency_coordinator', 'admin'), async (req: AuthenticatedRequest, res) => {
+    try {
+      const facility = await storage.getHealthFacility(req.params.id);
+      
+      if (!facility) {
+        return res.status(404).json({ success: false, error: 'Health facility not found' });
+      }
+
+      res.json({ success: true, data: facility });
+    } catch (error) {
+      console.error('❌ Failed to get health facility:', error);
+      res.status(500).json({ 
+        success: false,
+        error: 'Failed to get health facility',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
+  // Update facility status/capacity
+  app.put('/api/public-health/facilities/:id', authenticateJWT, authorizeRoles('health_facility_admin', 'public_health_officer', 'admin'), sensitiveOperationLimiter, async (req: AuthenticatedRequest, res) => {
+    try {
+      const facility = await storage.updateHealthFacility(req.params.id, req.body);
+      
+      // Create audit log
+      await storage.createAuditLog({
+        userId: req.userId!,
+        action: 'UPDATE_HEALTH_FACILITY',
+        resource: 'health_facilities',
+        details: { facilityId: req.params.id, updates: req.body },
+        ipAddress: req.ip,
+        userAgent: req.get('User-Agent')
+      });
+
+      res.json({ success: true, data: facility });
+    } catch (error) {
+      console.error('❌ Failed to update health facility:', error);
+      res.status(500).json({ 
+        success: false,
+        error: 'Failed to update health facility',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
+  // Get regional capacity overview
+  app.get('/api/public-health/facilities/capacity', authenticateJWT, authorizeRoles('public_health_officer', 'emergency_coordinator', 'admin'), async (req: AuthenticatedRequest, res) => {
+    try {
+      const region = req.query.region as string | undefined;
+      const capacityOverview = await storage.getRegionalCapacityOverview(region);
+      
+      res.json({ success: true, data: capacityOverview });
+    } catch (error) {
+      console.error('❌ Failed to get regional capacity overview:', error);
+      res.status(500).json({ 
+        success: false,
+        error: 'Failed to get regional capacity overview',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
+  // Activate emergency protocols
+  app.post('/api/public-health/facilities/:id/emergency', authenticateJWT, authorizeRoles('emergency_coordinator', 'public_health_officer', 'admin'), sensitiveOperationLimiter, async (req: AuthenticatedRequest, res) => {
+    try {
+      const facility = await storage.activateEmergencyProtocols(req.params.id, req.body);
+      
+      // Create audit log
+      await storage.createAuditLog({
+        userId: req.userId!,
+        action: 'ACTIVATE_EMERGENCY_PROTOCOLS',
+        resource: 'health_facilities',
+        details: { facilityId: req.params.id, protocols: req.body },
+        ipAddress: req.ip,
+        userAgent: req.get('User-Agent')
+      });
+
+      res.json({ success: true, data: facility, message: 'Emergency protocols activated successfully' });
+    } catch (error) {
+      console.error('❌ Failed to activate emergency protocols:', error);
+      res.status(500).json({ 
+        success: false,
+        error: 'Failed to activate emergency protocols',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
+  // ===== 5. PUBLIC HEALTH ALERTS =====
+
+  // Create public health alert
+  app.post('/api/public-health/alerts', authenticateJWT, authorizeRoles('public_health_officer', 'emergency_coordinator', 'admin'), sensitiveOperationLimiter, async (req: AuthenticatedRequest, res) => {
+    try {
+      const validatedData = insertPublicHealthAlertSchema.parse(req.body);
+      const alert = await storage.createPublicHealthAlert(validatedData);
+      
+      // Create audit log
+      await storage.createAuditLog({
+        userId: req.userId!,
+        action: 'CREATE_PUBLIC_HEALTH_ALERT',
+        resource: 'public_health_alerts',
+        details: { alertId: alert.id, alertType: alert.alertType, severity: alert.severity },
+        ipAddress: req.ip,
+        userAgent: req.get('User-Agent')
+      });
+
+      res.status(201).json({ success: true, data: alert });
+    } catch (error) {
+      console.error('❌ Failed to create public health alert:', error);
+      res.status(400).json({ 
+        success: false,
+        error: 'Failed to create public health alert',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
+  // List active alerts
+  app.get('/api/public-health/alerts', authenticateJWT, authorizeRoles('public_health_officer', 'emergency_coordinator', 'admin'), async (req: AuthenticatedRequest, res) => {
+    try {
+      const filters: any = {};
+      
+      if (req.query.alertType) filters.alertType = req.query.alertType as string;
+      if (req.query.severity) filters.severity = req.query.severity as string;
+      if (req.query.status) filters.status = req.query.status as string;
+
+      const alerts = await storage.getPublicHealthAlerts(filters);
+      
+      res.json({ success: true, data: alerts, count: alerts.length });
+    } catch (error) {
+      console.error('❌ Failed to get public health alerts:', error);
+      res.status(500).json({ 
+        success: false,
+        error: 'Failed to get public health alerts',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
+  // Get alert details
+  app.get('/api/public-health/alerts/:id', authenticateJWT, authorizeRoles('public_health_officer', 'emergency_coordinator', 'admin'), async (req: AuthenticatedRequest, res) => {
+    try {
+      const alert = await storage.getPublicHealthAlert(req.params.id);
+      
+      if (!alert) {
+        return res.status(404).json({ success: false, error: 'Public health alert not found' });
+      }
+
+      res.json({ success: true, data: alert });
+    } catch (error) {
+      console.error('❌ Failed to get public health alert:', error);
+      res.status(500).json({ 
+        success: false,
+        error: 'Failed to get public health alert',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
+  // Update alert status
+  app.put('/api/public-health/alerts/:id', authenticateJWT, authorizeRoles('public_health_officer', 'emergency_coordinator', 'admin'), sensitiveOperationLimiter, async (req: AuthenticatedRequest, res) => {
+    try {
+      const alert = await storage.updatePublicHealthAlert(req.params.id, req.body);
+      
+      // Create audit log
+      await storage.createAuditLog({
+        userId: req.userId!,
+        action: 'UPDATE_PUBLIC_HEALTH_ALERT',
+        resource: 'public_health_alerts',
+        details: { alertId: req.params.id, updates: req.body },
+        ipAddress: req.ip,
+        userAgent: req.get('User-Agent')
+      });
+
+      res.json({ success: true, data: alert });
+    } catch (error) {
+      console.error('❌ Failed to update public health alert:', error);
+      res.status(500).json({ 
+        success: false,
+        error: 'Failed to update public health alert',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
+  // Broadcast alert to channels
+  app.post('/api/public-health/alerts/:id/broadcast', authenticateJWT, authorizeRoles('public_health_officer', 'emergency_coordinator', 'admin'), sensitiveOperationLimiter, async (req: AuthenticatedRequest, res) => {
+    try {
+      const { channels } = req.body;
+      const success = await storage.broadcastAlert(req.params.id, channels);
+      
+      // Create audit log
+      await storage.createAuditLog({
+        userId: req.userId!,
+        action: 'BROADCAST_ALERT',
+        resource: 'public_health_alerts',
+        details: { alertId: req.params.id, channels },
+        ipAddress: req.ip,
+        userAgent: req.get('User-Agent')
+      });
+
+      if (success) {
+        res.json({ success: true, message: 'Alert broadcasted successfully' });
+      } else {
+        res.status(400).json({ success: false, error: 'Failed to broadcast alert' });
+      }
+    } catch (error) {
+      console.error('❌ Failed to broadcast alert:', error);
+      res.status(500).json({ 
+        success: false,
+        error: 'Failed to broadcast alert',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
+  // Deactivate alert
+  app.delete('/api/public-health/alerts/:id', authenticateJWT, authorizeRoles('public_health_officer', 'emergency_coordinator', 'admin'), sensitiveOperationLimiter, async (req: AuthenticatedRequest, res) => {
+    try {
+      await storage.deletePublicHealthAlert(req.params.id);
+      
+      // Create audit log
+      await storage.createAuditLog({
+        userId: req.userId!,
+        action: 'DEACTIVATE_ALERT',
+        resource: 'public_health_alerts',
+        details: { alertId: req.params.id },
+        ipAddress: req.ip,
+        userAgent: req.get('User-Agent')
+      });
+
+      res.json({ success: true, message: 'Public health alert deactivated successfully' });
+    } catch (error) {
+      console.error('❌ Failed to deactivate alert:', error);
+      res.status(500).json({ 
+        success: false,
+        error: 'Failed to deactivate alert',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
+  // ===== 6. EPIDEMIOLOGICAL DATA ANALYTICS =====
+
+  // Submit epidemiological data
+  app.post('/api/public-health/epidemiology', authenticateJWT, authorizeRoles('epidemiologist', 'public_health_officer', 'admin'), sensitiveOperationLimiter, async (req: AuthenticatedRequest, res) => {
+    try {
+      const validatedData = insertEpidemiologicalDataSchema.parse(req.body);
+      const data = await storage.createEpidemiologicalData(validatedData);
+      
+      // Create audit log
+      await storage.createAuditLog({
+        userId: req.userId!,
+        action: 'SUBMIT_EPIDEMIOLOGICAL_DATA',
+        resource: 'epidemiological_data',
+        details: { dataId: data.id, dataType: data.dataType },
+        ipAddress: req.ip,
+        userAgent: req.get('User-Agent')
+      });
+
+      res.status(201).json({ success: true, data });
+    } catch (error) {
+      console.error('❌ Failed to submit epidemiological data:', error);
+      res.status(400).json({ 
+        success: false,
+        error: 'Failed to submit epidemiological data',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
+  // Query epidemiological data
+  app.get('/api/public-health/epidemiology', authenticateJWT, authorizeRoles('epidemiologist', 'public_health_officer', 'admin'), async (req: AuthenticatedRequest, res) => {
+    try {
+      const filters: any = {};
+      
+      if (req.query.dataType) filters.dataType = req.query.dataType as string;
+      if (req.query.diseaseCode) filters.diseaseCode = req.query.diseaseCode as string;
+      if (req.query.geographicScope) filters.geographicScope = req.query.geographicScope as string;
+      if (req.query.startDate) filters.startDate = new Date(req.query.startDate as string);
+      if (req.query.endDate) filters.endDate = new Date(req.query.endDate as string);
+
+      const data = await storage.getEpidemiologicalData(filters);
+      
+      res.json({ success: true, data, count: data.length });
+    } catch (error) {
+      console.error('❌ Failed to get epidemiological data:', error);
+      res.status(500).json({ 
+        success: false,
+        error: 'Failed to get epidemiological data',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
+  // Generate statistical reports
+  app.get('/api/public-health/epidemiology/reports', authenticateJWT, authorizeRoles('epidemiologist', 'public_health_officer', 'admin'), async (req: AuthenticatedRequest, res) => {
+    try {
+      const reports = await storage.generateStatisticalReports(req.query);
+      
+      res.json({ success: true, data: reports });
+    } catch (error) {
+      console.error('❌ Failed to generate statistical reports:', error);
+      res.status(500).json({ 
+        success: false,
+        error: 'Failed to generate statistical reports',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
+  // Get MMWR week data
+  app.get('/api/public-health/epidemiology/mmwr/:week/:year', authenticateJWT, authorizeRoles('epidemiologist', 'public_health_officer', 'admin'), async (req: AuthenticatedRequest, res) => {
+    try {
+      const week = parseInt(req.params.week);
+      const year = parseInt(req.params.year);
+      
+      if (isNaN(week) || isNaN(year) || week < 1 || week > 53) {
+        return res.status(400).json({ success: false, error: 'Invalid MMWR week or year' });
+      }
+
+      const data = await storage.getMMWRData(week, year);
+      
+      res.json({ success: true, data, count: data.length });
+    } catch (error) {
+      console.error('❌ Failed to get MMWR data:', error);
+      res.status(500).json({ 
+        success: false,
+        error: 'Failed to get MMWR data',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
+  // Get population health trends
+  app.get('/api/public-health/epidemiology/trends', authenticateJWT, authorizeRoles('epidemiologist', 'public_health_officer', 'admin'), async (req: AuthenticatedRequest, res) => {
+    try {
+      const trends = await storage.getPopulationHealthTrends(req.query);
+      
+      res.json({ success: true, data: trends });
+    } catch (error) {
+      console.error('❌ Failed to get population health trends:', error);
+      res.status(500).json({ 
+        success: false,
+        error: 'Failed to get population health trends',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
+  // Generate CDC report
+  app.post('/api/public-health/epidemiology/cdc-report', authenticateJWT, authorizeRoles('epidemiologist', 'public_health_officer', 'admin'), sensitiveOperationLimiter, async (req: AuthenticatedRequest, res) => {
+    try {
+      const report = await storage.generateCDCReport(req.body);
+      
+      // Create audit log
+      await storage.createAuditLog({
+        userId: req.userId!,
+        action: 'GENERATE_CDC_REPORT',
+        resource: 'epidemiological_data',
+        details: { filters: req.body },
+        ipAddress: req.ip,
+        userAgent: req.get('User-Agent')
+      });
+
+      res.json({ success: true, data: report, message: 'CDC report generated successfully' });
+    } catch (error) {
+      console.error('❌ Failed to generate CDC report:', error);
+      res.status(500).json({ 
+        success: false,
+        error: 'Failed to generate CDC report',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
+  // ===== CDC FORMAT COMPLIANCE ENDPOINTS =====
+  
+  // NNDSS Format Export - Convert incidents to NNDSS format
+  app.get('/api/public-health/cdc/nndss/:incidentId', authenticateJWT, authorizeRoles('epidemiologist', 'public_health_officer', 'admin'), async (req: AuthenticatedRequest, res) => {
+    try {
+      const incident = await storage.getPublicHealthIncident(req.params.incidentId);
+      if (!incident) {
+        return res.status(404).json({ success: false, error: 'Health incident not found', code: 'INCIDENT_NOT_FOUND' });
+      }
+      
+      const nndssData = convertToNNDSSFormat(incident);
+      const validatedData = NNDSSDataSchema.parse(nndssData);
+      
+      res.json({ 
+        success: true, 
+        data: validatedData, 
+        format: 'NNDSS',
+        message: 'Incident data converted to NNDSS format successfully' 
+      });
+    } catch (error) {
+      console.error('❌ Failed to convert to NNDSS format:', error);
+      res.status(500).json({ 
+        success: false,
+        error: 'Failed to convert to NNDSS format',
+        code: 'NNDSS_CONVERSION_ERROR',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
+  // NEDSS Format Export - Convert surveillance data to NEDSS format  
+  app.get('/api/public-health/cdc/nedss/:surveillanceId', authenticateJWT, authorizeRoles('epidemiologist', 'public_health_officer', 'admin'), async (req: AuthenticatedRequest, res) => {
+    try {
+      const surveillance = await storage.getDiseaseSurveillanceRecord(req.params.surveillanceId);
+      if (!surveillance) {
+        return res.status(404).json({ success: false, error: 'Surveillance record not found', code: 'SURVEILLANCE_NOT_FOUND' });
+      }
+      
+      const nedssData = convertToNEDSSFormat(surveillance);
+      const validatedData = NEDSSDataSchema.parse(nedssData);
+      
+      res.json({ 
+        success: true, 
+        data: validatedData, 
+        format: 'NEDSS',
+        message: 'Surveillance data converted to NEDSS format successfully' 
+      });
+    } catch (error) {
+      console.error('❌ Failed to convert to NEDSS format:', error);
+      res.status(500).json({ 
+        success: false,
+        error: 'Failed to convert to NEDSS format',
+        code: 'NEDSS_CONVERSION_ERROR',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
+  // HAN Format Export - Convert alerts to HAN format
+  app.get('/api/public-health/cdc/han/:alertId', authenticateJWT, authorizeRoles('public_health_officer', 'emergency_coordinator', 'admin'), async (req: AuthenticatedRequest, res) => {
+    try {
+      const alert = await storage.getPublicHealthAlert(req.params.alertId);
+      if (!alert) {
+        return res.status(404).json({ success: false, error: 'Public health alert not found', code: 'ALERT_NOT_FOUND' });
+      }
+      
+      const hanData = convertToHANFormat(alert);
+      const validatedData = HANAlertSchema.parse(hanData);
+      
+      res.json({ 
+        success: true, 
+        data: validatedData, 
+        format: 'HAN',
+        message: 'Alert converted to HAN format successfully' 
+      });
+    } catch (error) {
+      console.error('❌ Failed to convert to HAN format:', error);
+      res.status(500).json({ 
+        success: false,
+        error: 'Failed to convert to HAN format',
+        code: 'HAN_CONVERSION_ERROR',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
+  // MMWR Format Export - Convert epidemiological data to MMWR format
+  app.get('/api/public-health/cdc/mmwr/:dataId', authenticateJWT, authorizeRoles('epidemiologist', 'public_health_officer', 'admin'), async (req: AuthenticatedRequest, res) => {
+    try {
+      const epidData = await storage.getEpidemiologicalDataRecord(req.params.dataId);
+      if (!epidData) {
+        return res.status(404).json({ success: false, error: 'Epidemiological data not found', code: 'EPID_DATA_NOT_FOUND' });
+      }
+      
+      const mmwrData = convertToMMWRFormat(epidData);
+      const validatedData = MMWRDataSchema.parse(mmwrData);
+      
+      res.json({ 
+        success: true, 
+        data: validatedData, 
+        format: 'MMWR',
+        message: 'Epidemiological data converted to MMWR format successfully' 
+      });
+    } catch (error) {
+      console.error('❌ Failed to convert to MMWR format:', error);
+      res.status(500).json({ 
+        success: false,
+        error: 'Failed to convert to MMWR format',
+        code: 'MMWR_CONVERSION_ERROR',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
+  // Bulk CDC Format Export
+  app.post('/api/public-health/cdc/bulk-export', authenticateJWT, authorizeRoles('epidemiologist', 'public_health_officer', 'admin'), sensitiveOperationLimiter, async (req: AuthenticatedRequest, res) => {
+    try {
+      const { format, filters, includeIds } = req.body;
+      
+      if (!['NNDSS', 'NEDSS', 'HAN', 'MMWR'].includes(format)) {
+        return res.status(400).json({ success: false, error: 'Invalid CDC format specified', code: 'INVALID_FORMAT' });
+      }
+      
+      let exportData = [];
+      
+      if (format === 'NNDSS') {
+        const incidents = includeIds ? 
+          await Promise.all(includeIds.map((id: string) => storage.getPublicHealthIncident(id))) :
+          await storage.getPublicHealthIncidents(filters);
+        exportData = incidents.filter(Boolean).map(incident => convertToNNDSSFormat(incident));
+      } else if (format === 'NEDSS') {
+        const surveillanceRecords = includeIds ?
+          await Promise.all(includeIds.map((id: string) => storage.getDiseaseSurveillanceRecord(id))) :
+          await storage.getDiseaseSurveillanceRecords(filters);
+        exportData = surveillanceRecords.filter(Boolean).map(record => convertToNEDSSFormat(record));
+      } else if (format === 'HAN') {
+        const alerts = includeIds ?
+          await Promise.all(includeIds.map((id: string) => storage.getPublicHealthAlert(id))) :
+          await storage.getPublicHealthAlerts(filters);
+        exportData = alerts.filter(Boolean).map(alert => convertToHANFormat(alert));
+      } else if (format === 'MMWR') {
+        const epidData = includeIds ?
+          await Promise.all(includeIds.map((id: string) => storage.getEpidemiologicalDataRecord(id))) :
+          await storage.getEpidemiologicalData(filters);
+        exportData = epidData.filter(Boolean).map(data => convertToMMWRFormat(data));
+      }
+      
+      // Audit log for bulk export
+      await storage.createAuditLog({
+        userId: req.userId!,
+        action: 'BULK_CDC_EXPORT',
+        resource: 'cdc_integration',
+        details: { format, exportCount: exportData.length, filters },
+        ipAddress: req.ip,
+        userAgent: req.get('User-Agent')
+      });
+      
+      res.json({ 
+        success: true, 
+        data: exportData, 
+        format,
+        count: exportData.length,
+        message: `Bulk export to ${format} format completed successfully` 
+      });
+    } catch (error) {
+      console.error('❌ Failed bulk CDC export:', error);
+      res.status(500).json({ 
+        success: false,
+        error: 'Failed bulk CDC export',
+        code: 'BULK_EXPORT_ERROR',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
+  // ===== ADDITIONAL CDC ENDPOINTS (ARCHITECT REQUIREMENTS) =====
+  
+  // MMWR by Week/Year - Get MMWR data for specific epidemiological week
+  app.get('/api/public-health/cdc/mmwr/:week/:year', authenticateJWT, authorizeRoles('epidemiologist', 'public_health_officer', 'admin'), async (req: AuthenticatedRequest, res) => {
+    try {
+      const { week, year } = req.params;
+      const weekNum = parseInt(week);
+      const yearNum = parseInt(year);
+      
+      if (weekNum < 1 || weekNum > 53) {
+        return res.status(400).json({ success: false, error: 'Invalid MMWR week (must be 1-53)', code: 'INVALID_WEEK' });
+      }
+      
+      if (yearNum < 2000 || yearNum > 2030) {
+        return res.status(400).json({ success: false, error: 'Invalid MMWR year (must be 2000-2030)', code: 'INVALID_YEAR' });
+      }
+      
+      const epidData = await storage.getEpidemiologicalDataByMMWRWeek(weekNum, yearNum);
+      if (!epidData || epidData.length === 0) {
+        return res.status(404).json({ success: false, error: 'No MMWR data found for specified week/year', code: 'MMWR_DATA_NOT_FOUND' });
+      }
+      
+      const mmwrReports = epidData.map(data => convertToMMWRFormat(data));
+      const validatedReports = mmwrReports.map(report => MMWRDataSchema.parse(report));
+      
+      res.json({ 
+        success: true, 
+        data: validatedReports, 
+        format: 'MMWR',
+        week: weekNum,
+        year: yearNum,
+        count: validatedReports.length,
+        message: `MMWR data for week ${weekNum}, ${yearNum} retrieved successfully` 
+      });
+    } catch (error) {
+      console.error('❌ Failed to get MMWR data by week/year:', error);
+      res.status(500).json({ 
+        success: false,
+        error: 'Failed to get MMWR data by week/year',
+        code: 'MMWR_WEEK_YEAR_ERROR',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
+  // NNDSS Export - Bulk export all NNDSS-formatted incidents
+  app.get('/api/public-health/cdc/nndss/export', authenticateJWT, authorizeRoles('epidemiologist', 'public_health_officer', 'admin'), async (req: AuthenticatedRequest, res) => {
+    try {
+      const { startDate, endDate, jurisdiction, conditionCode } = req.query;
+      
+      const filters = {
+        ...(startDate && { startDate: new Date(startDate as string) }),
+        ...(endDate && { endDate: new Date(endDate as string) }),
+        ...(jurisdiction && { jurisdiction: jurisdiction as string }),
+        ...(conditionCode && { conditionCode: conditionCode as string })
+      };
+      
+      const incidents = await storage.getPublicHealthIncidents(filters);
+      const nndssExports = incidents.map(incident => convertToNNDSSFormat(incident));
+      const validatedExports = nndssExports.map(data => NNDSSDataSchema.parse(data));
+      
+      // Audit log for NNDSS export
+      await storage.createAuditLog({
+        userId: req.userId!,
+        action: 'NNDSS_BULK_EXPORT',
+        resource: 'cdc_integration',
+        details: { exportCount: validatedExports.length, filters },
+        ipAddress: req.ip,
+        userAgent: req.get('User-Agent')
+      });
+      
+      res.json({ 
+        success: true, 
+        data: validatedExports, 
+        format: 'NNDSS',
+        count: validatedExports.length,
+        filters,
+        message: 'NNDSS bulk export completed successfully' 
+      });
+    } catch (error) {
+      console.error('❌ Failed NNDSS bulk export:', error);
+      res.status(500).json({ 
+        success: false,
+        error: 'Failed NNDSS bulk export',
+        code: 'NNDSS_EXPORT_ERROR',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
+  // NEDSS Export - Bulk export all NEDSS-formatted surveillance data
+  app.get('/api/public-health/cdc/nedss/export', authenticateJWT, authorizeRoles('epidemiologist', 'public_health_officer', 'admin'), async (req: AuthenticatedRequest, res) => {
+    try {
+      const { startDate, endDate, jurisdiction, investigationStatus, caseStatus } = req.query;
+      
+      const filters = {
+        ...(startDate && { startDate: new Date(startDate as string) }),
+        ...(endDate && { endDate: new Date(endDate as string) }),
+        ...(jurisdiction && { jurisdiction: jurisdiction as string }),
+        ...(investigationStatus && { investigationStatus: investigationStatus as string }),
+        ...(caseStatus && { caseStatus: caseStatus as string })
+      };
+      
+      const surveillanceRecords = await storage.getDiseaseSurveillanceRecords(filters);
+      const nedssExports = surveillanceRecords.map(record => convertToNEDSSFormat(record));
+      const validatedExports = nedssExports.map(data => NEDSSDataSchema.parse(data));
+      
+      // Audit log for NEDSS export
+      await storage.createAuditLog({
+        userId: req.userId!,
+        action: 'NEDSS_BULK_EXPORT',
+        resource: 'cdc_integration',
+        details: { exportCount: validatedExports.length, filters },
+        ipAddress: req.ip,
+        userAgent: req.get('User-Agent')
+      });
+      
+      res.json({ 
+        success: true, 
+        data: validatedExports, 
+        format: 'NEDSS',
+        count: validatedExports.length,
+        filters,
+        message: 'NEDSS bulk export completed successfully' 
+      });
+    } catch (error) {
+      console.error('❌ Failed NEDSS bulk export:', error);
+      res.status(500).json({ 
+        success: false,
+        error: 'Failed NEDSS bulk export',
+        code: 'NEDSS_EXPORT_ERROR',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
+  // HAN Message Creation - Create new HAN message/alert
+  app.post('/api/public-health/cdc/han/message', authenticateJWT, authorizeRoles('public_health_officer', 'emergency_coordinator', 'admin'), sensitiveOperationLimiter, async (req: AuthenticatedRequest, res) => {
+    try {
+      const hanMessageData = HANAlertSchema.parse(req.body);
+      
+      // Create public health alert first
+      const alertData = {
+        alertType: 'health_alert',
+        title: hanMessageData.subject,
+        message: hanMessageData.messageBody,
+        severity: hanMessageData.priority.toLowerCase(),
+        urgency: hanMessageData.priority === 'Emergency' ? 'immediate' : 'expected',
+        certainty: 'likely',
+        targetAudience: hanMessageData.audience.join(', '),
+        geographicScope: 'national',
+        effectiveTime: new Date(),
+        expirationTime: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
+        alertStatus: 'actual',
+        issuedBy: req.userId!,
+        cdcHanAlert: true,
+        cdcHanId: hanMessageData.hanId
+      };
+      
+      const alert = await storage.createPublicHealthAlert(alertData);
+      
+      // Convert to HAN format for validation
+      const hanFormatted = convertToHANFormat(alert);
+      const validatedHAN = HANAlertSchema.parse(hanFormatted);
+      
+      // Audit log for HAN message creation
+      await storage.createAuditLog({
+        userId: req.userId!,
+        action: 'CREATE_HAN_MESSAGE',
+        resource: 'public_health_alert',
+        details: { alertId: alert.id, hanId: hanMessageData.hanId },
+        ipAddress: req.ip,
+        userAgent: req.get('User-Agent')
+      });
+      
+      res.status(201).json({ 
+        success: true, 
+        data: {
+          alert,
+          hanFormat: validatedHAN
+        },
+        message: 'HAN message created successfully' 
+      });
+    } catch (error) {
+      console.error('❌ Failed to create HAN message:', error);
+      res.status(500).json({ 
+        success: false,
+        error: 'Failed to create HAN message',
+        code: 'HAN_MESSAGE_ERROR',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
+  // Bulk CDC Export - GET version for compliance with architect requirements
+  app.get('/api/public-health/cdc/bulk-export', authenticateJWT, authorizeRoles('epidemiologist', 'public_health_officer', 'admin'), async (req: AuthenticatedRequest, res) => {
+    try {
+      const { format, startDate, endDate, jurisdiction, includeIds } = req.query;
+      
+      if (!format || !['NNDSS', 'NEDSS', 'HAN', 'MMWR'].includes(format as string)) {
+        return res.status(400).json({ 
+          success: false, 
+          error: 'Invalid or missing CDC format parameter. Must be one of: NNDSS, NEDSS, HAN, MMWR', 
+          code: 'INVALID_FORMAT' 
+        });
+      }
+      
+      const filters = {
+        ...(startDate && { startDate: new Date(startDate as string) }),
+        ...(endDate && { endDate: new Date(endDate as string) }),
+        ...(jurisdiction && { jurisdiction: jurisdiction as string })
+      };
+      
+      const includeIdsArray = includeIds ? (includeIds as string).split(',') : [];
+      
+      let exportData = [];
+      
+      if (format === 'NNDSS') {
+        const incidents = includeIdsArray.length > 0 ? 
+          await Promise.all(includeIdsArray.map((id: string) => storage.getPublicHealthIncident(id))) :
+          await storage.getPublicHealthIncidents(filters);
+        exportData = incidents.filter(Boolean).map(incident => convertToNNDSSFormat(incident));
+      } else if (format === 'NEDSS') {
+        const surveillanceRecords = includeIdsArray.length > 0 ?
+          await Promise.all(includeIdsArray.map((id: string) => storage.getDiseaseSurveillanceRecord(id))) :
+          await storage.getDiseaseSurveillanceRecords(filters);
+        exportData = surveillanceRecords.filter(Boolean).map(record => convertToNEDSSFormat(record));
+      } else if (format === 'HAN') {
+        const alerts = includeIdsArray.length > 0 ?
+          await Promise.all(includeIdsArray.map((id: string) => storage.getPublicHealthAlert(id))) :
+          await storage.getPublicHealthAlerts(filters);
+        exportData = alerts.filter(Boolean).map(alert => convertToHANFormat(alert));
+      } else if (format === 'MMWR') {
+        const epidData = includeIdsArray.length > 0 ?
+          await Promise.all(includeIdsArray.map((id: string) => storage.getEpidemiologicalDataRecord(id))) :
+          await storage.getEpidemiologicalData(filters);
+        exportData = epidData.filter(Boolean).map(data => convertToMMWRFormat(data));
+      }
+      
+      // Audit log for bulk export
+      await storage.createAuditLog({
+        userId: req.userId!,
+        action: 'BULK_CDC_EXPORT_GET',
+        resource: 'cdc_integration',
+        details: { format, exportCount: exportData.length, filters, includeIds: includeIdsArray },
+        ipAddress: req.ip,
+        userAgent: req.get('User-Agent')
+      });
+      
+      res.json({ 
+        success: true, 
+        data: exportData, 
+        format,
+        count: exportData.length,
+        filters,
+        message: `Bulk CDC export in ${format} format completed successfully` 
+      });
+    } catch (error) {
+      console.error('❌ Failed bulk CDC GET export:', error);
+      res.status(500).json({ 
+        success: false,
+        error: 'Failed bulk CDC export',
+        code: 'BULK_EXPORT_GET_ERROR',
+        message: error instanceof Error ? error.message : 'Unknown error'
       });
     }
   });
