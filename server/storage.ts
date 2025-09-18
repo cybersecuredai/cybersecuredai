@@ -315,6 +315,100 @@ export interface IStorage {
   notifyContact(id: string, notificationData: any): Promise<boolean>;
   getExposedContactsByIncident(incidentId: string): Promise<ContactTracing[]>;
   
+  // ===== ENHANCED CONTACT TRACING SYSTEM OPERATIONS =====
+  
+  // Contact Tracing Location History operations
+  getLocationHistory(filters?: { userId?: string; deviceId?: string; startDate?: Date; endDate?: Date; consentGiven?: boolean }): Promise<ContactTracingLocationHistory[]>;
+  getLocationHistoryRecord(id: string): Promise<ContactTracingLocationHistory | undefined>;
+  createLocationHistoryRecord(location: InsertContactTracingLocationHistory): Promise<ContactTracingLocationHistory>;
+  updateLocationHistoryRecord(id: string, updates: Partial<ContactTracingLocationHistory>): Promise<ContactTracingLocationHistory>;
+  deleteLocationHistoryRecord(id: string): Promise<void>;
+  getLocationHistoryByDevice(deviceId: string, timeRange?: { start: Date; end: Date }): Promise<ContactTracingLocationHistory[]>;
+  getLocationHistoryByUser(userId: string, timeRange?: { start: Date; end: Date }): Promise<ContactTracingLocationHistory[]>;
+  cleanupExpiredLocationHistory(beforeDate?: Date): Promise<number>; // Returns number of records deleted
+  anonymizeLocationHistory(beforeDate: Date): Promise<number>; // Returns number of records anonymized
+  getLocationsByGeofence(latitude: number, longitude: number, radiusMeters: number, timeRange?: { start: Date; end: Date }): Promise<ContactTracingLocationHistory[]>;
+  
+  // Contact Proximity Detection operations
+  getProximityDetections(filters?: { riskLevel?: string; detectionMethod?: string; startDate?: Date; endDate?: Date }): Promise<ContactProximityDetection[]>;
+  getProximityDetection(id: string): Promise<ContactProximityDetection | undefined>;
+  createProximityDetection(detection: InsertContactProximityDetection): Promise<ContactProximityDetection>;
+  updateProximityDetection(id: string, updates: Partial<ContactProximityDetection>): Promise<ContactProximityDetection>;
+  deleteProximityDetection(id: string): Promise<void>;
+  getProximityDetectionsByDevice(deviceId: string, timeRange?: { start: Date; end: Date }): Promise<ContactProximityDetection[]>;
+  getProximityDetectionsByUser(userId: string, timeRange?: { start: Date; end: Date }): Promise<ContactProximityDetection[]>;
+  getProximityDetectionsByRisk(riskLevel: string, limit?: number): Promise<ContactProximityDetection[]>;
+  processProximityAlgorithm(algorithmVersion: string, timeRange: { start: Date; end: Date }): Promise<ContactProximityDetection[]>;
+  validateProximityDetection(id: string, validatedBy: string, validationStatus: string): Promise<ContactProximityDetection>;
+  
+  // Contact Tracing Notification Templates operations
+  getNotificationTemplates(filters?: { templateCategory?: string; riskLevel?: string; templateType?: string; isActive?: boolean }): Promise<ContactTracingNotificationTemplate[]>;
+  getNotificationTemplate(id: string): Promise<ContactTracingNotificationTemplate | undefined>;
+  getNotificationTemplateByTemplateId(templateId: string): Promise<ContactTracingNotificationTemplate | undefined>;
+  createNotificationTemplate(template: InsertContactTracingNotificationTemplate): Promise<ContactTracingNotificationTemplate>;
+  updateNotificationTemplate(id: string, updates: Partial<ContactTracingNotificationTemplate>): Promise<ContactTracingNotificationTemplate>;
+  deleteNotificationTemplate(id: string): Promise<void>;
+  getTemplatesByAudience(targetAudience: string, languageCode?: string): Promise<ContactTracingNotificationTemplate[]>;
+  getTemplatesByRiskLevel(riskLevel: string, templateType?: string): Promise<ContactTracingNotificationTemplate[]>;
+  approveNotificationTemplate(id: string, approvedBy: string): Promise<ContactTracingNotificationTemplate>;
+  incrementTemplateUsage(templateId: string): Promise<void>;
+  
+  // Contact Tracing Notification Logs operations
+  getNotificationLogs(filters?: { recipientId?: string; deliveryStatus?: string; notificationType?: string; startDate?: Date; endDate?: Date }): Promise<ContactTracingNotificationLog[]>;
+  getNotificationLog(id: string): Promise<ContactTracingNotificationLog | undefined>;
+  createNotificationLog(log: InsertContactTracingNotificationLog): Promise<ContactTracingNotificationLog>;
+  updateNotificationLog(id: string, updates: Partial<ContactTracingNotificationLog>): Promise<ContactTracingNotificationLog>;
+  deleteNotificationLog(id: string): Promise<void>;
+  getNotificationLogsByRecipient(recipientId: string, timeRange?: { start: Date; end: Date }): Promise<ContactTracingNotificationLog[]>;
+  getNotificationLogsByTemplate(templateId: string, timeRange?: { start: Date; end: Date }): Promise<ContactTracingNotificationLog[]>;
+  getFailedNotifications(retryEligible?: boolean): Promise<ContactTracingNotificationLog[]>;
+  markNotificationDelivered(notificationId: string, deliveredTimestamp: Date, externalResponse?: any): Promise<ContactTracingNotificationLog>;
+  markNotificationFailed(notificationId: string, errorCode: string, errorMessage: string): Promise<ContactTracingNotificationLog>;
+  recordNotificationEngagement(notificationId: string, engagementType: string, timestamp: Date): Promise<ContactTracingNotificationLog>;
+  escalateNotification(notificationId: string, escalatedTo: string, escalationReason: string): Promise<ContactTracingNotificationLog>;
+  
+  // Contact Tracing Privacy Consent operations
+  getPrivacyConsents(filters?: { userId?: string; consentStatus?: string; consentType?: string; startDate?: Date; endDate?: Date }): Promise<ContactTracingPrivacyConsent[]>;
+  getPrivacyConsent(id: string): Promise<ContactTracingPrivacyConsent | undefined>;
+  getPrivacyConsentByUser(userId: string): Promise<ContactTracingPrivacyConsent | undefined>;
+  getPrivacyConsentByDevice(deviceId: string): Promise<ContactTracingPrivacyConsent | undefined>;
+  createPrivacyConsent(consent: InsertContactTracingPrivacyConsent): Promise<ContactTracingPrivacyConsent>;
+  updatePrivacyConsent(id: string, updates: Partial<ContactTracingPrivacyConsent>): Promise<ContactTracingPrivacyConsent>;
+  deletePrivacyConsent(id: string): Promise<void>;
+  withdrawConsent(userId: string, withdrawalReason: string, withdrawalMethod: string): Promise<ContactTracingPrivacyConsent>;
+  verifyConsent(id: string, verifiedBy: string): Promise<ContactTracingPrivacyConsent>;
+  getConsentsByExpiry(beforeDate: Date): Promise<ContactTracingPrivacyConsent[]>;
+  recordDataSubjectRequest(userId: string, requestType: string, requestData: any): Promise<ContactTracingPrivacyConsent>;
+  getMinorConsents(parentGuardianId?: string): Promise<ContactTracingPrivacyConsent[]>;
+  
+  // ===== DATA RETENTION AND PRIVACY MANAGEMENT OPERATIONS =====
+  
+  // Enhanced data retention operations for compliance
+  cleanupExpiredContactTracingRecords?(beforeDate: Date): Promise<number>;
+  cleanupExpiredProximityDetections?(beforeDate: Date): Promise<number>;
+  cleanupExpiredNotificationLogs?(beforeDate: Date): Promise<number>;
+  
+  // Consent withdrawal data deletion operations
+  deleteUserLocationHistory?(userId: string): Promise<number>;
+  deleteUserContactTracingRecords?(userId: string): Promise<number>;
+  deleteUserNotifications?(userId: string): Promise<number>;
+  deleteUserProximityDetections?(userId: string): Promise<number>;
+  markConsentWithdrawn?(userId: string, withdrawalReason: string): Promise<void>;
+  
+  // Compliance monitoring and reporting operations
+  getOverdueLocationHistoryRecords?(retentionDays: number): Promise<number>;
+  getOverdueContactTracingRecords?(retentionDays: number): Promise<number>;
+  getRecentConsentWithdrawals?(days: number): Promise<number>;
+  
+  // Contact Tracing Advanced Analytics operations
+  getContactTracingMetrics(timeRange: { start: Date; end: Date }, filters?: any): Promise<any>;
+  generateContactTracingReport(reportType: string, parameters: any): Promise<any>;
+  getExposureRiskAnalysis(userId: string, timeRange?: { start: Date; end: Date }): Promise<any>;
+  getContactNetworkAnalysis(indexCaseId: string, degreeOfSeparation?: number): Promise<any>;
+  getLocationClusterAnalysis(timeRange: { start: Date; end: Date }, radiusMeters?: number): Promise<any>;
+  getNotificationEffectivenessMetrics(campaignId?: string, timeRange?: { start: Date; end: Date }): Promise<any>;
+  getPrivacyComplianceReport(timeRange: { start: Date; end: Date }): Promise<any>;
+  
   // Health Facilities operations
   getHealthFacilities(filters?: { facilityType?: string; status?: string; region?: string }): Promise<HealthFacility[]>;
   getHealthFacility(id: string): Promise<HealthFacility | undefined>;
