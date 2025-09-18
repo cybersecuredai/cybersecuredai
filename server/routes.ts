@@ -2,6 +2,8 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import express from "express";
 import path from "path";
+// AI adapter manager
+import { invoke as adapterInvoke, generateImage as adapterImage, listAdapters } from './adapters/manager';
 import multer from "multer";
 import { auth } from "express-openid-connect";
 import { storage } from "./storage";
@@ -91,6 +93,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
     };
     
     res.json(health);
+  });
+
+  // AI router endpoints (minimal) - uses adapters registered via ./adapters/*
+  app.post('/api/ai/invoke', async (req, res) => {
+    try {
+      const { task, input, model, timeoutMs, provider } = req.body;
+      if (!task || !input) return res.status(400).json({ error: 'task and input are required' });
+
+      const result = await adapterInvoke({ task, input, model, timeoutMs, providerOverride: provider });
+      res.json(result);
+    } catch (error: any) {
+      console.error('Error in /api/ai/invoke:', error);
+      res.status(500).json({ error: 'AI invocation failed', details: error?.message });
+    }
+  });
+
+  app.post('/api/ai/image', async (req, res) => {
+    try {
+      const { prompt, model, size, provider } = req.body;
+      if (!prompt) return res.status(400).json({ error: 'prompt is required' });
+
+      const result = await adapterImage({ prompt, model, size, providerOverride: provider });
+      res.json(result);
+    } catch (error: any) {
+      console.error('Error in /api/ai/image:', error);
+      res.status(500).json({ error: 'AI image generation failed', details: error?.message });
+    }
   });
   
   // Object storage public asset serving endpoint (referenced from: javascript_object_storage integration)
