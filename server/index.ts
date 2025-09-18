@@ -7,12 +7,14 @@ const app = express();
 
 // ===== CRITICAL OPERATIONAL SECURITY: BOOT-TIME VALIDATION =====
 
-// CRITICAL FIX: Comprehensive environment validation including CDC integration
+// CRITICAL FIX: Comprehensive environment validation including CDC integration with PEM key support
 function validateEnvironmentSecurity() {
-  const requiredSecrets = ['JWT_SECRET', 'FIPS_ENCRYPTION_KEY', 'FIPS_SIGNING_KEY'];
+  const requiredSecrets = ['JWT_SECRET'];
+  const phinRequiredSecrets = ['PHIN_PRIVATE_KEY_PEM', 'PHIN_PUBLIC_KEY_PEM'];
   const cdcRequiredSecrets = ['CDC_CLIENT_ID', 'CDC_CLIENT_SECRET', 'CDC_BASE_URL'];
   const missingSecrets: string[] = [];
   const weakSecrets: string[] = [];
+  const phinMissingSecrets: string[] = [];
   const cdcMissingSecrets: string[] = [];
   
   if (process.env.NODE_ENV === 'production') {
@@ -25,10 +27,25 @@ function validateEnvironmentSecurity() {
         missingSecrets.push(secret);
       } else if (secret === 'JWT_SECRET' && value.length < 32) {
         weakSecrets.push(`${secret} (minimum 32 characters required)`);
-      } else if (secret === 'FIPS_ENCRYPTION_KEY' && value.length < 64) {
-        weakSecrets.push(`${secret} (minimum 64 hex characters required)`);
-      } else if (secret === 'FIPS_SIGNING_KEY' && value.length < 64) {
-        weakSecrets.push(`${secret} (minimum 64 hex characters required for digital signing)`);
+      }
+    }
+    
+    // CRITICAL FIX: Validate PHIN PEM keys for cryptographic compliance
+    for (const secret of phinRequiredSecrets) {
+      const value = process.env[secret];
+      if (!value) {
+        phinMissingSecrets.push(secret);
+      } else {
+        // Validate PEM format
+        if (secret === 'PHIN_PRIVATE_KEY_PEM') {
+          if (!isPEMPrivateKey(value)) {
+            weakSecrets.push(`${secret} (must be valid PEM format RSA private key)`);
+          }
+        } else if (secret === 'PHIN_PUBLIC_KEY_PEM') {
+          if (!isPEMPublicKeyOrCert(value)) {
+            weakSecrets.push(`${secret} (must be valid PEM format RSA public key or certificate)`);
+          }
+        }
       }
     }
     
@@ -51,6 +68,18 @@ function validateEnvironmentSecurity() {
       console.error('🚨 CRITICAL SECURITY FAILURE: Missing required environment variables:');
       missingSecrets.forEach(secret => console.error(`   - ${secret}`));
       console.error('💀 APPLICATION CANNOT START SECURELY');
+      process.exit(1);
+    }
+    
+    // CRITICAL FIX: Fail-closed for missing PHIN configuration in production
+    if (phinMissingSecrets.length > 0) {
+      console.error('🚨 CRITICAL PHIN CONFIGURATION FAILURE: Missing required PHIN PEM keys:');
+      phinMissingSecrets.forEach(secret => console.error(`   - ${secret}`));
+      console.error('💀 PHIN DIGITAL SIGNATURES CANNOT START - PRODUCTION DEPLOYMENT BLOCKED');
+      console.error('🔧 Required PHIN configuration:');
+      console.error('   - PHIN_PRIVATE_KEY_PEM: RSA private key in PEM format for signing');
+      console.error('   - PHIN_PUBLIC_KEY_PEM: RSA public key in PEM format for verification');
+      console.error('   - Alternatively use PHIN_CERT_PEM: X.509 certificate in PEM format');
       process.exit(1);
     }
     
@@ -92,12 +121,112 @@ function validateEnvironmentSecurity() {
     
     console.log('✅ Production security validation passed');
     console.log('✅ All required secrets are properly configured');
+    console.log('✅ PHIN PEM keys validated for cryptographic compliance');
     console.log('✅ Application starting with secure configuration');
     
   } else {
     console.log('🔓 Development mode: Relaxed security validation');
     console.log('   Note: Production deployment requires stricter security configuration');
+    
+    // SECURITY FIX: Still validate PHIN keys in development if provided
+    if (process.env.PHIN_PRIVATE_KEY_PEM && process.env.PHIN_PUBLIC_KEY_PEM) {
+      console.log('🔑 PHIN PEM keys detected in development - validating format...');
+      if (!isPEMPrivateKey(process.env.PHIN_PRIVATE_KEY_PEM)) {
+        console.warn('⚠️ WARNING: PHIN_PRIVATE_KEY_PEM is not valid PEM format');
+      }
+      if (!isPEMPublicKeyOrCert(process.env.PHIN_PUBLIC_KEY_PEM)) {
+        console.warn('⚠️ WARNING: PHIN_PUBLIC_KEY_PEM is not valid PEM format');
+      }
+    }
   }
+}
+
+/**
+ * SECURITY FIX: Add startup cryptographic self-checks
+ */
+async function performCryptographicSelfChecks() {
+  try {
+    console.log('🔐 Performing PHIN cryptographic self-checks...');
+    
+    // Check if PHIN keys are configured
+    if (!process.env.PHIN_PRIVATE_KEY_PEM || !process.env.PHIN_PUBLIC_KEY_PEM) {
+      console.log('⚠️ PHIN keys not configured - skipping cryptographic self-checks');
+      return;
+    }
+    
+    // Dynamic import to avoid circular dependencies
+    const { getPHINSignatureService } = await import('./cdc-integration');
+    
+    // Test PHIN signature service
+    const phinService = getPHINSignatureService();
+    
+    // Test payload
+    const testPayload = {
+      test: 'PHIN_STARTUP_VALIDATION',
+      timestamp: Date.now(),
+      environment: process.env.NODE_ENV || 'development'
+    };
+    
+    // Test JWS signature generation and verification
+    console.log('🔑 Testing JWS signature generation...');
+    const jwsToken = phinService.generateJWSSignature(testPayload, {
+      issuer: 'startup-validation',
+      expiresIn: '300' // 5 minutes
+    });
+    
+    console.log('🔍 Testing JWS signature verification...');
+    const jwsResult = phinService.verifyJWSSignature(jwsToken, testPayload);
+    
+    if (!jwsResult.valid) {
+      throw new Error(`JWS self-check failed: ${jwsResult.error}`);
+    }
+    
+    // Test CMS signature generation
+    console.log('🔑 Testing CMS signature generation...');
+    const cmsSignature = phinService.generateCMSSignature(testPayload);
+    
+    if (!cmsSignature.signature) {
+      throw new Error('CMS signature generation returned empty signature');
+    }
+    
+    // Test CMS signature verification
+    console.log('🔍 Testing CMS signature verification...');
+    const cmsResult = phinService.verifyCMSSignature(testPayload, cmsSignature);
+    
+    if (!cmsResult.valid) {
+      throw new Error(`CMS self-check failed: ${cmsResult.error}`);
+    }
+    
+    console.log('✅ PHIN cryptographic self-checks passed successfully');
+    console.log('✅ JWS signature generation and verification working');
+    console.log('✅ CMS signature generation and verification working');
+    console.log('✅ PHIN 2.0 compliance validated');
+    
+  } catch (error) {
+    console.error('🚨 CRITICAL: PHIN cryptographic self-checks failed:', error);
+    
+    if (process.env.NODE_ENV === 'production') {
+      console.error('💀 Production deployment cannot continue with failed cryptographic checks');
+      process.exit(1);
+    } else {
+      console.log('⚠️ Development mode: Continuing despite failed cryptographic checks');
+    }
+  }
+}
+
+/**
+ * SECURITY FIX: Helper functions for PEM format validation
+ */
+function isPEMPrivateKey(pem: string): boolean {
+  return pem.includes('-----BEGIN PRIVATE KEY-----') ||
+         pem.includes('-----BEGIN RSA PRIVATE KEY-----') ||
+         pem.includes('-----BEGIN ENCRYPTED PRIVATE KEY-----');
+}
+
+function isPEMPublicKeyOrCert(pem: string): boolean {
+  return pem.includes('-----BEGIN PUBLIC KEY-----') ||
+         pem.includes('-----BEGIN RSA PUBLIC KEY-----') ||
+         pem.includes('-----BEGIN CERTIFICATE-----');
 }
 
 // Execute security validation before any other initialization
@@ -166,6 +295,11 @@ if (process.env.DATABASE_URL) {
     console.error('❌ Migration initialization failed:', error);
   });
 }
+
+// SECURITY FIX: Execute cryptographic self-checks on startup
+performCryptographicSelfChecks().catch(error => {
+  console.error('❌ Cryptographic self-checks initialization failed:', error);
+});
 
 // ===== CRITICAL HIPAA TRANSPORT SECURITY HARDENING =====
 

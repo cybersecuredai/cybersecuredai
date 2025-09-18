@@ -11,28 +11,98 @@ import jws from 'jws';
 /**
  * PHIN Digital Signature Service
  * Implements JWS and CMS digital signatures for CDC compliance
+ * SECURITY FIX: Proper RSA PEM key handling for PHIN 2.0 compliance
  */
 class PHINDigitalSignatureService {
-  private readonly signingKey: string;
+  private readonly privateKeyPem: string;
+  private readonly publicKeyPem: string;
   private readonly keyId: string;
   private readonly algorithm: string = 'RS256';
 
   constructor() {
-    // CRITICAL FIX: Use FIPS-compliant signing key from environment
-    this.signingKey = process.env.FIPS_SIGNING_KEY || process.env.JWT_SECRET || '';
+    // CRITICAL FIX: Use proper PEM format keys for RSA signatures
+    this.privateKeyPem = process.env.PHIN_PRIVATE_KEY_PEM || '';
+    this.publicKeyPem = process.env.PHIN_PUBLIC_KEY_PEM || process.env.PHIN_CERT_PEM || '';
     this.keyId = process.env.PHIN_KEY_ID || 'phin-sig-key-1';
     
-    if (!this.signingKey) {
-      throw new Error('CRITICAL: FIPS_SIGNING_KEY or JWT_SECRET required for PHIN digital signatures');
+    // CRITICAL FIX: Validate PEM format keys
+    this.validateCryptographicConfiguration();
+  }
+
+  /**
+   * SECURITY FIX: Validate cryptographic configuration
+   */
+  private validateCryptographicConfiguration(): void {
+    if (!this.privateKeyPem) {
+      throw new Error('CRITICAL: PHIN_PRIVATE_KEY_PEM required for PHIN digital signatures');
     }
     
-    if (this.signingKey.length < 64) {
-      console.warn('⚠️ WARNING: Signing key may not meet FIPS 140-2 requirements');
+    if (!this.publicKeyPem) {
+      throw new Error('CRITICAL: PHIN_PUBLIC_KEY_PEM or PHIN_CERT_PEM required for signature verification');
+    }
+    
+    // Validate PEM format
+    if (!this.isPEMPrivateKey(this.privateKeyPem)) {
+      throw new Error('CRITICAL: PHIN_PRIVATE_KEY_PEM must be valid PEM format RSA private key');
+    }
+    
+    if (!this.isPEMPublicKeyOrCert(this.publicKeyPem)) {
+      throw new Error('CRITICAL: PHIN_PUBLIC_KEY_PEM must be valid PEM format RSA public key or certificate');
+    }
+    
+    // Test cryptographic operations
+    this.validateCryptographicOperations();
+  }
+
+  /**
+   * SECURITY FIX: Validate PEM private key format
+   */
+  private isPEMPrivateKey(pem: string): boolean {
+    return pem.includes('-----BEGIN PRIVATE KEY-----') ||
+           pem.includes('-----BEGIN RSA PRIVATE KEY-----') ||
+           pem.includes('-----BEGIN ENCRYPTED PRIVATE KEY-----');
+  }
+
+  /**
+   * SECURITY FIX: Validate PEM public key or certificate format
+   */
+  private isPEMPublicKeyOrCert(pem: string): boolean {
+    return pem.includes('-----BEGIN PUBLIC KEY-----') ||
+           pem.includes('-----BEGIN RSA PUBLIC KEY-----') ||
+           pem.includes('-----BEGIN CERTIFICATE-----');
+  }
+
+  /**
+   * SECURITY FIX: Test cryptographic operations on startup
+   */
+  private validateCryptographicOperations(): void {
+    try {
+      // Test canary payload
+      const testPayload = { test: 'PHIN_CRYPTO_VALIDATION', timestamp: Date.now() };
+      
+      // Test JWS signature generation and verification
+      const jwsToken = this.generateJWSSignature(testPayload, { issuer: 'test' });
+      const jwsResult = this.verifyJWSSignature(jwsToken, testPayload);
+      
+      if (!jwsResult.valid) {
+        throw new Error(`JWS validation failed: ${jwsResult.error}`);
+      }
+      
+      // Test CMS signature generation
+      const cmsSignature = this.generateCMSSignature(testPayload);
+      
+      if (!cmsSignature.signature) {
+        throw new Error('CMS signature generation failed');
+      }
+      
+      console.log('✅ PHIN cryptographic validation successful');
+    } catch (error) {
+      throw new Error(`CRITICAL: Cryptographic validation failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
 
   /**
-   * Generate JWS (JSON Web Signature) for PHIN compliance
+   * SECURITY FIX: Generate JWS (JSON Web Signature) for PHIN compliance with proper RSA keys
    */
   generateJWSSignature(payload: any, options: {
     issuer?: string;
@@ -62,10 +132,11 @@ class PHINDigitalSignatureService {
         'data-integrity-hash': crypto.createHash('sha256').update(JSON.stringify(payload)).digest('hex')
       };
 
+      // CRITICAL FIX: Use proper RSA private key for RS256 signature
       return jws.sign({
         header,
         payload: claims,
-        secret: this.signingKey
+        secret: this.privateKeyPem
       });
     } catch (error) {
       console.error('❌ CRITICAL: JWS signature generation failed:', error);
@@ -74,7 +145,7 @@ class PHINDigitalSignatureService {
   }
 
   /**
-   * Verify JWS signature for PHIN compliance
+   * SECURITY FIX: Verify JWS signature for PHIN compliance with proper RSA public key
    */
   verifyJWSSignature(jwsToken: string, expectedPayload?: any): {
     valid: boolean;
@@ -87,7 +158,8 @@ class PHINDigitalSignatureService {
         return { valid: false, error: 'Invalid JWS token format' };
       }
 
-      const verified = jws.verify(jwsToken, this.algorithm, this.signingKey);
+      // CRITICAL FIX: Use public key for verification, not private key
+      const verified = jws.verify(jwsToken, this.algorithm, this.publicKeyPem);
       if (!verified) {
         return { valid: false, error: 'JWS signature verification failed' };
       }
@@ -126,7 +198,7 @@ class PHINDigitalSignatureService {
   }
 
   /**
-   * Generate CMS (Cryptographic Message Syntax) signature for enhanced PHIN compliance
+   * SECURITY FIX: Generate CMS (Cryptographic Message Syntax) signature with proper Node.js crypto APIs
    */
   generateCMSSignature(payload: any): {
     signature: string;
@@ -136,15 +208,18 @@ class PHINDigitalSignatureService {
     digestAlgorithm: string;
   } {
     try {
-      // Create message digest
+      // Create message to sign
       const messageBytes = Buffer.from(JSON.stringify(payload), 'utf8');
-      const digest = crypto.createHash('sha256').update(messageBytes).digest();
       
-      // Create signature using RSA-PSS (FIPS-approved)
-      const signature = crypto.sign('RSA-PSS', digest, {
-        key: this.signingKey,
-        saltLength: crypto.constants.RSA_PSS_SALTLEN_DIGEST,
-        mgf: crypto.constants.RSA_PKCS1_MGF1
+      // CRITICAL FIX: Use proper Node.js crypto APIs for RSA-PSS signature
+      const sign = crypto.createSign('sha256');
+      sign.update(messageBytes);
+      
+      // Use correct RSA-PSS signature with proper padding and salt length
+      const signature = sign.sign({
+        key: this.privateKeyPem,
+        padding: crypto.constants.RSA_PKCS1_PSS_PADDING,
+        saltLength: crypto.constants.RSA_PSS_SALTLEN_DIGEST
       });
 
       return {
@@ -157,6 +232,43 @@ class PHINDigitalSignatureService {
     } catch (error) {
       console.error('❌ CRITICAL: CMS signature generation failed:', error);
       throw new Error('PHIN CMS signature generation failed');
+    }
+  }
+
+  /**
+   * SECURITY FIX: Verify CMS signature with proper Node.js crypto APIs
+   */
+  verifyCMSSignature(payload: any, cmsSignature: {
+    signature: string;
+    algorithm: string;
+    keyId: string;
+    timestamp: string;
+    digestAlgorithm: string;
+  }): { valid: boolean; error?: string } {
+    try {
+      // Verify algorithm compatibility
+      if (cmsSignature.algorithm !== 'RSA-PSS-SHA256') {
+        return { valid: false, error: `Unsupported CMS algorithm: ${cmsSignature.algorithm}` };
+      }
+      
+      // Create message to verify
+      const messageBytes = Buffer.from(JSON.stringify(payload), 'utf8');
+      
+      // Use proper Node.js crypto APIs for verification
+      const verify = crypto.createVerify('sha256');
+      verify.update(messageBytes);
+      
+      // Verify signature with public key and proper padding
+      const isValid = verify.verify({
+        key: this.publicKeyPem,
+        padding: crypto.constants.RSA_PKCS1_PSS_PADDING,
+        saltLength: crypto.constants.RSA_PSS_SALTLEN_DIGEST
+      }, Buffer.from(cmsSignature.signature, 'base64'));
+      
+      return { valid: isValid };
+    } catch (error) {
+      console.error('❌ CMS signature verification failed:', error);
+      return { valid: false, error: 'CMS signature verification exception' };
     }
   }
 
