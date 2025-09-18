@@ -12,6 +12,22 @@ import {
   customComplianceControls,
   subscribers,
   confirmationCodes,
+  // HIPAA Compliance tables
+  hipaaSecurityOfficers,
+  hipaaPolicies,
+  hipaaTraining,
+  hipaaTrainingRecords,
+  hipaaBusinessAssociates,
+  hipaaWorkstationSecurity,
+  hipaaMediaControls,
+  hipaaFacilityAccess,
+  hipaaSecureAuditLogs,
+  hipaaEmergencyAccess,
+  hipaaBreachIncidents,
+  hipaaRiskAssessments,
+  hipaaTimeBasedAccess,
+  hipaaAccessRequests,
+  hipaaEncryptionKeys,
   type User, 
   type InsertUser,
   type Threat,
@@ -67,7 +83,38 @@ import {
   type PublicHealthAlert,
   type InsertPublicHealthAlert,
   type EpidemiologicalData,
-  type InsertEpidemiologicalData
+  type InsertEpidemiologicalData,
+  // HIPAA Compliance types
+  type HipaaSecurityOfficer,
+  type InsertHipaaSecurityOfficer,
+  type HipaaPolicy,
+  type InsertHipaaPolicy,
+  type HipaaTraining,
+  type InsertHipaaTraining,
+  type HipaaTrainingRecord,
+  type InsertHipaaTrainingRecord,
+  type HipaaBusinessAssociate,
+  type InsertHipaaBusinessAssociate,
+  type HipaaWorkstationSecurity,
+  type InsertHipaaWorkstationSecurity,
+  type HipaaMediaControl,
+  type InsertHipaaMediaControl,
+  type HipaaFacilityAccess,
+  type InsertHipaaFacilityAccess,
+  type HipaaSecureAuditLog,
+  type InsertHipaaSecureAuditLog,
+  type HipaaEmergencyAccess,
+  type InsertHipaaEmergencyAccess,
+  type HipaaBreachIncident,
+  type InsertHipaaBreachIncident,
+  type HipaaRiskAssessment,
+  type InsertHipaaRiskAssessment,
+  type HipaaTimeBasedAccess,
+  type InsertHipaaTimeBasedAccess,
+  type HipaaAccessRequest,
+  type InsertHipaaAccessRequest,
+  type HipaaEncryptionKey,
+  type InsertHipaaEncryptionKey
 } from "@shared/schema";
 import { randomUUID } from "crypto";
 
@@ -295,6 +342,124 @@ export interface IStorage {
   getMMWRData(week: number, year: number): Promise<EpidemiologicalData[]>;
   getPopulationHealthTrends(filters?: any): Promise<any[]>;
   generateCDCReport(filters?: any): Promise<any>;
+
+  // ===== HIPAA COMPLIANCE OPERATIONS =====
+  
+  // HIPAA Security Officer operations
+  getSecurityOfficers(organizationId: string): Promise<HipaaSecurityOfficer[]>;
+  getSecurityOfficer(id: string): Promise<HipaaSecurityOfficer | undefined>;
+  createSecurityOfficer(officer: InsertHipaaSecurityOfficer): Promise<HipaaSecurityOfficer>;
+  updateSecurityOfficer(id: string, updates: Partial<HipaaSecurityOfficer>): Promise<HipaaSecurityOfficer>;
+  deleteSecurityOfficer(id: string): Promise<void>;
+  getActiveSecurityOfficers(organizationId: string): Promise<HipaaSecurityOfficer[]>;
+  findActiveSecurityOfficer(organizationId: string, officerType: string, designation?: string): Promise<HipaaSecurityOfficer | undefined>;
+  
+  // HIPAA Policy operations  
+  getHipaaPolicies(organizationId: string, status?: string): Promise<HipaaPolicy[]>;
+  getHipaaPolicyById(policyId: string): Promise<HipaaPolicy | undefined>;
+  createHipaaPolicy(policy: InsertHipaaPolicy): Promise<HipaaPolicy>;
+  updateHipaaPolicy(policyId: string, updates: Partial<HipaaPolicy>): Promise<HipaaPolicy>;
+  deleteHipaaPolicy(policyId: string): Promise<void>;
+  getNextPolicySequence(organizationId: string, category: string): Promise<number>;
+  
+  // HIPAA Training operations
+  getHipaaTrainings(organizationId: string, status?: string): Promise<HipaaTraining[]>;
+  getHipaaTrainingById(trainingId: string): Promise<HipaaTraining | undefined>;
+  createHipaaTraining(training: InsertHipaaTraining): Promise<HipaaTraining>;
+  updateHipaaTraining(id: string, updates: Partial<HipaaTraining>): Promise<HipaaTraining>;
+  deleteHipaaTraining(id: string): Promise<void>;
+  getNextTrainingSequence(organizationId: string, trainingType: string): Promise<number>;
+  
+  // HIPAA Training Record operations
+  getTrainingRecords(organizationId: string, userId?: string, status?: string): Promise<HipaaTrainingRecord[]>;
+  getTrainingRecord(id: string): Promise<HipaaTrainingRecord | undefined>;
+  createTrainingRecord(record: InsertHipaaTrainingRecord): Promise<HipaaTrainingRecord>;
+  updateTrainingRecord(id: string, updates: Partial<HipaaTrainingRecord>): Promise<HipaaTrainingRecord>;
+  deleteTrainingRecord(id: string): Promise<void>;
+  bulkCreateTrainingRecords(records: InsertHipaaTrainingRecord[]): Promise<HipaaTrainingRecord[]>;
+  getTrainingComplianceStats(organizationId: string): Promise<{
+    totalUsers: number;
+    compliantUsers: number;
+    overdueUsers: number;
+    upcomingDeadlines: any[];
+  }>;
+  
+  // HIPAA Business Associate operations
+  getBusinessAssociates(organizationId: string, status?: string): Promise<HipaaBusinessAssociate[]>;
+  getBusinessAssociateById(baId: string): Promise<HipaaBusinessAssociate | undefined>;
+  createBusinessAssociate(ba: InsertHipaaBusinessAssociate): Promise<HipaaBusinessAssociate>;
+  updateBusinessAssociate(baId: string, updates: Partial<HipaaBusinessAssociate>): Promise<HipaaBusinessAssociate>;
+  deleteBusinessAssociate(baId: string): Promise<void>;
+  getNextBASequence(organizationId: string): Promise<number>;
+  
+  // HIPAA Workstation Security operations
+  getWorkstationSecurity(organizationId: string, status?: string): Promise<HipaaWorkstationSecurity[]>;
+  getWorkstationSecurityById(id: string): Promise<HipaaWorkstationSecurity | undefined>;
+  createWorkstationSecurity(workstation: InsertHipaaWorkstationSecurity): Promise<HipaaWorkstationSecurity>;
+  updateWorkstationSecurity(id: string, updates: Partial<HipaaWorkstationSecurity>): Promise<HipaaWorkstationSecurity>;
+  deleteWorkstationSecurity(id: string): Promise<void>;
+  
+  // HIPAA Media Controls operations
+  getMediaControls(organizationId: string, status?: string): Promise<HipaaMediaControl[]>;
+  getMediaControlById(id: string): Promise<HipaaMediaControl | undefined>;
+  createMediaControl(media: InsertHipaaMediaControl): Promise<HipaaMediaControl>;
+  updateMediaControl(id: string, updates: Partial<HipaaMediaControl>): Promise<HipaaMediaControl>;
+  deleteMediaControl(id: string): Promise<void>;
+  
+  // HIPAA Facility Access operations
+  getFacilityAccess(organizationId: string, status?: string): Promise<HipaaFacilityAccess[]>;
+  getFacilityAccessById(id: string): Promise<HipaaFacilityAccess | undefined>;
+  createFacilityAccess(facility: InsertHipaaFacilityAccess): Promise<HipaaFacilityAccess>;
+  updateFacilityAccess(id: string, updates: Partial<HipaaFacilityAccess>): Promise<HipaaFacilityAccess>;
+  deleteFacilityAccess(id: string): Promise<void>;
+  
+  // HIPAA Secure Audit Log operations
+  getSecureAuditLogs(organizationId: string, filters?: { userId?: string; action?: string; resource?: string; startDate?: Date; endDate?: Date }): Promise<HipaaSecureAuditLog[]>;
+  getSecureAuditLog(id: string): Promise<HipaaSecureAuditLog | undefined>;
+  createSecureAuditLog(auditLog: InsertHipaaSecureAuditLog): Promise<HipaaSecureAuditLog>;
+  verifyAuditLogIntegrity(chainHash: string): Promise<boolean>;
+  
+  // HIPAA Emergency Access operations
+  getEmergencyAccess(organizationId: string, status?: string): Promise<HipaaEmergencyAccess[]>;
+  getEmergencyAccessById(id: string): Promise<HipaaEmergencyAccess | undefined>;
+  createEmergencyAccess(access: InsertHipaaEmergencyAccess): Promise<HipaaEmergencyAccess>;
+  updateEmergencyAccess(id: string, updates: Partial<HipaaEmergencyAccess>): Promise<HipaaEmergencyAccess>;
+  deleteEmergencyAccess(id: string): Promise<void>;
+  
+  // HIPAA Breach Incident operations
+  getBreachIncidents(organizationId: string, status?: string): Promise<HipaaBreachIncident[]>;
+  getBreachIncidentById(id: string): Promise<HipaaBreachIncident | undefined>;
+  createBreachIncident(incident: InsertHipaaBreachIncident): Promise<HipaaBreachIncident>;
+  updateBreachIncident(id: string, updates: Partial<HipaaBreachIncident>): Promise<HipaaBreachIncident>;
+  deleteBreachIncident(id: string): Promise<void>;
+  
+  // HIPAA Risk Assessment operations
+  getRiskAssessments(organizationId: string, status?: string): Promise<HipaaRiskAssessment[]>;
+  getRiskAssessmentById(id: string): Promise<HipaaRiskAssessment | undefined>;
+  createRiskAssessment(assessment: InsertHipaaRiskAssessment): Promise<HipaaRiskAssessment>;
+  updateRiskAssessment(id: string, updates: Partial<HipaaRiskAssessment>): Promise<HipaaRiskAssessment>;
+  deleteRiskAssessment(id: string): Promise<void>;
+  
+  // HIPAA Time-based Access operations
+  getTimeBasedAccess(organizationId: string, userId?: string): Promise<HipaaTimeBasedAccess[]>;
+  getTimeBasedAccessById(id: string): Promise<HipaaTimeBasedAccess | undefined>;
+  createTimeBasedAccess(access: InsertHipaaTimeBasedAccess): Promise<HipaaTimeBasedAccess>;
+  updateTimeBasedAccess(id: string, updates: Partial<HipaaTimeBasedAccess>): Promise<HipaaTimeBasedAccess>;
+  deleteTimeBasedAccess(id: string): Promise<void>;
+  
+  // HIPAA Access Request operations
+  getAccessRequests(organizationId: string, status?: string): Promise<HipaaAccessRequest[]>;
+  getAccessRequestById(id: string): Promise<HipaaAccessRequest | undefined>;
+  createAccessRequest(request: InsertHipaaAccessRequest): Promise<HipaaAccessRequest>;
+  updateAccessRequest(id: string, updates: Partial<HipaaAccessRequest>): Promise<HipaaAccessRequest>;
+  deleteAccessRequest(id: string): Promise<void>;
+  
+  // HIPAA Encryption Key operations
+  getEncryptionKeys(organizationId: string, status?: string): Promise<HipaaEncryptionKey[]>;
+  getEncryptionKeyById(id: string): Promise<HipaaEncryptionKey | undefined>;
+  createEncryptionKey(key: InsertHipaaEncryptionKey): Promise<HipaaEncryptionKey>;
+  updateEncryptionKey(id: string, updates: Partial<HipaaEncryptionKey>): Promise<HipaaEncryptionKey>;
+  deleteEncryptionKey(id: string): Promise<void>;
 }
 
 export class MemStorage implements IStorage {
@@ -327,6 +492,11 @@ export class MemStorage implements IStorage {
   private acdsDeployments: Map<string, AcdsDeployment> = new Map();
   private acdsCoordinations: Map<string, AcdsCoordination> = new Map();
   private acdsAnalytics: Map<string, AcdsAnalytics> = new Map();
+
+  // HIPAA Storage Maps
+  private hipaaWorkstationSecurity: Map<string, HipaaWorkstationSecurity> = new Map();
+  private hipaaMediaControls: Map<string, HipaaMediaControl> = new Map();
+  private hipaaFacilityAccess: Map<string, HipaaFacilityAccess> = new Map();
 
   constructor() {
     this.initializeData();
@@ -1856,6 +2026,124 @@ export class MemStorage implements IStorage {
     const analytics = await this.getAcdsAnalytics(organizationId);
     return analytics.filter(a => a.timestamp >= startDate && a.timestamp <= endDate);
   }
+
+  // ===== HIPAA WORKSTATION SECURITY OPERATIONS =====
+  
+  async getWorkstationSecurity(organizationId: string, status?: string): Promise<HipaaWorkstationSecurity[]> {
+    const workstations = Array.from(this.hipaaWorkstationSecurity.values());
+    let filtered = workstations.filter(w => w.organizationId === organizationId);
+    return status ? filtered.filter(w => w.status === status) : filtered;
+  }
+
+  async getWorkstationSecurityById(id: string): Promise<HipaaWorkstationSecurity | undefined> {
+    return this.hipaaWorkstationSecurity.get(id);
+  }
+
+  async createWorkstationSecurity(workstation: InsertHipaaWorkstationSecurity): Promise<HipaaWorkstationSecurity> {
+    const id = randomUUID();
+    const newWorkstation: HipaaWorkstationSecurity = {
+      ...workstation,
+      id,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    this.hipaaWorkstationSecurity.set(id, newWorkstation);
+    return newWorkstation;
+  }
+
+  async updateWorkstationSecurity(id: string, updates: Partial<HipaaWorkstationSecurity>): Promise<HipaaWorkstationSecurity> {
+    const workstation = this.hipaaWorkstationSecurity.get(id);
+    if (!workstation) throw new Error("HIPAA workstation security record not found");
+    
+    const updatedWorkstation = { ...workstation, ...updates, updatedAt: new Date() };
+    this.hipaaWorkstationSecurity.set(id, updatedWorkstation);
+    return updatedWorkstation;
+  }
+
+  async deleteWorkstationSecurity(id: string): Promise<void> {
+    this.hipaaWorkstationSecurity.delete(id);
+  }
+
+  // ===== HIPAA MEDIA CONTROLS OPERATIONS =====
+
+  async getMediaControls(organizationId: string, status?: string): Promise<HipaaMediaControl[]> {
+    const mediaControls = Array.from(this.hipaaMediaControls.values());
+    let filtered = mediaControls.filter(m => m.organizationId === organizationId);
+    return status ? filtered.filter(m => m.status === status) : filtered;
+  }
+
+  async getMediaControlById(id: string): Promise<HipaaMediaControl | undefined> {
+    return this.hipaaMediaControls.get(id);
+  }
+
+  async createMediaControl(media: InsertHipaaMediaControl): Promise<HipaaMediaControl> {
+    const id = randomUUID();
+    const newMedia: HipaaMediaControl = {
+      ...media,
+      id,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    this.hipaaMediaControls.set(id, newMedia);
+    return newMedia;
+  }
+
+  async updateMediaControl(id: string, updates: Partial<HipaaMediaControl>): Promise<HipaaMediaControl> {
+    const media = this.hipaaMediaControls.get(id);
+    if (!media) throw new Error("HIPAA media control record not found");
+    
+    const updatedMedia = { ...media, ...updates, updatedAt: new Date() };
+    this.hipaaMediaControls.set(id, updatedMedia);
+    return updatedMedia;
+  }
+
+  async deleteMediaControl(id: string): Promise<void> {
+    this.hipaaMediaControls.delete(id);
+  }
+
+  // ===== HIPAA FACILITY ACCESS OPERATIONS =====
+
+  async getFacilityAccess(organizationId: string, status?: string): Promise<HipaaFacilityAccess[]> {
+    const facilityAccess = Array.from(this.hipaaFacilityAccess.values());
+    let filtered = facilityAccess.filter(f => f.organizationId === organizationId);
+    return status ? filtered.filter(f => f.status === status) : filtered;
+  }
+
+  async getFacilityAccessById(id: string): Promise<HipaaFacilityAccess | undefined> {
+    return this.hipaaFacilityAccess.get(id);
+  }
+
+  async createFacilityAccess(facility: InsertHipaaFacilityAccess): Promise<HipaaFacilityAccess> {
+    const id = randomUUID();
+    const newFacility: HipaaFacilityAccess = {
+      ...facility,
+      id,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    this.hipaaFacilityAccess.set(id, newFacility);
+    return newFacility;
+  }
+
+  async updateFacilityAccess(id: string, updates: Partial<HipaaFacilityAccess>): Promise<HipaaFacilityAccess> {
+    const facility = this.hipaaFacilityAccess.get(id);
+    if (!facility) throw new Error("HIPAA facility access record not found");
+    
+    const updatedFacility = { ...facility, ...updates, updatedAt: new Date() };
+    this.hipaaFacilityAccess.set(id, updatedFacility);
+    return updatedFacility;
+  }
+
+  async deleteFacilityAccess(id: string): Promise<void> {
+    this.hipaaFacilityAccess.delete(id);
+  }
 }
 
-export const storage = new MemStorage();
+// Import database storage for HIPAA compliance
+import { DbStorage } from "./db-storage";
+import { isDatabaseAvailable } from "./db";
+
+// Use database storage for HIPAA compliance or fallback to MemStorage for development
+export const storage = isDatabaseAvailable() 
+  ? new DbStorage() 
+  : new MemStorage();
