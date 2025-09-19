@@ -73,7 +73,6 @@ eng.traineddata
 # Documentation files (keep only essential ones)
 *.html
 !index.html
-*.md
 !README.md
 
 # Server public (already excluded)
