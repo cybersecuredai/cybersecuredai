@@ -28,6 +28,16 @@ import {
   hipaaTimeBasedAccess,
   hipaaAccessRequests,
   hipaaEncryptionKeys,
+  // Catalog system imports
+  catalogCategories,
+  bomComponents,
+  catalogProducts,
+  productBom,
+  catalogServices,
+  catalogSolutions,
+  solutionComponents,
+  pricingHistory,
+  competitiveAnalysis,
   type User, 
   type InsertUser,
   type Threat,
@@ -114,7 +124,26 @@ import {
   type HipaaAccessRequest,
   type InsertHipaaAccessRequest,
   type HipaaEncryptionKey,
-  type InsertHipaaEncryptionKey
+  type InsertHipaaEncryptionKey,
+  // Catalog system types
+  type CatalogCategory,
+  type InsertCatalogCategory,
+  type BomComponent,
+  type InsertBomComponent,
+  type CatalogProduct,
+  type InsertCatalogProduct,
+  type ProductBom,
+  type InsertProductBom,
+  type CatalogService,
+  type InsertCatalogService,
+  type CatalogSolution,
+  type InsertCatalogSolution,
+  type SolutionComponent,
+  type InsertSolutionComponent,
+  type PricingHistory,
+  type InsertPricingHistory,
+  type CompetitiveAnalysis,
+  type InsertCompetitiveAnalysis
 } from "@shared/schema";
 import { randomUUID } from "crypto";
 
@@ -670,6 +699,17 @@ export class MemStorage implements IStorage {
   private hipaaWorkstationSecurity: Map<string, HipaaWorkstationSecurity> = new Map();
   private hipaaMediaControls: Map<string, HipaaMediaControl> = new Map();
   private hipaaFacilityAccess: Map<string, HipaaFacilityAccess> = new Map();
+
+  // Catalog System Storage Maps
+  private catalogCategories: Map<string, CatalogCategory> = new Map();
+  private bomComponents: Map<string, BomComponent> = new Map();
+  private catalogProducts: Map<string, CatalogProduct> = new Map();
+  private productBom: Map<string, ProductBom> = new Map();
+  private catalogServices: Map<string, CatalogService> = new Map();
+  private catalogSolutions: Map<string, CatalogSolution> = new Map();
+  private solutionComponents: Map<string, SolutionComponent> = new Map();
+  private pricingHistory: Map<string, PricingHistory> = new Map();
+  private competitiveAnalysis: Map<string, CompetitiveAnalysis> = new Map();
 
   constructor() {
     this.initializeData();
@@ -2309,6 +2349,377 @@ export class MemStorage implements IStorage {
 
   async deleteFacilityAccess(id: string): Promise<void> {
     this.hipaaFacilityAccess.delete(id);
+  }
+
+  // ===== CATALOG SYSTEM OPERATIONS =====
+  
+  // Catalog Category operations
+  async getCatalogCategories(categoryType?: string): Promise<CatalogCategory[]> {
+    const categories = Array.from(this.catalogCategories.values());
+    return categoryType ? categories.filter(c => c.categoryType === categoryType) : categories;
+  }
+
+  async getCatalogCategory(id: string): Promise<CatalogCategory | undefined> {
+    return this.catalogCategories.get(id);
+  }
+
+  async createCatalogCategory(category: InsertCatalogCategory): Promise<CatalogCategory> {
+    const id = randomUUID();
+    const newCategory: CatalogCategory = {
+      ...category,
+      id,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    this.catalogCategories.set(id, newCategory);
+    return newCategory;
+  }
+
+  async updateCatalogCategory(id: string, updates: Partial<CatalogCategory>): Promise<CatalogCategory> {
+    const category = this.catalogCategories.get(id);
+    if (!category) throw new Error("Catalog category not found");
+    const updated = { ...category, ...updates, updatedAt: new Date() };
+    this.catalogCategories.set(id, updated);
+    return updated;
+  }
+
+  async deleteCatalogCategory(id: string): Promise<void> {
+    this.catalogCategories.delete(id);
+  }
+
+  // BOM Component operations
+  async getBomComponents(): Promise<BomComponent[]> {
+    return Array.from(this.bomComponents.values());
+  }
+
+  async getBomComponent(id: string): Promise<BomComponent | undefined> {
+    return this.bomComponents.get(id);
+  }
+
+  async createBomComponent(component: InsertBomComponent): Promise<BomComponent> {
+    const id = randomUUID();
+    const newComponent: BomComponent = {
+      ...component,
+      id,
+      isActive: component.isActive ?? true,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    this.bomComponents.set(id, newComponent);
+    return newComponent;
+  }
+
+  async updateBomComponent(id: string, updates: Partial<BomComponent>): Promise<BomComponent> {
+    const component = this.bomComponents.get(id);
+    if (!component) throw new Error("BOM component not found");
+    const updated = { ...component, ...updates, updatedAt: new Date() };
+    this.bomComponents.set(id, updated);
+    return updated;
+  }
+
+  async deleteBomComponent(id: string): Promise<void> {
+    this.bomComponents.delete(id);
+  }
+
+  async getBomComponentsByType(componentType: string): Promise<BomComponent[]> {
+    return Array.from(this.bomComponents.values()).filter(c => c.componentType === componentType);
+  }
+
+  // Catalog Product operations
+  async getCatalogProducts(categoryId?: string): Promise<CatalogProduct[]> {
+    const products = Array.from(this.catalogProducts.values());
+    return categoryId ? products.filter(p => p.categoryId === categoryId) : products;
+  }
+
+  async getCatalogProduct(id: string): Promise<CatalogProduct | undefined> {
+    return this.catalogProducts.get(id);
+  }
+
+  async getCatalogProductByCode(productCode: string): Promise<CatalogProduct | undefined> {
+    return Array.from(this.catalogProducts.values()).find(p => p.productCode === productCode);
+  }
+
+  async createCatalogProduct(product: InsertCatalogProduct): Promise<CatalogProduct> {
+    const id = randomUUID();
+    const newProduct: CatalogProduct = {
+      ...product,
+      id,
+      isActive: product.isActive ?? true,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    this.catalogProducts.set(id, newProduct);
+    return newProduct;
+  }
+
+  async updateCatalogProduct(id: string, updates: Partial<CatalogProduct>): Promise<CatalogProduct> {
+    const product = this.catalogProducts.get(id);
+    if (!product) throw new Error("Catalog product not found");
+    const updated = { ...product, ...updates, updatedAt: new Date() };
+    this.catalogProducts.set(id, updated);
+    return updated;
+  }
+
+  async deleteCatalogProduct(id: string): Promise<void> {
+    this.catalogProducts.delete(id);
+  }
+
+  async getProductsWithBom(): Promise<(CatalogProduct & { bom: (ProductBom & { component: BomComponent })[] })[]> {
+    const products = Array.from(this.catalogProducts.values());
+    return products.map(product => ({
+      ...product,
+      bom: Array.from(this.productBom.values())
+        .filter(bom => bom.productId === product.id)
+        .map(bom => ({
+          ...bom,
+          component: this.bomComponents.get(bom.componentId)!
+        }))
+    }));
+  }
+
+  // Product BOM operations  
+  async getProductBom(productId: string): Promise<(ProductBom & { component: BomComponent })[]> {
+    return Array.from(this.productBom.values())
+      .filter(bom => bom.productId === productId)
+      .map(bom => ({
+        ...bom,
+        component: this.bomComponents.get(bom.componentId)!
+      }));
+  }
+
+  async addProductBomComponent(productBom: InsertProductBom): Promise<ProductBom> {
+    const id = randomUUID();
+    const newBom: ProductBom = { ...productBom, id };
+    this.productBom.set(id, newBom);
+    return newBom;
+  }
+
+  async updateProductBomComponent(id: string, updates: Partial<ProductBom>): Promise<ProductBom> {
+    const bom = this.productBom.get(id);
+    if (!bom) throw new Error("Product BOM not found");
+    const updated = { ...bom, ...updates };
+    this.productBom.set(id, updated);
+    return updated;
+  }
+
+  async removeProductBomComponent(id: string): Promise<void> {
+    this.productBom.delete(id);
+  }
+
+  // Catalog Service operations
+  async getCatalogServices(categoryId?: string): Promise<CatalogService[]> {
+    const services = Array.from(this.catalogServices.values());
+    return categoryId ? services.filter(s => s.categoryId === categoryId) : services;
+  }
+
+  async getCatalogService(id: string): Promise<CatalogService | undefined> {
+    return this.catalogServices.get(id);
+  }
+
+  async getCatalogServiceByCode(serviceCode: string): Promise<CatalogService | undefined> {
+    return Array.from(this.catalogServices.values()).find(s => s.serviceCode === serviceCode);
+  }
+
+  async createCatalogService(service: InsertCatalogService): Promise<CatalogService> {
+    const id = randomUUID();
+    const newService: CatalogService = {
+      ...service,
+      id,
+      isActive: service.isActive ?? true,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    this.catalogServices.set(id, newService);
+    return newService;
+  }
+
+  async updateCatalogService(id: string, updates: Partial<CatalogService>): Promise<CatalogService> {
+    const service = this.catalogServices.get(id);
+    if (!service) throw new Error("Catalog service not found");
+    const updated = { ...service, ...updates, updatedAt: new Date() };
+    this.catalogServices.set(id, updated);
+    return updated;
+  }
+
+  async deleteCatalogService(id: string): Promise<void> {
+    this.catalogServices.delete(id);
+  }
+
+  async getServicesByType(serviceType: string): Promise<CatalogService[]> {
+    return Array.from(this.catalogServices.values()).filter(s => s.serviceType === serviceType);
+  }
+
+  // Catalog Solution operations
+  async getCatalogSolutions(categoryId?: string): Promise<CatalogSolution[]> {
+    const solutions = Array.from(this.catalogSolutions.values());
+    return categoryId ? solutions.filter(s => s.categoryId === categoryId) : solutions;
+  }
+
+  async getCatalogSolution(id: string): Promise<CatalogSolution | undefined> {
+    return this.catalogSolutions.get(id);
+  }
+
+  async getCatalogSolutionByCode(solutionCode: string): Promise<CatalogSolution | undefined> {
+    return Array.from(this.catalogSolutions.values()).find(s => s.solutionCode === solutionCode);
+  }
+
+  async createCatalogSolution(solution: InsertCatalogSolution): Promise<CatalogSolution> {
+    const id = randomUUID();
+    const newSolution: CatalogSolution = {
+      ...solution,
+      id,
+      isActive: solution.isActive ?? true,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    this.catalogSolutions.set(id, newSolution);
+    return newSolution;
+  }
+
+  async updateCatalogSolution(id: string, updates: Partial<CatalogSolution>): Promise<CatalogSolution> {
+    const solution = this.catalogSolutions.get(id);
+    if (!solution) throw new Error("Catalog solution not found");
+    const updated = { ...solution, ...updates, updatedAt: new Date() };
+    this.catalogSolutions.set(id, updated);
+    return updated;
+  }
+
+  async deleteCatalogSolution(id: string): Promise<void> {
+    this.catalogSolutions.delete(id);
+  }
+
+  async getSolutionsWithComponents(): Promise<(CatalogSolution & { components: SolutionComponent[] })[]> {
+    const solutions = Array.from(this.catalogSolutions.values());
+    return solutions.map(solution => ({
+      ...solution,
+      components: Array.from(this.solutionComponents.values()).filter(c => c.solutionId === solution.id)
+    }));
+  }
+
+  // Solution Component operations
+  async getSolutionComponents(solutionId: string): Promise<SolutionComponent[]> {
+    return Array.from(this.solutionComponents.values()).filter(c => c.solutionId === solutionId);
+  }
+
+  async addSolutionComponent(component: InsertSolutionComponent): Promise<SolutionComponent> {
+    const id = randomUUID();
+    const newComponent: SolutionComponent = { ...component, id };
+    this.solutionComponents.set(id, newComponent);
+    return newComponent;
+  }
+
+  async updateSolutionComponent(id: string, updates: Partial<SolutionComponent>): Promise<SolutionComponent> {
+    const component = this.solutionComponents.get(id);
+    if (!component) throw new Error("Solution component not found");
+    const updated = { ...component, ...updates };
+    this.solutionComponents.set(id, updated);
+    return updated;
+  }
+
+  async removeSolutionComponent(id: string): Promise<void> {
+    this.solutionComponents.delete(id);
+  }
+
+  // Pricing History operations
+  async getPricingHistory(entityType: string, entityId: string): Promise<PricingHistory[]> {
+    return Array.from(this.pricingHistory.values())
+      .filter(p => p.entityType === entityType && p.entityId === entityId);
+  }
+
+  async createPricingHistoryEntry(entry: InsertPricingHistory): Promise<PricingHistory> {
+    const id = randomUUID();
+    const newEntry: PricingHistory = {
+      ...entry,
+      id,
+      effectiveDate: entry.effectiveDate || new Date(),
+      createdAt: new Date()
+    };
+    this.pricingHistory.set(id, newEntry);
+    return newEntry;
+  }
+
+  // Competitive Analysis operations
+  async getCompetitiveAnalysis(): Promise<CompetitiveAnalysis[]> {
+    return Array.from(this.competitiveAnalysis.values());
+  }
+
+  async getCompetitiveAnalysisForProduct(productName: string): Promise<CompetitiveAnalysis[]> {
+    return Array.from(this.competitiveAnalysis.values()).filter(c => c.productName === productName);
+  }
+
+  async createCompetitiveAnalysis(analysis: InsertCompetitiveAnalysis): Promise<CompetitiveAnalysis> {
+    const id = randomUUID();
+    const newAnalysis: CompetitiveAnalysis = {
+      ...analysis,
+      id,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    this.competitiveAnalysis.set(id, newAnalysis);
+    return newAnalysis;
+  }
+
+  async updateCompetitiveAnalysis(id: string, updates: Partial<CompetitiveAnalysis>): Promise<CompetitiveAnalysis> {
+    const analysis = this.competitiveAnalysis.get(id);
+    if (!analysis) throw new Error("Competitive analysis not found");
+    const updated = { ...analysis, ...updates, updatedAt: new Date() };
+    this.competitiveAnalysis.set(id, updated);
+    return updated;
+  }
+
+  async deleteCompetitiveAnalysis(id: string): Promise<void> {
+    this.competitiveAnalysis.delete(id);
+  }
+
+  // Catalog Analytics and Reporting
+  async getCatalogMetrics(): Promise<{
+    totalProducts: number;
+    totalServices: number;
+    totalSolutions: number;
+    averageProductMargin: number;
+    averageServiceMargin: number;
+    totalCatalogValue: number;
+  }> {
+    const products = Array.from(this.catalogProducts.values());
+    const services = Array.from(this.catalogServices.values());
+    const solutions = Array.from(this.catalogSolutions.values());
+
+    const productMargins = products.map(p => 
+      ((p.commercialSellPrice - p.totalCostPrice) / p.commercialSellPrice) * 100
+    );
+    const serviceMargins = services.map(s => 
+      ((s.commercialSellPrice - s.deliveryCost) / s.commercialSellPrice) * 100
+    );
+
+    return {
+      totalProducts: products.length,
+      totalServices: services.length,
+      totalSolutions: solutions.length,
+      averageProductMargin: productMargins.reduce((a, b) => a + b, 0) / productMargins.length || 0,
+      averageServiceMargin: serviceMargins.reduce((a, b) => a + b, 0) / serviceMargins.length || 0,
+      totalCatalogValue: products.reduce((sum, p) => sum + p.commercialSellPrice, 0) +
+                        services.reduce((sum, s) => sum + s.commercialSellPrice, 0) +
+                        solutions.reduce((sum, s) => sum + s.commercialSellPrice, 0)
+    };
+  }
+
+  async getCatalogReport(reportType: 'pricing' | 'margins' | 'competitive' | 'bom'): Promise<any> {
+    switch (reportType) {
+      case 'pricing':
+        return {
+          products: Array.from(this.catalogProducts.values()),
+          services: Array.from(this.catalogServices.values()),
+          solutions: Array.from(this.catalogSolutions.values())
+        };
+      case 'margins':
+        return await this.getCatalogMetrics();
+      case 'competitive':
+        return Array.from(this.competitiveAnalysis.values());
+      case 'bom':
+        return await this.getProductsWithBom();
+      default:
+        return {};
+    }
   }
 }
 
