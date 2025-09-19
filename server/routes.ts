@@ -4,6 +4,7 @@ import express from "express";
 import path from "path";
 // AI adapter manager
 import { invoke as adapterInvoke, generateImage as adapterImage, listAdapters } from './adapters/manager';
+import { metricsEndpoint } from './observability/metrics';
 import multer from "multer";
 import { auth } from "express-openid-connect";
 import { storage } from "./storage";
@@ -121,6 +122,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: 'AI image generation failed', details: error?.message });
     }
   });
+  
+  // Prometheus metrics endpoint
+  app.get('/metrics', metricsEndpoint());
   
   // Object storage public asset serving endpoint (referenced from: javascript_object_storage integration)
   app.get("/public-objects/:filePath(*)", async (req, res) => {
