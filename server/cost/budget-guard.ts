@@ -26,4 +26,8 @@ export function resetBudgets() {
   for (const k of Object.keys(budgets)) budgets[k].usedUsd = 0;
 }
 
-export default { setBudgetFor, getBudgetFor, consumeBudget, resetBudgets };
+export function listBudgets() {
+  return { ...budgets };
+}
+
+export default { setBudgetFor, getBudgetFor, consumeBudget, resetBudgets, listBudgets };

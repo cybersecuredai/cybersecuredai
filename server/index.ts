@@ -1,5 +1,6 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
+import { setupOtel, shutdownOtel } from './observability/otel';
 import { setupVite, serveStatic, log } from "./vite";
 
 const app = express();
@@ -38,6 +39,18 @@ app.use((req, res, next) => {
 
 (async () => {
   try {
+    // If running with mock adapter enabled, load it before registering routes
+    if (process.env.ENABLE_MOCK_ADAPTER === 'true') {
+      await import('./adapters/mock-adapter');
+    }
+    // Initialize OpenTelemetry SDK
+    try {
+      await setupOtel();
+      console.log('OpenTelemetry initialized');
+    } catch (e) {
+      console.warn('Failed to initialize OpenTelemetry:', e);
+    }
+
     const server = await registerRoutes(app);
 
     // Enhanced error handling middleware
@@ -89,10 +102,16 @@ app.use((req, res, next) => {
     });
 
     // Graceful shutdown handling
-    const gracefulShutdown = (signal: string) => {
+    const gracefulShutdown = async (signal: string) => {
       log(`Received ${signal}. Shutting down gracefully...`);
-      server.close(() => {
+      server.close(async () => {
         log('Server closed.');
+        try {
+          await shutdownOtel();
+          log('OpenTelemetry shutdown complete');
+        } catch (e) {
+          console.warn('Error shutting down OTEL:', e);
+        }
         process.exit(0);
       });
     };

@@ -4,6 +4,7 @@ import express from "express";
 import path from "path";
 // AI adapter manager
 import { invoke as adapterInvoke, generateImage as adapterImage, listAdapters } from './adapters/manager';
+import { setBudgetFor, getBudgetFor, resetBudgets } from './cost/budget-guard';
 import { metricsEndpoint } from './observability/metrics';
 import multer from "multer";
 import { auth } from "express-openid-connect";
@@ -103,10 +104,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!task || !input) return res.status(400).json({ error: 'task and input are required' });
 
       const result = await adapterInvoke({ task, input, model, timeoutMs, providerOverride: provider });
+      if (result?.meta?.status === 'error') {
+        return res.status(502).json({ error: { code: result.meta?.error || 'adapter_error', message: 'Adapter error', provider: result.provider, details: result.raw } });
+      }
       res.json(result);
     } catch (error: any) {
       console.error('Error in /api/ai/invoke:', error);
-      res.status(500).json({ error: 'AI invocation failed', details: error?.message });
+      const code = error?.code || 'internal_error';
+      res.status(500).json({ error: { code, message: 'AI invocation failed', details: error?.message } });
     }
   });
 
@@ -116,15 +121,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!prompt) return res.status(400).json({ error: 'prompt is required' });
 
       const result = await adapterImage({ prompt, model, size, providerOverride: provider });
+      if (result?.meta?.status === 'error') {
+        return res.status(502).json({ error: { code: result.meta?.error || 'adapter_error', message: 'Adapter image error', provider: result.provider, details: result.raw } });
+      }
       res.json(result);
     } catch (error: any) {
       console.error('Error in /api/ai/image:', error);
-      res.status(500).json({ error: 'AI image generation failed', details: error?.message });
+      const code = error?.code || 'internal_error';
+      res.status(500).json({ error: { code, message: 'AI image generation failed', details: error?.message } });
     }
   });
   
   // Prometheus metrics endpoint
   app.get('/metrics', metricsEndpoint());
+
+  // Simple admin endpoints to manage budgets (guarded by ENABLE_ADMIN=true)
+  const ENABLE_ADMIN = process.env.ENABLE_ADMIN === 'true';
+  if (ENABLE_ADMIN) {
+    app.get('/admin/budgets', async (req, res) => {
+      const guard = await import('./cost/budget-guard');
+      res.json(guard.listBudgets());
+    });
+
+    app.post('/admin/budgets', async (req, res) => {
+      try {
+        const { id, limitUsd } = req.body;
+        if (!id || typeof limitUsd !== 'number') return res.status(400).json({ error: 'id and numeric limitUsd required' });
+        setBudgetFor(id, limitUsd);
+        res.json({ ok: true, id, limitUsd });
+      } catch (err: any) {
+        res.status(500).json({ error: err?.message });
+      }
+    });
+
+    app.post('/admin/budgets/reset', async (req, res) => {
+      resetBudgets();
+      res.json({ ok: true });
+    });
+  }
   
   // Object storage public asset serving endpoint (referenced from: javascript_object_storage integration)
   app.get("/public-objects/:filePath(*)", async (req, res) => {
