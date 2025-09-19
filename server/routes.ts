@@ -11,7 +11,7 @@ import { AuthService, authenticateJWT, authorizeRoles, sensitiveOperationLimiter
 import { phiRedactionMiddleware, contactTracingPhiMinimization, phiAuditMiddleware, validatePublicHealthAccess } from "./hipaa-compliance";
 import { convertToMMWRFormat, convertToNNDSSFormat, convertToNEDSSFormat, convertToHANFormat, MMWRDataSchema, NNDSSDataSchema, NEDSSDataSchema, HANAlertSchema, getCDCIntegrationService, createPHINMessageHeader } from "./cdc-integration";
 import { registerHipaaAdminRoutes } from "./hipaa-api-routes";
-import { insertUserSchema, insertThreatSchema, insertFileSchema, insertIncidentSchema, insertThreatNotificationSchema, insertSubscriberSchema, insertLiveLocationDeviceSchema, insertLiveLocationHistorySchema, insertLiveLocationAlertSchema, insertLiveLocationGeoFenceSchema, insertLiveLocationAssetSchema, insertLiveLocationNetworkSegmentSchema, insertCypherhumSessionSchema, insertCypherhumVisualizationSchema, insertCypherhumInteractionSchema, insertCypherhumThreatModelSchema, insertCypherhumAnalyticsSchema, insertAcdsDroneSchema, insertAcdsSwarmMissionSchema, insertAcdsDeploymentSchema, insertAcdsCoordinationSchema, insertAcdsAnalyticsSchema, insertPublicHealthIncidentSchema, insertDiseaseSurveillanceSchema, insertContactTracingSchema, insertContactTracingLocationHistorySchema, insertContactProximityDetectionSchema, insertContactTracingNotificationTemplateSchema, insertContactTracingNotificationLogSchema, insertContactTracingPrivacyConsentSchema, insertHealthFacilitySchema, insertPublicHealthAlertSchema, insertEpidemiologicalDataSchema } from "@shared/schema";
+import { insertUserSchema, insertThreatSchema, insertFileSchema, insertIncidentSchema, insertThreatNotificationSchema, insertSubscriberSchema, insertLiveLocationDeviceSchema, insertLiveLocationHistorySchema, insertLiveLocationAlertSchema, insertLiveLocationGeoFenceSchema, insertLiveLocationAssetSchema, insertLiveLocationNetworkSegmentSchema, insertCypherhumSessionSchema, insertCypherhumVisualizationSchema, insertCypherhumInteractionSchema, insertCypherhumThreatModelSchema, insertCypherhumAnalyticsSchema, insertAcdsDroneSchema, insertAcdsSwarmMissionSchema, insertAcdsDeploymentSchema, insertAcdsCoordinationSchema, insertAcdsAnalyticsSchema, insertPublicHealthIncidentSchema, insertDiseaseSurveillanceSchema, insertContactTracingSchema, insertContactTracingLocationHistorySchema, insertContactProximityDetectionSchema, insertContactTracingNotificationTemplateSchema, insertContactTracingNotificationLogSchema, insertContactTracingPrivacyConsentSchema, insertHealthFacilitySchema, insertPublicHealthAlertSchema, insertEpidemiologicalDataSchema, insertCatalogCategorySchema, insertBomComponentSchema, insertCatalogProductSchema, insertProductBomSchema, insertCatalogServiceSchema, insertCatalogSolutionSchema, insertSolutionComponentSchema, insertPricingHistorySchema, insertCompetitiveAnalysisSchema } from "@shared/schema";
 import { ObjectStorageService } from "./objectStorage";
 import { initializeDataRetentionService, getDataRetentionService } from "./services/data-retention-service";
 // Engine types only - no instantiation imports
@@ -14992,6 +14992,536 @@ startxref
   } else {
     console.log('ℹ️ WebSocket disabled via ENABLE_WS environment variable');
   }
+
+  // ===== CYBERSECURED AI CATALOG SYSTEM API ENDPOINTS =====
+  
+  // Catalog Categories endpoints
+  app.get('/api/catalog/categories', authenticateJWT, authorizeRoles('admin', 'security_officer', 'analyst'), async (req, res) => {
+    try {
+      const categoryType = req.query.categoryType as string;
+      const categories = await storage.getCatalogCategories(categoryType);
+      res.json(categories);
+    } catch (error) {
+      console.error('❌ Failed to get catalog categories:', error);
+      res.status(500).json({ error: 'Failed to get catalog categories' });
+    }
+  });
+
+  app.get('/api/catalog/categories/:id', authenticateJWT, authorizeRoles('admin', 'security_officer', 'analyst'), async (req, res) => {
+    try {
+      const category = await storage.getCatalogCategory(req.params.id);
+      if (!category) {
+        return res.status(404).json({ error: 'Category not found' });
+      }
+      res.json(category);
+    } catch (error) {
+      console.error('❌ Failed to get catalog category:', error);
+      res.status(500).json({ error: 'Failed to get catalog category' });
+    }
+  });
+
+  app.post('/api/catalog/categories', authenticateJWT, authorizeRoles('admin', 'security_officer'), async (req, res) => {
+    try {
+      const categoryData = insertCatalogCategorySchema.parse(req.body);
+      const category = await storage.createCatalogCategory(categoryData);
+      res.status(201).json(category);
+    } catch (error) {
+      console.error('❌ Failed to create catalog category:', error);
+      res.status(500).json({ error: 'Failed to create catalog category' });
+    }
+  });
+
+  app.put('/api/catalog/categories/:id', authenticateJWT, authorizeRoles('admin', 'security_officer'), async (req, res) => {
+    try {
+      const category = await storage.updateCatalogCategory(req.params.id, req.body);
+      res.json(category);
+    } catch (error) {
+      console.error('❌ Failed to update catalog category:', error);
+      res.status(500).json({ error: 'Failed to update catalog category' });
+    }
+  });
+
+  app.delete('/api/catalog/categories/:id', authenticateJWT, authorizeRoles('admin'), async (req, res) => {
+    try {
+      await storage.deleteCatalogCategory(req.params.id);
+      res.status(204).send();
+    } catch (error) {
+      console.error('❌ Failed to delete catalog category:', error);
+      res.status(500).json({ error: 'Failed to delete catalog category' });
+    }
+  });
+
+  // BOM Components endpoints
+  app.get('/api/catalog/bom-components', authenticateJWT, authorizeRoles('admin', 'security_officer', 'analyst'), async (req, res) => {
+    try {
+      const componentType = req.query.componentType as string;
+      const components = componentType 
+        ? await storage.getBomComponentsByType(componentType)
+        : await storage.getBomComponents();
+      res.json(components);
+    } catch (error) {
+      console.error('❌ Failed to get BOM components:', error);
+      res.status(500).json({ error: 'Failed to get BOM components' });
+    }
+  });
+
+  app.get('/api/catalog/bom-components/:id', authenticateJWT, authorizeRoles('admin', 'security_officer', 'analyst'), async (req, res) => {
+    try {
+      const component = await storage.getBomComponent(req.params.id);
+      if (!component) {
+        return res.status(404).json({ error: 'BOM component not found' });
+      }
+      res.json(component);
+    } catch (error) {
+      console.error('❌ Failed to get BOM component:', error);
+      res.status(500).json({ error: 'Failed to get BOM component' });
+    }
+  });
+
+  app.post('/api/catalog/bom-components', authenticateJWT, authorizeRoles('admin', 'security_officer'), async (req, res) => {
+    try {
+      const componentData = insertBomComponentSchema.parse(req.body);
+      const component = await storage.createBomComponent(componentData);
+      res.status(201).json(component);
+    } catch (error) {
+      console.error('❌ Failed to create BOM component:', error);
+      res.status(500).json({ error: 'Failed to create BOM component' });
+    }
+  });
+
+  app.put('/api/catalog/bom-components/:id', authenticateJWT, authorizeRoles('admin', 'security_officer'), async (req, res) => {
+    try {
+      const component = await storage.updateBomComponent(req.params.id, req.body);
+      res.json(component);
+    } catch (error) {
+      console.error('❌ Failed to update BOM component:', error);
+      res.status(500).json({ error: 'Failed to update BOM component' });
+    }
+  });
+
+  app.delete('/api/catalog/bom-components/:id', authenticateJWT, authorizeRoles('admin'), async (req, res) => {
+    try {
+      await storage.deleteBomComponent(req.params.id);
+      res.status(204).send();
+    } catch (error) {
+      console.error('❌ Failed to delete BOM component:', error);
+      res.status(500).json({ error: 'Failed to delete BOM component' });
+    }
+  });
+
+  // Catalog Products endpoints
+  app.get('/api/catalog/products', authenticateJWT, authorizeRoles('admin', 'security_officer', 'analyst'), async (req, res) => {
+    try {
+      const categoryId = req.query.categoryId as string;
+      const products = await storage.getCatalogProducts(categoryId);
+      res.json(products);
+    } catch (error) {
+      console.error('❌ Failed to get catalog products:', error);
+      res.status(500).json({ error: 'Failed to get catalog products' });
+    }
+  });
+
+  app.get('/api/catalog/products/with-bom', authenticateJWT, authorizeRoles('admin', 'security_officer', 'analyst'), async (req, res) => {
+    try {
+      const products = await storage.getProductsWithBom();
+      res.json(products);
+    } catch (error) {
+      console.error('❌ Failed to get products with BOM:', error);
+      res.status(500).json({ error: 'Failed to get products with BOM' });
+    }
+  });
+
+  app.get('/api/catalog/products/:id', authenticateJWT, authorizeRoles('admin', 'security_officer', 'analyst'), async (req, res) => {
+    try {
+      const product = await storage.getCatalogProduct(req.params.id);
+      if (!product) {
+        return res.status(404).json({ error: 'Product not found' });
+      }
+      res.json(product);
+    } catch (error) {
+      console.error('❌ Failed to get catalog product:', error);
+      res.status(500).json({ error: 'Failed to get catalog product' });
+    }
+  });
+
+  app.get('/api/catalog/products/code/:productCode', authenticateJWT, authorizeRoles('admin', 'security_officer', 'analyst'), async (req, res) => {
+    try {
+      const product = await storage.getCatalogProductByCode(req.params.productCode);
+      if (!product) {
+        return res.status(404).json({ error: 'Product not found' });
+      }
+      res.json(product);
+    } catch (error) {
+      console.error('❌ Failed to get catalog product by code:', error);
+      res.status(500).json({ error: 'Failed to get catalog product by code' });
+    }
+  });
+
+  app.post('/api/catalog/products', authenticateJWT, authorizeRoles('admin', 'security_officer'), async (req, res) => {
+    try {
+      const productData = insertCatalogProductSchema.parse(req.body);
+      const product = await storage.createCatalogProduct(productData);
+      res.status(201).json(product);
+    } catch (error) {
+      console.error('❌ Failed to create catalog product:', error);
+      res.status(500).json({ error: 'Failed to create catalog product' });
+    }
+  });
+
+  app.put('/api/catalog/products/:id', authenticateJWT, authorizeRoles('admin', 'security_officer'), async (req, res) => {
+    try {
+      const product = await storage.updateCatalogProduct(req.params.id, req.body);
+      res.json(product);
+    } catch (error) {
+      console.error('❌ Failed to update catalog product:', error);
+      res.status(500).json({ error: 'Failed to update catalog product' });
+    }
+  });
+
+  app.delete('/api/catalog/products/:id', authenticateJWT, authorizeRoles('admin'), async (req, res) => {
+    try {
+      await storage.deleteCatalogProduct(req.params.id);
+      res.status(204).send();
+    } catch (error) {
+      console.error('❌ Failed to delete catalog product:', error);
+      res.status(500).json({ error: 'Failed to delete catalog product' });
+    }
+  });
+
+  // Product BOM endpoints
+  app.get('/api/catalog/products/:productId/bom', authenticateJWT, authorizeRoles('admin', 'security_officer', 'analyst'), async (req, res) => {
+    try {
+      const bom = await storage.getProductBom(req.params.productId);
+      res.json(bom);
+    } catch (error) {
+      console.error('❌ Failed to get product BOM:', error);
+      res.status(500).json({ error: 'Failed to get product BOM' });
+    }
+  });
+
+  app.post('/api/catalog/products/:productId/bom', authenticateJWT, authorizeRoles('admin', 'security_officer'), async (req, res) => {
+    try {
+      const bomData = insertProductBomSchema.parse({ ...req.body, productId: req.params.productId });
+      const bomEntry = await storage.addProductBomComponent(bomData);
+      res.status(201).json(bomEntry);
+    } catch (error) {
+      console.error('❌ Failed to add product BOM component:', error);
+      res.status(500).json({ error: 'Failed to add product BOM component' });
+    }
+  });
+
+  app.put('/api/catalog/bom/:bomId', authenticateJWT, authorizeRoles('admin', 'security_officer'), async (req, res) => {
+    try {
+      const bomEntry = await storage.updateProductBomComponent(req.params.bomId, req.body);
+      res.json(bomEntry);
+    } catch (error) {
+      console.error('❌ Failed to update product BOM component:', error);
+      res.status(500).json({ error: 'Failed to update product BOM component' });
+    }
+  });
+
+  app.delete('/api/catalog/bom/:bomId', authenticateJWT, authorizeRoles('admin'), async (req, res) => {
+    try {
+      await storage.removeProductBomComponent(req.params.bomId);
+      res.status(204).send();
+    } catch (error) {
+      console.error('❌ Failed to remove product BOM component:', error);
+      res.status(500).json({ error: 'Failed to remove product BOM component' });
+    }
+  });
+
+  // Catalog Services endpoints
+  app.get('/api/catalog/services', authenticateJWT, authorizeRoles('admin', 'security_officer', 'analyst'), async (req, res) => {
+    try {
+      const categoryId = req.query.categoryId as string;
+      const serviceType = req.query.serviceType as string;
+      
+      let services;
+      if (serviceType) {
+        services = await storage.getServicesByType(serviceType);
+      } else {
+        services = await storage.getCatalogServices(categoryId);
+      }
+      
+      res.json(services);
+    } catch (error) {
+      console.error('❌ Failed to get catalog services:', error);
+      res.status(500).json({ error: 'Failed to get catalog services' });
+    }
+  });
+
+  app.get('/api/catalog/services/:id', authenticateJWT, authorizeRoles('admin', 'security_officer', 'analyst'), async (req, res) => {
+    try {
+      const service = await storage.getCatalogService(req.params.id);
+      if (!service) {
+        return res.status(404).json({ error: 'Service not found' });
+      }
+      res.json(service);
+    } catch (error) {
+      console.error('❌ Failed to get catalog service:', error);
+      res.status(500).json({ error: 'Failed to get catalog service' });
+    }
+  });
+
+  app.get('/api/catalog/services/code/:serviceCode', authenticateJWT, authorizeRoles('admin', 'security_officer', 'analyst'), async (req, res) => {
+    try {
+      const service = await storage.getCatalogServiceByCode(req.params.serviceCode);
+      if (!service) {
+        return res.status(404).json({ error: 'Service not found' });
+      }
+      res.json(service);
+    } catch (error) {
+      console.error('❌ Failed to get catalog service by code:', error);
+      res.status(500).json({ error: 'Failed to get catalog service by code' });
+    }
+  });
+
+  app.post('/api/catalog/services', authenticateJWT, authorizeRoles('admin', 'security_officer'), async (req, res) => {
+    try {
+      const serviceData = insertCatalogServiceSchema.parse(req.body);
+      const service = await storage.createCatalogService(serviceData);
+      res.status(201).json(service);
+    } catch (error) {
+      console.error('❌ Failed to create catalog service:', error);
+      res.status(500).json({ error: 'Failed to create catalog service' });
+    }
+  });
+
+  app.put('/api/catalog/services/:id', authenticateJWT, authorizeRoles('admin', 'security_officer'), async (req, res) => {
+    try {
+      const service = await storage.updateCatalogService(req.params.id, req.body);
+      res.json(service);
+    } catch (error) {
+      console.error('❌ Failed to update catalog service:', error);
+      res.status(500).json({ error: 'Failed to update catalog service' });
+    }
+  });
+
+  app.delete('/api/catalog/services/:id', authenticateJWT, authorizeRoles('admin'), async (req, res) => {
+    try {
+      await storage.deleteCatalogService(req.params.id);
+      res.status(204).send();
+    } catch (error) {
+      console.error('❌ Failed to delete catalog service:', error);
+      res.status(500).json({ error: 'Failed to delete catalog service' });
+    }
+  });
+
+  // Catalog Solutions endpoints
+  app.get('/api/catalog/solutions', authenticateJWT, authorizeRoles('admin', 'security_officer', 'analyst'), async (req, res) => {
+    try {
+      const categoryId = req.query.categoryId as string;
+      const withComponents = req.query.withComponents === 'true';
+      
+      let solutions;
+      if (withComponents) {
+        solutions = await storage.getSolutionsWithComponents();
+      } else {
+        solutions = await storage.getCatalogSolutions(categoryId);
+      }
+      
+      res.json(solutions);
+    } catch (error) {
+      console.error('❌ Failed to get catalog solutions:', error);
+      res.status(500).json({ error: 'Failed to get catalog solutions' });
+    }
+  });
+
+  app.get('/api/catalog/solutions/:id', authenticateJWT, authorizeRoles('admin', 'security_officer', 'analyst'), async (req, res) => {
+    try {
+      const solution = await storage.getCatalogSolution(req.params.id);
+      if (!solution) {
+        return res.status(404).json({ error: 'Solution not found' });
+      }
+      res.json(solution);
+    } catch (error) {
+      console.error('❌ Failed to get catalog solution:', error);
+      res.status(500).json({ error: 'Failed to get catalog solution' });
+    }
+  });
+
+  app.get('/api/catalog/solutions/code/:solutionCode', authenticateJWT, authorizeRoles('admin', 'security_officer', 'analyst'), async (req, res) => {
+    try {
+      const solution = await storage.getCatalogSolutionByCode(req.params.solutionCode);
+      if (!solution) {
+        return res.status(404).json({ error: 'Solution not found' });
+      }
+      res.json(solution);
+    } catch (error) {
+      console.error('❌ Failed to get catalog solution by code:', error);
+      res.status(500).json({ error: 'Failed to get catalog solution by code' });
+    }
+  });
+
+  app.post('/api/catalog/solutions', authenticateJWT, authorizeRoles('admin', 'security_officer'), async (req, res) => {
+    try {
+      const solutionData = insertCatalogSolutionSchema.parse(req.body);
+      const solution = await storage.createCatalogSolution(solutionData);
+      res.status(201).json(solution);
+    } catch (error) {
+      console.error('❌ Failed to create catalog solution:', error);
+      res.status(500).json({ error: 'Failed to create catalog solution' });
+    }
+  });
+
+  app.put('/api/catalog/solutions/:id', authenticateJWT, authorizeRoles('admin', 'security_officer'), async (req, res) => {
+    try {
+      const solution = await storage.updateCatalogSolution(req.params.id, req.body);
+      res.json(solution);
+    } catch (error) {
+      console.error('❌ Failed to update catalog solution:', error);
+      res.status(500).json({ error: 'Failed to update catalog solution' });
+    }
+  });
+
+  app.delete('/api/catalog/solutions/:id', authenticateJWT, authorizeRoles('admin'), async (req, res) => {
+    try {
+      await storage.deleteCatalogSolution(req.params.id);
+      res.status(204).send();
+    } catch (error) {
+      console.error('❌ Failed to delete catalog solution:', error);
+      res.status(500).json({ error: 'Failed to delete catalog solution' });
+    }
+  });
+
+  // Solution Components endpoints
+  app.get('/api/catalog/solutions/:solutionId/components', authenticateJWT, authorizeRoles('admin', 'security_officer', 'analyst'), async (req, res) => {
+    try {
+      const components = await storage.getSolutionComponents(req.params.solutionId);
+      res.json(components);
+    } catch (error) {
+      console.error('❌ Failed to get solution components:', error);
+      res.status(500).json({ error: 'Failed to get solution components' });
+    }
+  });
+
+  app.post('/api/catalog/solutions/:solutionId/components', authenticateJWT, authorizeRoles('admin', 'security_officer'), async (req, res) => {
+    try {
+      const componentData = insertSolutionComponentSchema.parse({ ...req.body, solutionId: req.params.solutionId });
+      const component = await storage.addSolutionComponent(componentData);
+      res.status(201).json(component);
+    } catch (error) {
+      console.error('❌ Failed to add solution component:', error);
+      res.status(500).json({ error: 'Failed to add solution component' });
+    }
+  });
+
+  app.put('/api/catalog/solution-components/:componentId', authenticateJWT, authorizeRoles('admin', 'security_officer'), async (req, res) => {
+    try {
+      const component = await storage.updateSolutionComponent(req.params.componentId, req.body);
+      res.json(component);
+    } catch (error) {
+      console.error('❌ Failed to update solution component:', error);
+      res.status(500).json({ error: 'Failed to update solution component' });
+    }
+  });
+
+  app.delete('/api/catalog/solution-components/:componentId', authenticateJWT, authorizeRoles('admin'), async (req, res) => {
+    try {
+      await storage.removeSolutionComponent(req.params.componentId);
+      res.status(204).send();
+    } catch (error) {
+      console.error('❌ Failed to remove solution component:', error);
+      res.status(500).json({ error: 'Failed to remove solution component' });
+    }
+  });
+
+  // Pricing History endpoints
+  app.get('/api/catalog/pricing-history/:entityType/:entityId', authenticateJWT, authorizeRoles('admin', 'security_officer', 'analyst'), async (req, res) => {
+    try {
+      const { entityType, entityId } = req.params;
+      const history = await storage.getPricingHistory(entityType, entityId);
+      res.json(history);
+    } catch (error) {
+      console.error('❌ Failed to get pricing history:', error);
+      res.status(500).json({ error: 'Failed to get pricing history' });
+    }
+  });
+
+  app.post('/api/catalog/pricing-history', authenticateJWT, authorizeRoles('admin', 'security_officer'), async (req, res) => {
+    try {
+      const historyData = insertPricingHistorySchema.parse(req.body);
+      const history = await storage.createPricingHistoryEntry(historyData);
+      res.status(201).json(history);
+    } catch (error) {
+      console.error('❌ Failed to create pricing history entry:', error);
+      res.status(500).json({ error: 'Failed to create pricing history entry' });
+    }
+  });
+
+  // Competitive Analysis endpoints
+  app.get('/api/catalog/competitive-analysis', authenticateJWT, authorizeRoles('admin', 'security_officer', 'analyst'), async (req, res) => {
+    try {
+      const productName = req.query.productName as string;
+      let analysis;
+      
+      if (productName) {
+        analysis = await storage.getCompetitiveAnalysisForProduct(productName);
+      } else {
+        analysis = await storage.getCompetitiveAnalysis();
+      }
+      
+      res.json(analysis);
+    } catch (error) {
+      console.error('❌ Failed to get competitive analysis:', error);
+      res.status(500).json({ error: 'Failed to get competitive analysis' });
+    }
+  });
+
+  app.post('/api/catalog/competitive-analysis', authenticateJWT, authorizeRoles('admin', 'security_officer'), async (req, res) => {
+    try {
+      const analysisData = insertCompetitiveAnalysisSchema.parse(req.body);
+      const analysis = await storage.createCompetitiveAnalysis(analysisData);
+      res.status(201).json(analysis);
+    } catch (error) {
+      console.error('❌ Failed to create competitive analysis:', error);
+      res.status(500).json({ error: 'Failed to create competitive analysis' });
+    }
+  });
+
+  app.put('/api/catalog/competitive-analysis/:id', authenticateJWT, authorizeRoles('admin', 'security_officer'), async (req, res) => {
+    try {
+      const analysis = await storage.updateCompetitiveAnalysis(req.params.id, req.body);
+      res.json(analysis);
+    } catch (error) {
+      console.error('❌ Failed to update competitive analysis:', error);
+      res.status(500).json({ error: 'Failed to update competitive analysis' });
+    }
+  });
+
+  app.delete('/api/catalog/competitive-analysis/:id', authenticateJWT, authorizeRoles('admin'), async (req, res) => {
+    try {
+      await storage.deleteCompetitiveAnalysis(req.params.id);
+      res.status(204).send();
+    } catch (error) {
+      console.error('❌ Failed to delete competitive analysis:', error);
+      res.status(500).json({ error: 'Failed to delete competitive analysis' });
+    }
+  });
+
+  // Catalog Analytics and Reporting endpoints
+  app.get('/api/catalog/metrics', authenticateJWT, authorizeRoles('admin', 'security_officer', 'analyst'), async (req, res) => {
+    try {
+      const metrics = await storage.getCatalogMetrics();
+      res.json(metrics);
+    } catch (error) {
+      console.error('❌ Failed to get catalog metrics:', error);
+      res.status(500).json({ error: 'Failed to get catalog metrics' });
+    }
+  });
+
+  app.get('/api/catalog/reports/:reportType', authenticateJWT, authorizeRoles('admin', 'security_officer', 'analyst'), async (req, res) => {
+    try {
+      const reportType = req.params.reportType as 'pricing' | 'margins' | 'competitive' | 'bom';
+      const report = await storage.getCatalogReport(reportType);
+      res.json(report);
+    } catch (error) {
+      console.error('❌ Failed to get catalog report:', error);
+      res.status(500).json({ error: 'Failed to get catalog report' });
+    }
+  });
+
+  console.log('💼 CyberSecured AI Catalog API endpoints registered with authentication and authorization');
 
   // ===== CRITICAL FIX: REGISTER HIPAA ADMIN ROUTES =====
   // COMPLIANCE: Ensure all HIPAA administrative safeguard routes are registered
