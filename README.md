@@ -1,6 +1,8 @@
 
 # Multi-Model Router (minimal)
 
+![CI](https://github.com/cybersecuredai/cybersecuredai/actions/workflows/ci.yml/badge.svg)
+
 See `SPEC.md` for the full technical specification.
 
 Run locally (dev):

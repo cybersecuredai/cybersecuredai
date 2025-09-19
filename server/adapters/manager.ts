@@ -5,6 +5,8 @@ import { retryWithBackoff, isRetryableError } from '../retry/retry';
 import { estimateInvokeCost, estimateImageCost, attachEstimateToInvoke, attachEstimateToImage } from '../cost/cost-estimator';
 import { consumeBudget, getBudgetFor } from '../cost/budget-guard';
 import { trace } from '@opentelemetry/api';
+import { withTimeout } from '../utils/timeout';
+import { TimeoutError, ProviderError } from './errors';
 
 const adapters: Record<string, AIAdapter> = {};
 
@@ -67,7 +69,9 @@ export async function invoke(request: InvokeRequest) : Promise<InvokeResponse> {
         errorsTotal.inc({ endpoint: '/api/ai/invoke', provider: name, model: request.model || 'unknown', error_type: 'budget_exceeded' } as any, 1);
         return { id: crypto.randomUUID(), provider: name, model: request.model || 'unknown', output: '', raw: { budgetId }, meta: { latencyMs, status: 'error', error: 'budget_exceeded' } };
       }
-      const resp = await retryWithBackoff(() => adapter.invoke!(request), 2, 100);
+  // Use request timeoutMs or provider default (5000ms)
+  const timeoutMs = request.timeoutMs || parseInt(process.env.DEFAULT_PROVIDER_TIMEOUT_MS || '5000', 10);
+  const resp = await retryWithBackoff(() => withTimeout(adapter.invoke!(request), timeoutMs), 2, 100);
       // attach estimate to response
       attachEstimateToInvoke(resp, estimate);
 
@@ -87,10 +91,19 @@ export async function invoke(request: InvokeRequest) : Promise<InvokeResponse> {
       span.setAttribute('status', 'error');
       span.setAttribute('error', err?.message || 'error');
       span.end();
+      // Map timeout to typed TimeoutError so callers can handle it
+      if (err instanceof Error && err.message === 'timeout') {
+        const toErr = new TimeoutError(name);
+        if (!isRetryableError(toErr)) {
+          return { id: crypto.randomUUID(), provider: name, model: request.model || 'unknown', output: '', raw: toErr, meta: { latencyMs, status: 'error', error: toErr.message, code: toErr.code } };
+        }
+        // else continue to next provider
+      }
 
       // if error is retryable, try next provider; otherwise fail fast
       if (!isRetryableError(err)) {
-        return { id: crypto.randomUUID(), provider: name, model: request.model || 'unknown', output: '', raw: err, meta: { latencyMs, status: 'error', error: err?.message } };
+        const pErr = err instanceof Error ? new ProviderError(name, err.message, err) : new ProviderError(name);
+        return { id: crypto.randomUUID(), provider: name, model: request.model || 'unknown', output: '', raw: pErr, meta: { latencyMs, status: 'error', error: pErr.message, code: pErr.code } };
       }
       // else continue to next provider
     }
@@ -123,7 +136,8 @@ export async function generateImage(request: ImageRequest): Promise<ImageRespons
         return { id: crypto.randomUUID(), provider: name, model: request.model || 'unknown', url: null, b64: null, raw: { budgetId }, meta: { latencyMs, status: 'error', error: 'budget_exceeded' } };
       }
 
-      const resp = await retryWithBackoff(() => adapter.image!(request), 2, 100);
+  const timeoutMs = parseInt(process.env.DEFAULT_PROVIDER_TIMEOUT_MS || '5000', 10);
+  const resp = await retryWithBackoff(() => withTimeout(adapter.image!(request), timeoutMs), 2, 100);
       attachEstimateToImage(resp, estimate);
       const latencyMs = Date.now() - start;
       requestsTotal.inc({ endpoint: '/api/ai/image', provider: name, model: resp.model || request.model || 'unknown', status: 'ok' } as any, 1);
@@ -141,11 +155,26 @@ export async function generateImage(request: ImageRequest): Promise<ImageRespons
       span.setAttribute('error', err?.message || 'error');
       span.end();
 
+      if (err instanceof Error && err.message === 'timeout') {
+        const toErr = new TimeoutError(name);
+        if (!isRetryableError(toErr)) {
+          return { id: crypto.randomUUID(), provider: name, model: request.model || 'unknown', url: null, b64: null, raw: toErr, meta: { latencyMs, status: 'error', error: toErr.message, code: toErr.code } };
+        }
+      }
+
       if (!isRetryableError(err)) {
-        return { id: crypto.randomUUID(), provider: name, model: request.model || 'unknown', url: null, b64: null, raw: err, meta: { latencyMs, status: 'error', error: err?.message } };
+        const pErr = err instanceof Error ? new ProviderError(name, err.message, err) : new ProviderError(name);
+        return { id: crypto.randomUUID(), provider: name, model: request.model || 'unknown', url: null, b64: null, raw: pErr, meta: { latencyMs, status: 'error', error: pErr.message, code: pErr.code } };
       }
     }
   }
 
   return { id: crypto.randomUUID(), provider: 'none', model: request.model || 'unknown', url: null, b64: null, raw: {}, meta: { latencyMs: 0, status: 'error', error: 'No image adapter available or all providers failed' } };
+}
+
+// If requested, load the mock adapter at runtime so tests can get a happy-path response
+if (process.env.ENABLE_MOCK_ADAPTER === 'true') {
+  import('./mock-adapter').catch(() => {
+    // ignore errors during optional mock import
+  });
 }
