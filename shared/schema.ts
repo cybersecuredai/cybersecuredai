@@ -4067,6 +4067,313 @@ export type InsertHipaaAccessRequest = z.infer<typeof insertHipaaAccessRequestSc
 export type HipaaEncryptionKey = typeof hipaaEncryptionKeys.$inferSelect;
 export type InsertHipaaEncryptionKey = z.infer<typeof insertHipaaEncryptionKeySchema>;
 
+// ===== CYBERSECURED AI CATALOG SYSTEM =====
+
+// Catalog Categories - Core categories for organizing products, services, and solutions
+export const catalogCategories = pgTable("catalog_categories", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: varchar("name").notNull(),
+  slug: varchar("slug").notNull().unique(),
+  description: text("description"),
+  categoryType: varchar("category_type").notNull(), // product, service, solution
+  parentId: varchar("parent_id").references(() => catalogCategories.id),
+  sortOrder: integer("sort_order").default(0),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// BOM Components - Individual components and their costs for products
+export const bomComponents = pgTable("bom_components", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  componentName: varchar("component_name").notNull(),
+  componentType: varchar("component_type").notNull(), // hardware, software, service, license, labor
+  vendorName: varchar("vendor_name"),
+  vendorPartNumber: varchar("vendor_part_number"),
+  description: text("description"),
+  unitCost: numeric("unit_cost", { precision: 12, scale: 2 }).notNull(),
+  currency: varchar("currency").default("USD"),
+  leadTimeDays: integer("lead_time_days"),
+  minimumOrderQuantity: integer("minimum_order_quantity").default(1),
+  specifications: jsonb("specifications"), // Technical specifications
+  certifications: jsonb("certifications"), // Security/compliance certifications
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Catalog Products - Core CyberSecured AI products with full BOM and pricing
+export const catalogProducts = pgTable("catalog_products", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: varchar("name").notNull(),
+  slug: varchar("slug").notNull().unique(),
+  productCode: varchar("product_code").notNull().unique(),
+  categoryId: varchar("category_id").notNull().references(() => catalogCategories.id),
+  shortDescription: text("short_description"),
+  fullDescription: text("full_description"),
+  technicalSpecifications: jsonb("technical_specifications"),
+  features: jsonb("features"), // Array of key features
+  
+  // Pricing Information
+  developmentCost: numeric("development_cost", { precision: 12, scale: 2 }),
+  manufacturingCost: numeric("manufacturing_cost", { precision: 12, scale: 2 }),
+  totalCostPrice: numeric("total_cost_price", { precision: 12, scale: 2 }).notNull(),
+  commercialSellPrice: numeric("commercial_sell_price", { precision: 12, scale: 2 }).notNull(),
+  federalSellPrice: numeric("federal_sell_price", { precision: 12, scale: 2 }).notNull(),
+  gsaPrice: numeric("gsa_price", { precision: 12, scale: 2 }),
+  
+  // Margin Analysis
+  commercialMarginPercent: numeric("commercial_margin_percent", { precision: 5, scale: 2 }),
+  federalMarginPercent: numeric("federal_margin_percent", { precision: 5, scale: 2 }),
+  
+  // Volume Pricing
+  volumePricingTiers: jsonb("volume_pricing_tiers"), // Array of quantity/price tiers
+  
+  // Compliance and Certifications
+  complianceFrameworks: jsonb("compliance_frameworks"), // FISMA, FedRAMP, etc.
+  securityCertifications: jsonb("security_certifications"),
+  
+  // Licensing and Deployment
+  licenseModel: varchar("license_model"), // perpetual, subscription, usage-based
+  deploymentModel: varchar("deployment_model"), // on-premise, cloud, hybrid
+  supportLevel: varchar("support_level").default("standard"), // basic, standard, premium, enterprise
+  
+  // Product Status
+  productStatus: varchar("product_status").notNull().default("active"), // active, deprecated, planned, beta
+  releaseDate: timestamp("release_date"),
+  endOfLifeDate: timestamp("end_of_life_date"),
+  
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Product BOM - Junction table linking products to their bill of materials
+export const productBom = pgTable("product_bom", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  productId: varchar("product_id").notNull().references(() => catalogProducts.id),
+  componentId: varchar("component_id").notNull().references(() => bomComponents.id),
+  quantity: numeric("quantity", { precision: 8, scale: 2 }).notNull(),
+  componentRole: varchar("component_role"), // primary, secondary, optional
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Catalog Services - Professional and managed services
+export const catalogServices = pgTable("catalog_services", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: varchar("name").notNull(),
+  slug: varchar("slug").notNull().unique(),
+  serviceCode: varchar("service_code").notNull().unique(),
+  categoryId: varchar("category_id").notNull().references(() => catalogCategories.id),
+  shortDescription: text("short_description"),
+  fullDescription: text("full_description"),
+  
+  // Service Classification
+  serviceType: varchar("service_type").notNull(), // professional, managed, consulting, support
+  serviceDelivery: varchar("service_delivery").notNull(), // on-site, remote, hybrid
+  
+  // Resource Requirements
+  requiredSkillLevel: varchar("required_skill_level").notNull(), // junior, senior, expert, architect
+  requiredCertifications: jsonb("required_certifications"),
+  laborHours: jsonb("labor_hours"), // Breakdown by role/seniority
+  
+  // Pricing Structure
+  hourlyRate: numeric("hourly_rate", { precision: 8, scale: 2 }),
+  dailyRate: numeric("daily_rate", { precision: 8, scale: 2 }),
+  weeklyRate: numeric("weekly_rate", { precision: 8, scale: 2 }),
+  monthlyRate: numeric("monthly_rate", { precision: 8, scale: 2 }),
+  projectBasePrice: numeric("project_base_price", { precision: 12, scale: 2 }),
+  
+  // Cost Structure
+  deliveryCost: numeric("delivery_cost", { precision: 12, scale: 2 }).notNull(),
+  commercialSellPrice: numeric("commercial_sell_price", { precision: 12, scale: 2 }).notNull(),
+  federalSellPrice: numeric("federal_sell_price", { precision: 12, scale: 2 }).notNull(),
+  
+  // Margin Analysis
+  commercialMarginPercent: numeric("commercial_margin_percent", { precision: 5, scale: 2 }),
+  federalMarginPercent: numeric("federal_margin_percent", { precision: 5, scale: 2 }),
+  
+  // Service Level Agreements
+  slaCommitments: jsonb("sla_commitments"),
+  responseTimeHours: integer("response_time_hours"),
+  resolutionTimeHours: integer("resolution_time_hours"),
+  availabilityPercent: numeric("availability_percent", { precision: 5, scale: 2 }),
+  
+  // Compliance Requirements
+  complianceFrameworks: jsonb("compliance_frameworks"),
+  clearanceLevel: varchar("clearance_level"), // public, secret, top_secret
+  
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Catalog Solutions - Integrated product + service packages
+export const catalogSolutions = pgTable("catalog_solutions", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: varchar("name").notNull(),
+  slug: varchar("slug").notNull().unique(),
+  solutionCode: varchar("solution_code").notNull().unique(),
+  categoryId: varchar("category_id").notNull().references(() => catalogCategories.id),
+  shortDescription: text("short_description"),
+  fullDescription: text("full_description"),
+  
+  // Solution Classification
+  solutionType: varchar("solution_type").notNull(), // integrated, bundled, enterprise, pilot
+  targetAudience: varchar("target_audience").notNull(), // federal, education, healthcare, commercial
+  deploymentSize: varchar("deployment_size").notNull(), // small, medium, large, enterprise
+  
+  // Implementation Details
+  implementationPeriodMonths: integer("implementation_period_months"),
+  onboardingIncluded: boolean("onboarding_included").default(true),
+  trainingIncluded: boolean("training_included").default(true),
+  migrationSupport: boolean("migration_support").default(false),
+  
+  // Pricing Structure
+  totalSolutionCost: numeric("total_solution_cost", { precision: 12, scale: 2 }).notNull(),
+  commercialSellPrice: numeric("commercial_sell_price", { precision: 12, scale: 2 }).notNull(),
+  federalSellPrice: numeric("federal_sell_price", { precision: 12, scale: 2 }).notNull(),
+  bundleDiscountPercent: numeric("bundle_discount_percent", { precision: 5, scale: 2 }),
+  
+  // Contract Terms
+  minimumContractMonths: integer("minimum_contract_months").default(12),
+  maximumContractMonths: integer("maximum_contract_months"),
+  autoRenewal: boolean("auto_renewal").default(true),
+  
+  // Multi-year Pricing
+  yearOnePrice: numeric("year_one_price", { precision: 12, scale: 2 }),
+  yearTwoPrice: numeric("year_two_price", { precision: 12, scale: 2 }),
+  yearThreePrice: numeric("year_three_price", { precision: 12, scale: 2 }),
+  
+  // Enterprise Licensing
+  enterpriseLicenseTerms: jsonb("enterprise_license_terms"),
+  scalabilityOptions: jsonb("scalability_options"),
+  customizationLevel: varchar("customization_level"), // standard, enhanced, full
+  
+  // Support and Maintenance
+  supportLevel: varchar("support_level").default("standard"),
+  maintenanceIncluded: boolean("maintenance_included").default(true),
+  upgradePolicy: text("upgrade_policy"),
+  
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Solution Components - Junction table linking solutions to products and services
+export const solutionComponents = pgTable("solution_components", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  solutionId: varchar("solution_id").notNull().references(() => catalogSolutions.id),
+  componentType: varchar("component_type").notNull(), // product, service
+  componentId: varchar("component_id").notNull(), // References either catalogProducts.id or catalogServices.id
+  quantity: numeric("quantity", { precision: 8, scale: 2 }).notNull(),
+  componentRole: varchar("component_role"), // core, optional, addon
+  discountPercent: numeric("discount_percent", { precision: 5, scale: 2 }),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Pricing History - Track pricing changes over time
+export const pricingHistory = pgTable("pricing_history", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  entityType: varchar("entity_type").notNull(), // product, service, solution
+  entityId: varchar("entity_id").notNull(),
+  priceType: varchar("price_type").notNull(), // commercial, federal, gsa
+  oldPrice: numeric("old_price", { precision: 12, scale: 2 }),
+  newPrice: numeric("new_price", { precision: 12, scale: 2 }).notNull(),
+  changeReason: text("change_reason"),
+  effectiveDate: timestamp("effective_date").notNull(),
+  changedBy: varchar("changed_by").references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Competitive Analysis - Track competitor pricing and positioning
+export const competitiveAnalysis = pgTable("competitive_analysis", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  competitorName: varchar("competitor_name").notNull(),
+  productName: varchar("product_name").notNull(),
+  competitorPrice: numeric("competitor_price", { precision: 12, scale: 2 }),
+  ourPrice: numeric("our_price", { precision: 12, scale: 2 }),
+  priceAdvantage: numeric("price_advantage", { precision: 5, scale: 2 }),
+  featureComparison: jsonb("feature_comparison"),
+  marketPosition: varchar("market_position"), // leader, challenger, follower, niche
+  analysisNotes: text("analysis_notes"),
+  lastUpdated: timestamp("last_updated").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Insert Schemas for Catalog Tables
+export const insertCatalogCategorySchema = createInsertSchema(catalogCategories).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertBomComponentSchema = createInsertSchema(bomComponents).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertCatalogProductSchema = createInsertSchema(catalogProducts).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertProductBomSchema = createInsertSchema(productBom).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertCatalogServiceSchema = createInsertSchema(catalogServices).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertCatalogSolutionSchema = createInsertSchema(catalogSolutions).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertSolutionComponentSchema = createInsertSchema(solutionComponents).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertPricingHistorySchema = createInsertSchema(pricingHistory).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertCompetitiveAnalysisSchema = createInsertSchema(competitiveAnalysis).omit({
+  id: true,
+  createdAt: true,
+});
+
+// Type Exports for Catalog System
+export type CatalogCategory = typeof catalogCategories.$inferSelect;
+export type InsertCatalogCategory = z.infer<typeof insertCatalogCategorySchema>;
+export type BomComponent = typeof bomComponents.$inferSelect;
+export type InsertBomComponent = z.infer<typeof insertBomComponentSchema>;
+export type CatalogProduct = typeof catalogProducts.$inferSelect;
+export type InsertCatalogProduct = z.infer<typeof insertCatalogProductSchema>;
+export type ProductBom = typeof productBom.$inferSelect;
+export type InsertProductBom = z.infer<typeof insertProductBomSchema>;
+export type CatalogService = typeof catalogServices.$inferSelect;
+export type InsertCatalogService = z.infer<typeof insertCatalogServiceSchema>;
+export type CatalogSolution = typeof catalogSolutions.$inferSelect;
+export type InsertCatalogSolution = z.infer<typeof insertCatalogSolutionSchema>;
+export type SolutionComponent = typeof solutionComponents.$inferSelect;
+export type InsertSolutionComponent = z.infer<typeof insertSolutionComponentSchema>;
+export type PricingHistory = typeof pricingHistory.$inferSelect;
+export type InsertPricingHistory = z.infer<typeof insertPricingHistorySchema>;
+export type CompetitiveAnalysis = typeof competitiveAnalysis.$inferSelect;
+export type InsertCompetitiveAnalysis = z.infer<typeof insertCompetitiveAnalysisSchema>;
+
 // Type exports for TypeScript usage
 export type UnifiedSystemStatus = z.infer<typeof UnifiedSystemStatusSchema>;
 export type CrossSystemMetrics = z.infer<typeof CrossSystemMetricsSchema>;

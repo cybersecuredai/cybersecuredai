@@ -554,6 +554,85 @@ export interface IStorage {
   createEncryptionKey(key: InsertHipaaEncryptionKey): Promise<HipaaEncryptionKey>;
   updateEncryptionKey(id: string, updates: Partial<HipaaEncryptionKey>): Promise<HipaaEncryptionKey>;
   deleteEncryptionKey(id: string): Promise<void>;
+
+  // ===== CATALOG SYSTEM OPERATIONS =====
+  
+  // Catalog Category operations
+  getCatalogCategories(categoryType?: string): Promise<CatalogCategory[]>;
+  getCatalogCategory(id: string): Promise<CatalogCategory | undefined>;
+  createCatalogCategory(category: InsertCatalogCategory): Promise<CatalogCategory>;
+  updateCatalogCategory(id: string, updates: Partial<CatalogCategory>): Promise<CatalogCategory>;
+  deleteCatalogCategory(id: string): Promise<void>;
+  
+  // BOM Component operations  
+  getBomComponents(): Promise<BomComponent[]>;
+  getBomComponent(id: string): Promise<BomComponent | undefined>;
+  createBomComponent(component: InsertBomComponent): Promise<BomComponent>;
+  updateBomComponent(id: string, updates: Partial<BomComponent>): Promise<BomComponent>;
+  deleteBomComponent(id: string): Promise<void>;
+  getBomComponentsByType(componentType: string): Promise<BomComponent[]>;
+  
+  // Catalog Product operations
+  getCatalogProducts(categoryId?: string): Promise<CatalogProduct[]>;
+  getCatalogProduct(id: string): Promise<CatalogProduct | undefined>;
+  getCatalogProductByCode(productCode: string): Promise<CatalogProduct | undefined>;
+  createCatalogProduct(product: InsertCatalogProduct): Promise<CatalogProduct>;
+  updateCatalogProduct(id: string, updates: Partial<CatalogProduct>): Promise<CatalogProduct>;
+  deleteCatalogProduct(id: string): Promise<void>;
+  getProductsWithBom(): Promise<(CatalogProduct & { bom: (ProductBom & { component: BomComponent })[] })[]>;
+  
+  // Product BOM operations
+  getProductBom(productId: string): Promise<(ProductBom & { component: BomComponent })[]>;
+  addProductBomComponent(productBom: InsertProductBom): Promise<ProductBom>;
+  updateProductBomComponent(id: string, updates: Partial<ProductBom>): Promise<ProductBom>;
+  removeProductBomComponent(id: string): Promise<void>;
+  
+  // Catalog Service operations
+  getCatalogServices(categoryId?: string): Promise<CatalogService[]>;
+  getCatalogService(id: string): Promise<CatalogService | undefined>;
+  getCatalogServiceByCode(serviceCode: string): Promise<CatalogService | undefined>;
+  createCatalogService(service: InsertCatalogService): Promise<CatalogService>;
+  updateCatalogService(id: string, updates: Partial<CatalogService>): Promise<CatalogService>;
+  deleteCatalogService(id: string): Promise<void>;
+  getServicesByType(serviceType: string): Promise<CatalogService[]>;
+  
+  // Catalog Solution operations
+  getCatalogSolutions(categoryId?: string): Promise<CatalogSolution[]>;
+  getCatalogSolution(id: string): Promise<CatalogSolution | undefined>;
+  getCatalogSolutionByCode(solutionCode: string): Promise<CatalogSolution | undefined>;
+  createCatalogSolution(solution: InsertCatalogSolution): Promise<CatalogSolution>;
+  updateCatalogSolution(id: string, updates: Partial<CatalogSolution>): Promise<CatalogSolution>;
+  deleteCatalogSolution(id: string): Promise<void>;
+  getSolutionsWithComponents(): Promise<(CatalogSolution & { components: SolutionComponent[] })[]>;
+  
+  // Solution Component operations
+  getSolutionComponents(solutionId: string): Promise<SolutionComponent[]>;
+  addSolutionComponent(component: InsertSolutionComponent): Promise<SolutionComponent>;
+  updateSolutionComponent(id: string, updates: Partial<SolutionComponent>): Promise<SolutionComponent>;
+  removeSolutionComponent(id: string): Promise<void>;
+  
+  // Pricing History operations
+  getPricingHistory(entityType: string, entityId: string): Promise<PricingHistory[]>;
+  createPricingHistoryEntry(entry: InsertPricingHistory): Promise<PricingHistory>;
+  
+  // Competitive Analysis operations
+  getCompetitiveAnalysis(): Promise<CompetitiveAnalysis[]>;
+  getCompetitiveAnalysisForProduct(productName: string): Promise<CompetitiveAnalysis[]>;
+  createCompetitiveAnalysis(analysis: InsertCompetitiveAnalysis): Promise<CompetitiveAnalysis>;
+  updateCompetitiveAnalysis(id: string, updates: Partial<CompetitiveAnalysis>): Promise<CompetitiveAnalysis>;
+  deleteCompetitiveAnalysis(id: string): Promise<void>;
+  
+  // Catalog Analytics and Reporting
+  getCatalogMetrics(): Promise<{
+    totalProducts: number;
+    totalServices: number;
+    totalSolutions: number;
+    averageProductMargin: number;
+    averageServiceMargin: number;
+    totalCatalogValue: number;
+  }>;
+  
+  getCatalogReport(reportType: 'pricing' | 'margins' | 'competitive' | 'bom'): Promise<any>;
 }
 
 export class MemStorage implements IStorage {
