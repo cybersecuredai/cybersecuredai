@@ -1,4 +1,4 @@
-type Budget = { limitUsd: number; usedUsd: number };
+git push -u origin feature/adapters-stubstype Budget = { limitUsd: number; usedUsd: number };
 
 // In-memory budgets: key can be provider name or API key identifier
 const budgets: Record<string, Budget> = {};
