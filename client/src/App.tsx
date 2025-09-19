@@ -123,6 +123,9 @@ const IdentityAccessManagement = lazy(() => import("@/pages/platform/IdentityAcc
 const SystemAdministration = lazy(() => import("@/pages/platform/SystemAdministration"));
 const HardwareSecurityModules = lazy(() => import("@/pages/platform/HardwareSecurityModules"));
 const BiometricAuthentication = lazy(() => import("@/pages/platform/BiometricAuthentication"));
+
+// Catalog Management System - Internal pricing and product management
+const Catalog = lazy(() => import("@/pages/Catalog"));
 const EnhancedThreatIntelligence = lazy(() => import("@/pages/platform/EnhancedThreatIntelligence"));
 const SecurityInfrastructureMonitoring = lazy(() => import("@/pages/platform/SecurityInfrastructureMonitoring"));
 const EnterpriseIAM = lazy(() => import("@/pages/platform/EnterpriseIAM"));
@@ -588,6 +591,11 @@ function Router() {
       <Route path="/ai-config">
         <Layout>
           <AIConfiguration />
+        </Layout>
+      </Route>
+      <Route path="/catalog">
+        <Layout>
+          <Catalog />
         </Layout>
       </Route>
       <Route path="/vulnerability-monitoring">
