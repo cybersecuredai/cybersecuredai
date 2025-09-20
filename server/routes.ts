@@ -11,7 +11,7 @@ import { auth } from "express-openid-connect";
 import { storage } from "./storage";
 import { eq, and, desc, sql, isNotNull } from "drizzle-orm";
 import { AuthService, authenticateJWT, authorizeRoles, sensitiveOperationLimiter, type AuthenticatedRequest } from "./auth";
-import { insertUserSchema, insertThreatSchema, insertFileSchema, insertIncidentSchema, insertThreatNotificationSchema, insertSubscriberSchema } from "@shared/schema";
+import { insertUserSchema, insertThreatSchema, insertFileSchema, insertIncidentSchema, insertThreatNotificationSchema, insertSubscriberSchema } from "../shared/schema";
 import { ObjectStorageService } from "./objectStorage";
 // Engine types only - no instantiation imports
 import type { VerificationContext } from "./engines/zero-trust";
@@ -135,30 +135,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Prometheus metrics endpoint
   app.get('/metrics', metricsEndpoint());
 
-  // Simple admin endpoints to manage budgets (guarded by ENABLE_ADMIN=true)
-  const ENABLE_ADMIN = process.env.ENABLE_ADMIN === 'true';
-  if (ENABLE_ADMIN) {
-    app.get('/admin/budgets', async (req, res) => {
-      const guard = await import('./cost/budget-guard');
-      res.json(guard.listBudgets());
-    });
+  // Admin endpoints to manage budgets (role-based: admin only)
+  app.get('/admin/budgets', authenticateJWT, authorizeRoles('admin'), async (req, res) => {
+    const guard = await import('./cost/budget-guard');
+    res.json(guard.listBudgets());
+  });
 
-    app.post('/admin/budgets', async (req, res) => {
-      try {
-        const { id, limitUsd } = req.body;
-        if (!id || typeof limitUsd !== 'number') return res.status(400).json({ error: 'id and numeric limitUsd required' });
-        setBudgetFor(id, limitUsd);
-        res.json({ ok: true, id, limitUsd });
-      } catch (err: any) {
-        res.status(500).json({ error: err?.message });
-      }
-    });
+  app.post('/admin/budgets', authenticateJWT, authorizeRoles('admin'), async (req, res) => {
+    try {
+      const { id, limitUsd } = req.body;
+      if (!id || typeof limitUsd !== 'number') return res.status(400).json({ error: 'id and numeric limitUsd required' });
+      setBudgetFor(id, limitUsd);
+      res.json({ ok: true, id, limitUsd });
+    } catch (err: any) {
+      res.status(500).json({ error: err?.message });
+    }
+  });
 
-    app.post('/admin/budgets/reset', async (req, res) => {
-      resetBudgets();
-      res.json({ ok: true });
-    });
-  }
+  app.post('/admin/budgets/reset', authenticateJWT, authorizeRoles('admin'), async (req, res) => {
+    resetBudgets();
+    res.json({ ok: true });
+  });
   
   // Object storage public asset serving endpoint (referenced from: javascript_object_storage integration)
   app.get("/public-objects/:filePath(*)", async (req, res) => {

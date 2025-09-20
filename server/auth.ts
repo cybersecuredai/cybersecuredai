@@ -2,7 +2,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import CryptoJS from 'crypto-js';
 import { Request, Response, NextFunction } from 'express';
-import type { User } from '@shared/schema';
+import type { User } from '../shared/schema';
 import { storage } from './storage';
 
 // Environment variables for security

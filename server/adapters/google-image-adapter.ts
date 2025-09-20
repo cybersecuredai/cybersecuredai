@@ -1,12 +1,14 @@
 import { AIAdapter, ImageRequest, ImageResponse } from './adapter-types';
 import { loadGoogleAuth } from './image-auth';
 
+function hasGoogleCredentials() {
+  return !!(process.env.GOOGLE_CREDENTIALS_JSON || process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON);
+}
 const GoogleImageAdapter: AIAdapter = {
   name: 'google',
   async image(request: ImageRequest): Promise<ImageResponse> {
     // Placeholder: implement real Google image API call
-    const auth = await loadGoogleAuth();
-    if (!auth) throw new Error('Google credentials missing');
+  if (!hasGoogleCredentials()) throw new Error('Google credentials missing');
     // Simulate image generation
     return {
       id: 'google-image-' + Date.now(),

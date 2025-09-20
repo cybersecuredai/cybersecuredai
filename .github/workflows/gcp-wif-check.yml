@@ -1,0 +1,26 @@
+name: GCP WIF Check
+
+on:
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  auth-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - id: auth
+        name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: "projects/623664514494/locations/global/workloadIdentityPools/github-ci-pool/providers/'github'"
+          service_account: "training-vertex-api@pacific-diode-471015-r7.iam.gserviceaccount.com"
+      - uses: google-github-actions/setup-gcloud@v2
+      - name: Verify auth
+        run: |
+          gcloud auth list
+          echo "Project number should be 623664514494:"
+          gcloud projects describe pacific-diode-471015-r7 --format='value(projectNumber)'

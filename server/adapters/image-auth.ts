@@ -1,3 +1,5 @@
+// Alias for compatibility with Google image adapter stub
+export const loadGoogleAuth = loadGoogleCredentials;
 /**
  * Image provider auth loaders and helpers
  */

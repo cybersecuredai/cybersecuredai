@@ -1,0 +1,22 @@
+From 8521afdffa526be4b76cbf648d410c20097b788b Mon Sep 17 00:00:00 2001
+From: dev_cybersecured <developer@cybersecuredai.com>
+Date: Fri, 19 Sep 2025 22:57:50 +0000
+Subject: [PATCH] fix: update budget-guard after manual edits
+
+---
+ server/cost/budget-guard.ts | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/server/cost/budget-guard.ts b/server/cost/budget-guard.ts
+index 051e032..c3a9175 100644
+--- a/server/cost/budget-guard.ts
++++ b/server/cost/budget-guard.ts
+@@ -1,4 +1,4 @@
+-type Budget = { limitUsd: number; usedUsd: number };
++git push -u origin feature/adapters-stubstype Budget = { limitUsd: number; usedUsd: number };
+ 
+ // In-memory budgets: key can be provider name or API key identifier
+ const budgets: Record<string, Budget> = {};
+-- 
+2.50.1
+
