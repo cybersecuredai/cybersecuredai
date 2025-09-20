@@ -1,0 +1,152 @@
+From 2fad76df38906b5a2faf03463015c3e3bf75a0e8 Mon Sep 17 00:00:00 2001
+From: dev_cybersecured <developer@cybersecuredai.com>
+Date: Fri, 19 Sep 2025 20:55:14 +0000
+Subject: [PATCH 2/5] feat(admin): add budgets admin endpoints and wire OTEL
+ startup/shutdown
+
+---
+ server/cost/budget-guard.ts |  6 +++++-
+ server/index.ts             | 23 ++++++++++++++++++++--
+ server/routes.ts            | 38 +++++++++++++++++++++++++++++++++++--
+ 3 files changed, 62 insertions(+), 5 deletions(-)
+
+diff --git a/server/cost/budget-guard.ts b/server/cost/budget-guard.ts
+index 5d7d110..70b7ab0 100644
+--- a/server/cost/budget-guard.ts
++++ b/server/cost/budget-guard.ts
+@@ -26,4 +26,8 @@ export function resetBudgets() {
+   for (const k of Object.keys(budgets)) budgets[k].usedUsd = 0;
+ }
+ 
+-export default { setBudgetFor, getBudgetFor, consumeBudget, resetBudgets };
++export function listBudgets() {
++  return { ...budgets };
++}
++
++export default { setBudgetFor, getBudgetFor, consumeBudget, resetBudgets, listBudgets };
+diff --git a/server/index.ts b/server/index.ts
+index 69986fd..61618b7 100644
+--- a/server/index.ts
++++ b/server/index.ts
+@@ -1,5 +1,6 @@
+ import express, { type Request, Response, NextFunction } from "express";
+ import { registerRoutes } from "./routes";
++import { setupOtel, shutdownOtel } from './observability/otel';
+ import { setupVite, serveStatic, log } from "./vite";
+ 
+ const app = express();
+@@ -38,6 +39,18 @@ app.use((req, res, next) => {
+ 
+ (async () => {
+   try {
++    // If running with mock adapter enabled, load it before registering routes
++    if (process.env.ENABLE_MOCK_ADAPTER === 'true') {
++      await import('./adapters/mock-adapter');
++    }
++    // Initialize OpenTelemetry SDK
++    try {
++      await setupOtel();
++      console.log('OpenTelemetry initialized');
++    } catch (e) {
++      console.warn('Failed to initialize OpenTelemetry:', e);
++    }
++
+     const server = await registerRoutes(app);
+ 
+     // Enhanced error handling middleware
+@@ -89,10 +102,16 @@ app.use((req, res, next) => {
+     });
+ 
+     // Graceful shutdown handling
+-    const gracefulShutdown = (signal: string) => {
++    const gracefulShutdown = async (signal: string) => {
+       log(`Received ${signal}. Shutting down gracefully...`);
+-      server.close(() => {
++      server.close(async () => {
+         log('Server closed.');
++        try {
++          await shutdownOtel();
++          log('OpenTelemetry shutdown complete');
++        } catch (e) {
++          console.warn('Error shutting down OTEL:', e);
++        }
+         process.exit(0);
+       });
+     };
+diff --git a/server/routes.ts b/server/routes.ts
+index 8f815d5..8b73b7a 100644
+--- a/server/routes.ts
++++ b/server/routes.ts
+@@ -4,6 +4,7 @@ import express from "express";
+ import path from "path";
+ // AI adapter manager
+ import { invoke as adapterInvoke, generateImage as adapterImage, listAdapters } from './adapters/manager';
++import { setBudgetFor, getBudgetFor, resetBudgets } from './cost/budget-guard';
+ import { metricsEndpoint } from './observability/metrics';
+ import multer from "multer";
+ import { auth } from "express-openid-connect";
+@@ -103,10 +104,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
+       if (!task || !input) return res.status(400).json({ error: 'task and input are required' });
+ 
+       const result = await adapterInvoke({ task, input, model, timeoutMs, providerOverride: provider });
++      if (result?.meta?.status === 'error') {
++        return res.status(502).json({ error: { code: result.meta?.error || 'adapter_error', message: 'Adapter error', provider: result.provider, details: result.raw } });
++      }
+       res.json(result);
+     } catch (error: any) {
+       console.error('Error in /api/ai/invoke:', error);
+-      res.status(500).json({ error: 'AI invocation failed', details: error?.message });
++      const code = error?.code || 'internal_error';
++      res.status(500).json({ error: { code, message: 'AI invocation failed', details: error?.message } });
+     }
+   });
+ 
+@@ -116,15 +121,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
+       if (!prompt) return res.status(400).json({ error: 'prompt is required' });
+ 
+       const result = await adapterImage({ prompt, model, size, providerOverride: provider });
++      if (result?.meta?.status === 'error') {
++        return res.status(502).json({ error: { code: result.meta?.error || 'adapter_error', message: 'Adapter image error', provider: result.provider, details: result.raw } });
++      }
+       res.json(result);
+     } catch (error: any) {
+       console.error('Error in /api/ai/image:', error);
+-      res.status(500).json({ error: 'AI image generation failed', details: error?.message });
++      const code = error?.code || 'internal_error';
++      res.status(500).json({ error: { code, message: 'AI image generation failed', details: error?.message } });
+     }
+   });
+   
+   // Prometheus metrics endpoint
+   app.get('/metrics', metricsEndpoint());
++
++  // Simple admin endpoints to manage budgets (guarded by ENABLE_ADMIN=true)
++  const ENABLE_ADMIN = process.env.ENABLE_ADMIN === 'true';
++  if (ENABLE_ADMIN) {
++    app.get('/admin/budgets', async (req, res) => {
++      const guard = await import('./cost/budget-guard');
++      res.json(guard.listBudgets());
++    });
++
++    app.post('/admin/budgets', async (req, res) => {
++      try {
++        const { id, limitUsd } = req.body;
++        if (!id || typeof limitUsd !== 'number') return res.status(400).json({ error: 'id and numeric limitUsd required' });
++        setBudgetFor(id, limitUsd);
++        res.json({ ok: true, id, limitUsd });
++      } catch (err: any) {
++        res.status(500).json({ error: err?.message });
++      }
++    });
++
++    app.post('/admin/budgets/reset', async (req, res) => {
++      resetBudgets();
++      res.json({ ok: true });
++    });
++  }
+   
+   // Object storage public asset serving endpoint (referenced from: javascript_object_storage integration)
+   app.get("/public-objects/:filePath(*)", async (req, res) => {
+-- 
+2.50.1
+

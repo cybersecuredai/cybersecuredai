@@ -1,3 +1,7 @@
+git push -u origin feature/adapters-stubs# In your local clone of the repo
+git remote add bundle /path/to/feature-adapters-stubs.bundle
+git fetch bundle
+git checkout -b feature/adapters-stubs bundle/HEAD
 git push -u origin feature/adapters-stubstype Budget = { limitUsd: number; usedUsd: number };
 
 // In-memory budgets: key can be provider name or API key identifier
