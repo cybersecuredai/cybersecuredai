@@ -43,6 +43,7 @@ import { Link, useLocation } from "wouter";
 import { MarketingLayout } from "@/components/MarketingLayout";
 import { ThreatMap } from "@/components/ThreatMap";
 import { GeospatialIntelligenceMap } from "@/components/GeospatialIntelligenceMap";
+import { OceanBackground } from "@/components/OceanBackground";
 import { useAuth } from "@/hooks/useAuth";
 import { useEffect, useState } from "react";
 import { CypherAI } from "@/components/CypherAI";
@@ -136,9 +137,12 @@ export default function Home() {
       <style>{scanningStyles}</style>
       <div className="min-h-screen bg-slate-900">
         
+        {/* Photorealistic Ocean Background */}
+        <OceanBackground />
+        
         {/* Leadership Recognition Hero */}
-        <section className="relative py-12 md:py-24 px-4 md:px-6 bg-gradient-to-br from-slate-900 via-blue-900/30 to-slate-900">
-          <div className="absolute inset-0 bg-grid-white/[0.02]"></div>
+        <section className="relative py-12 md:py-24 px-4 md:px-6">
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-slate-900/50 to-slate-900/90"></div>
           <div className="container mx-auto max-w-7xl relative z-10">
             <div className="text-center mb-8 md:mb-16">
               <Badge className="mb-4 md:mb-8 bg-cyan-500/20 text-cyan-300 border-cyan-500/30 text-sm md:text-lg px-4 md:px-6 py-1 md:py-2 flex items-center gap-2">
