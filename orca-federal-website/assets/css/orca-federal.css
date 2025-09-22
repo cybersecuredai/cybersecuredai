@@ -37,7 +37,7 @@
 
 body {
     font-family: var(--font-sans);
-    background: var(--depth-gradient);
+    background: #1e2a3a;
     color: #e2e8f0;
     line-height: 1.7;
     min-height: 100vh;
@@ -275,18 +275,54 @@ body::after {
 }
 
 .nav-cta {
-    background: var(--federal-gold);
-    color: var(--federal-navy);
+    background: linear-gradient(145deg, 
+        #0ea5e9 0%,
+        #0284c7 25%,
+        #0369a1 50%,
+        #0284c7 75%,
+        #0ea5e9 100%);
+    box-shadow: 
+        0 12px 24px rgba(0, 0, 0, 0.4),
+        0 6px 12px rgba(14, 165, 233, 0.3),
+        inset 0 2px 0 rgba(255, 255, 255, 0.3),
+        inset 0 -2px 0 rgba(0, 0, 0, 0.2);
+    border: 2px solid rgba(14, 165, 233, 0.6);
+    transform: perspective(500px) rotateX(8deg) rotateY(2deg) translateZ(0px);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
     padding: 0.5rem 1.5rem;
     border-radius: 8px;
-    text-decoration: none;
+    color: white;
     font-weight: 600;
-    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+    cursor: pointer;
+}
+
+.nav-cta::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.4) 40%,
+        rgba(255, 255, 255, 0.6) 50%,
+        rgba(255, 255, 255, 0.4) 60%,
+        transparent 100%);
+    animation: button-shine 3s ease-in-out infinite;
 }
 
 .nav-cta:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(212, 165, 116, 0.3);
+    transform: perspective(500px) rotateX(0deg) rotateY(0deg) translateZ(20px) scale(1.05);
+    box-shadow: 
+        0 20px 40px rgba(0, 0, 0, 0.5),
+        0 10px 20px rgba(14, 165, 233, 0.4),
+        inset 0 2px 0 rgba(255, 255, 255, 0.4),
+        inset 0 -2px 0 rgba(0, 0, 0, 0.3);
 }
 
 /* Hero Section */
@@ -367,20 +403,8 @@ body::after {
     margin-bottom: 1rem;
 }
 
-/* 4D Perspective Buttons */
-.button-4d {
-    background: linear-gradient(145deg, 
-        rgba(59, 130, 246, 0.9) 0%,
-        rgba(37, 99, 235, 0.8) 25%,
-        rgba(30, 64, 175, 0.9) 50%,
-        rgba(37, 99, 235, 0.8) 75%,
-        rgba(59, 130, 246, 0.9) 100%);
-    box-shadow: 
-        0 12px 24px rgba(0, 0, 0, 0.4),
-        0 6px 12px rgba(59, 130, 246, 0.3),
-        inset 0 2px 0 rgba(255, 255, 255, 0.3),
-        inset 0 -2px 0 rgba(0, 0, 0, 0.2);
-    border: 2px solid rgba(59, 130, 246, 0.6);
+/* 4D Perspective Buttons - Base Styles */
+.button-4d, .button-4d-primary, .button-4d-secondary, .button-4d-cyber {
     transform: perspective(500px) rotateX(8deg) rotateY(2deg) translateZ(0px);
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
@@ -392,9 +416,10 @@ body::after {
     text-decoration: none;
     display: inline-block;
     cursor: pointer;
+    border: 2px solid;
 }
 
-.button-4d::before {
+.button-4d::before, .button-4d-primary::before, .button-4d-secondary::before, .button-4d-cyber::before {
     content: '';
     position: absolute;
     top: 0;
@@ -410,11 +435,102 @@ body::after {
     animation: button-shine 3s ease-in-out infinite;
 }
 
-.button-4d:hover {
+.button-4d:hover, .button-4d-primary:hover, .button-4d-secondary:hover, .button-4d-cyber:hover {
     transform: perspective(500px) rotateX(0deg) rotateY(0deg) translateZ(20px) scale(1.05);
+}
+
+/* Default button-4d (Primary style) */
+.button-4d {
+    background: linear-gradient(145deg, 
+        #0ea5e9 0%,
+        #0284c7 25%,
+        #0369a1 50%,
+        #0284c7 75%,
+        #0ea5e9 100%);
+    box-shadow: 
+        0 12px 24px rgba(0, 0, 0, 0.4),
+        0 6px 12px rgba(14, 165, 233, 0.3),
+        inset 0 2px 0 rgba(255, 255, 255, 0.3),
+        inset 0 -2px 0 rgba(0, 0, 0, 0.2);
+    border-color: rgba(14, 165, 233, 0.6);
+}
+
+.button-4d:hover {
     box-shadow: 
         0 20px 40px rgba(0, 0, 0, 0.5),
-        0 10px 20px rgba(59, 130, 246, 0.4),
+        0 10px 20px rgba(14, 165, 233, 0.4),
+        inset 0 2px 0 rgba(255, 255, 255, 0.4),
+        inset 0 -2px 0 rgba(0, 0, 0, 0.3);
+}
+
+/* Primary buttons - #0ea5e9 */
+.button-4d-primary {
+    background: linear-gradient(145deg, 
+        #0ea5e9 0%,
+        #0284c7 25%,
+        #0369a1 50%,
+        #0284c7 75%,
+        #0ea5e9 100%);
+    box-shadow: 
+        0 12px 24px rgba(0, 0, 0, 0.4),
+        0 6px 12px rgba(14, 165, 233, 0.3),
+        inset 0 2px 0 rgba(255, 255, 255, 0.3),
+        inset 0 -2px 0 rgba(0, 0, 0, 0.2);
+    border-color: rgba(14, 165, 233, 0.6);
+}
+
+.button-4d-primary:hover {
+    box-shadow: 
+        0 20px 40px rgba(0, 0, 0, 0.5),
+        0 10px 20px rgba(14, 165, 233, 0.4),
+        inset 0 2px 0 rgba(255, 255, 255, 0.4),
+        inset 0 -2px 0 rgba(0, 0, 0, 0.3);
+}
+
+/* Secondary buttons - #22d3ee */
+.button-4d-secondary {
+    background: linear-gradient(145deg, 
+        #22d3ee 0%,
+        #06b6d4 25%,
+        #0891b2 50%,
+        #06b6d4 75%,
+        #22d3ee 100%);
+    box-shadow: 
+        0 12px 24px rgba(0, 0, 0, 0.4),
+        0 6px 12px rgba(34, 211, 238, 0.3),
+        inset 0 2px 0 rgba(255, 255, 255, 0.3),
+        inset 0 -2px 0 rgba(0, 0, 0, 0.2);
+    border-color: rgba(34, 211, 238, 0.6);
+}
+
+.button-4d-secondary:hover {
+    box-shadow: 
+        0 20px 40px rgba(0, 0, 0, 0.5),
+        0 10px 20px rgba(34, 211, 238, 0.4),
+        inset 0 2px 0 rgba(255, 255, 255, 0.4),
+        inset 0 -2px 0 rgba(0, 0, 0, 0.3);
+}
+
+/* Cyber buttons - #0c4a6e */
+.button-4d-cyber {
+    background: linear-gradient(145deg, 
+        #0c4a6e 0%,
+        #075985 25%,
+        #0369a1 50%,
+        #075985 75%,
+        #0c4a6e 100%);
+    box-shadow: 
+        0 12px 24px rgba(0, 0, 0, 0.4),
+        0 6px 12px rgba(12, 74, 110, 0.3),
+        inset 0 2px 0 rgba(255, 255, 255, 0.3),
+        inset 0 -2px 0 rgba(0, 0, 0, 0.2);
+    border-color: rgba(12, 74, 110, 0.6);
+}
+
+.button-4d-cyber:hover {
+    box-shadow: 
+        0 20px 40px rgba(0, 0, 0, 0.5),
+        0 10px 20px rgba(12, 74, 110, 0.4),
         inset 0 2px 0 rgba(255, 255, 255, 0.4),
         inset 0 -2px 0 rgba(0, 0, 0, 0.3);
 }
