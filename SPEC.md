@@ -53,9 +53,9 @@ export const SceneRequestSchema = z.object({ nodes: z.array(z.any()) });
 - existing v0.1 routes remain for code, reasoning_long, chat_general
 
 ## 5) Auth (GovCloud OIDC)
-- Require Authorization: Bearer <JWT>
-- Validate with: OIDC_ISSUER_URL, OIDC_AUDIENCE, OIDC_CLIENT_ID
-- Deny-by-default, scope-gate tasks/providers
+- Default: JWT auth via /api/auth endpoints (implemented).  
+- OIDC (GovCloud) planned: when OIDC_ISSUER_URL, OIDC_AUDIENCE, OIDC_CLIENT_ID are set, enforce Bearer JWT validation against OIDC issuer (to be wired).  
+- Deny-by-default, scope-gate tasks/providers.
 
 ## 6) Configuration and Secrets (additions)
 - DEEPAI_API_KEY
@@ -65,14 +65,14 @@ export const SceneRequestSchema = z.object({ nodes: z.array(z.any()) });
 - Existing: OPENAI_API_KEY, ANTHROPIC_API_KEY, GEMINI_API_KEY, DEEPSEEK_API_KEY, DEEPSEEK_BASE_URL, LOG_LEVEL, PORT
 
 ## 7) Observability
-- Pino JSON logs with request id and provider
-- Metrics: invocation counters, failure counters, latency histograms
-- Tracing: hooks for OpenTelemetry (planned)
+- Pino JSON logs with requestId and structured fields (implemented)
+- Metrics: invocation counters, failure counters, latency histograms (implemented)
+- Tracing: hooks for OpenTelemetry (initialized; spans around adapter calls)
 
 ## 8) Error Handling & Retries
-- Provider timeouts with typed errors
-- Single retry to alternate provider when idempotent
-- Error shape: { provider, code, message, retryable }
+- Provider timeouts with typed errors (implemented)
+- Single retry with exponential backoff and fallback to next provider in AI_PROVIDER_ORDER (implemented)
+- Error shape: { provider, code, message, retryable } (returned as structured error payloads)
 
 ## 9) Security & Data Handling
 - No persistence of inputs/outputs by default

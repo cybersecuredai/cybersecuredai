@@ -44,13 +44,13 @@ export async function hunyuanVoyager(body: any) {
   };
 }
 
+export async function cat4dProvider(body: any) {
   // Compose ProviderRequest
   const req = {
     prompt: body.prompt || body.spec || "",
     params: body.params || {}
   };
   const result = await callCAT4D(req);
-  // Attach a UUID for tracking
   return {
     id: randomUUID(),
     provider: "cat4d",
@@ -65,13 +65,13 @@ export async function hunyuanVoyager(body: any) {
   };
 }
 
+export async function fourDiffProvider(body: any) {
   // Compose ProviderRequest
   const req = {
     prompt: body.prompt || body.spec || "",
     params: body.params || {}
   };
   const result = await call4Diff(req);
-  // Attach a UUID for tracking
   return {
     id: randomUUID(),
     provider: "4diff",

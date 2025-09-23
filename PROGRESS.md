@@ -1,6 +1,6 @@
 # Project Progress Snapshot
 
-_Last updated: 2025-09-22_
+_Last updated: 2025-09-23_
 
 ## TODO List (with status)
 
@@ -14,13 +14,13 @@ _Last updated: 2025-09-22_
 - [x] Devcontainer & Codespaces bootstrap
 - [x] Image providers wired
 - [-] Unit tests: routing decisions & schema (in progress)
-- [-] Provider timeouts & typed errors (P0, in progress)
-- [-] Return structured error shape from endpoints (P0, in progress)
-- [-] Smoke tests: /health and minimal /invoke (P0, in progress)
-- [ ] Structured logging context (P1)
+- [x] Provider timeouts & typed errors (P0)
+- [x] Return structured error shape from endpoints (P0)
+- [x] Smoke tests: /health and minimal /invoke (P0)
+- [x] Structured logging context (P1)
 - [ ] Dockerfile & docker-compose verification (P1)
 - [ ] Finalize Purpose & Scope (P1)
-- [ ] Single retry to alternate provider (P1)
+- [x] Single retry to alternate provider (P1)
 - [ ] Metrics & latency histograms (P2)
 - [ ] Baseline load test (P2)
 - [ ] Select cloud deployment target (P2)
@@ -37,18 +37,20 @@ _Last updated: 2025-09-22_
 - `feature/adapters-stubs`
 
 ## This Week's Plan (Track A)
-- [ ] Structured logging context with requestId propagation (pino-http)
+- [x] Structured logging context with requestId propagation (pino-http)
 	- Acceptance: API logs include requestId, provider, latency, status, error code when applicable
-- [ ] Single retry to alternate provider
+- [x] Single retry to alternate provider
 	- Acceptance: Retry once on retryable error and fallback provider attempted per AI_PROVIDER_ORDER; unit test covers path
 - [ ] Dockerfile & docker-compose verification
 	- Acceptance: Local build succeeds; container runs /api/health and minimal /api/ai/invoke
 
 ## Last Actions
+- Implemented structured logging with pino-http (requestId propagation) and enriched request completion logs
+- Enabled single retry with backoff and provider fallback per AI_PROVIDER_ORDER in adapters/manager.ts
 - P0 items (timeouts, structured errors) implemented and tested
 - Unit and smoke tests pass
 - CI workflow runs smoke and unit tests
-- Endpoint error shape is now structured and tested
+- Endpoint error shape is structured and tested
 
 ## How to Save Progress
 Run:

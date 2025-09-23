@@ -16,11 +16,12 @@ const app = express();
 const logger = pino({ level: process.env.LOG_LEVEL || 'info' });
 app.use(pinoHttp({
   logger,
-  genReqId: (req) => req.headers['x-request-id'] as string || `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+  genReqId: (req) => (req.headers['x-request-id'] as string) || `${Date.now()}-${Math.random().toString(36).slice(2)}`,
   customLogLevel: function (res, err) {
-    if (res.statusCode >= 500 || err) return 'error'
-    if (res.statusCode >= 400) return 'warn'
-    return 'info'
+    const sc = (res as any)?.statusCode ?? 200;
+    if (sc >= 500 || err) return 'error';
+    if (sc >= 400) return 'warn';
+    return 'info';
   },
   autoLogging: { ignore: (req) => !req.url?.startsWith('/api') },
 }));
@@ -41,6 +42,7 @@ app.use((req, res, next) => {
   res.on("finish", () => {
     const duration = Date.now() - start;
     if (path.startsWith("/api")) {
+      const reqId = (req as any).id || req.headers['x-request-id'];
       let logLine = `${req.method} ${path} ${res.statusCode} in ${duration}ms`;
       if (capturedJsonResponse) {
         logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
@@ -50,7 +52,7 @@ app.use((req, res, next) => {
       // dual log: pretty short line and structured entry
       log(logLine);
       (req as any).log?.info({
-        requestId: (req as any).id,
+        requestId: reqId,
         method: req.method,
         path,
         statusCode: res.statusCode,
