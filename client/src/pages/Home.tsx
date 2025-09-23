@@ -190,7 +190,7 @@ export default function Home() {
                       <div className="flex items-center space-x-3">
                         <Enhanced4DShieldIcon className="w-5 h-5 md:w-6 md:h-6 text-cyan-400" size={24} />
                         <div>
-                          <h3 className="text-white font-bold text-base md:text-lg">CyberSecured AI Platform</h3>
+                          <h3 className="text-white font-bold text-base md:text-lg">ORCA Federal Platform</h3>
                           <p className="text-gray-400 text-xs md:text-sm">Converged Intelligence Dashboard</p>
                         </div>
                       </div>
@@ -393,7 +393,7 @@ export default function Home() {
               <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-bold text-white mb-8 leading-tight">
                 Five Revolutionary<br />
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-cyan-400 to-blue-500">
-                  CyberSecured AI Systems
+                  ORCA AI Systems
                 </span>
               </h1>
               <p className="text-xl md:text-2xl text-gray-200 max-w-5xl mx-auto mb-12 leading-relaxed">

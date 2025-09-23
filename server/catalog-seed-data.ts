@@ -1,4 +1,4 @@
-// CyberSecured AI Catalog Seed Data
+// ORCA Federal Catalog Seed Data
 // Comprehensive federal cybersecurity offerings with realistic pricing structure
 // CONFIDENTIAL: Internal use only - contains sensitive pricing information
 
@@ -14,7 +14,7 @@ import type {
 } from "@shared/schema";
 
 export async function seedCatalogData() {
-  console.log('🌱 Seeding CyberSecured AI Catalog Data...');
+  console.log('🌱 Seeding ORCA Federal Catalog Data...');
 
   try {
     // ===== STEP 1: CREATE CATEGORIES =====
@@ -61,10 +61,10 @@ export async function seedCatalogData() {
       
       // Software Components
       { componentName: 'TensorFlow Enterprise License', componentType: 'software', vendorName: 'Google', vendorPartNumber: 'TF-ENT-001', unitCost: 50000, description: 'Enterprise machine learning framework license', leadTimeDays: 7, minimumOrderQuantity: 1 },
-      { componentName: 'Genetic Algorithm Engine Core', componentType: 'software', vendorName: 'CyberSecured AI', vendorPartNumber: 'GAE-CORE-2025', unitCost: 125000, description: 'Proprietary self-evolving AI algorithm engine', leadTimeDays: 14, minimumOrderQuantity: 1 },
-      { componentName: 'Real-time Correlation Engine', componentType: 'software', vendorName: 'CyberSecured AI', vendorPartNumber: 'RCE-2025', unitCost: 85000, description: 'Advanced threat correlation and analysis engine', leadTimeDays: 14, minimumOrderQuantity: 1 },
-      { componentName: 'Holographic Rendering Framework', componentType: 'software', vendorName: 'CyberSecured AI', vendorPartNumber: 'HRF-5D-2025', unitCost: 95000, description: '5D holographic visualization rendering engine', leadTimeDays: 21, minimumOrderQuantity: 1 },
-      { componentName: 'Swarm Coordination Protocol', componentType: 'software', vendorName: 'CyberSecured AI', vendorPartNumber: 'SCP-ACDS-2025', unitCost: 75000, description: 'Autonomous defense swarm coordination software', leadTimeDays: 14, minimumOrderQuantity: 1 },
+      { componentName: 'Genetic Algorithm Engine Core', componentType: 'software', vendorName: 'ORCA Federal', vendorPartNumber: 'GAE-CORE-2025', unitCost: 125000, description: 'Proprietary self-evolving AI algorithm engine', leadTimeDays: 14, minimumOrderQuantity: 1 },
+      { componentName: 'Real-time Correlation Engine', componentType: 'software', vendorName: 'ORCA Federal', vendorPartNumber: 'RCE-2025', unitCost: 85000, description: 'Advanced threat correlation and analysis engine', leadTimeDays: 14, minimumOrderQuantity: 1 },
+      { componentName: 'Holographic Rendering Framework', componentType: 'software', vendorName: 'ORCA Federal', vendorPartNumber: 'HRF-5D-2025', unitCost: 95000, description: '5D holographic visualization rendering engine', leadTimeDays: 21, minimumOrderQuantity: 1 },
+      { componentName: 'Swarm Coordination Protocol', componentType: 'software', vendorName: 'ORCA Federal', vendorPartNumber: 'SCP-ACDS-2025', unitCost: 75000, description: 'Autonomous defense swarm coordination software', leadTimeDays: 14, minimumOrderQuantity: 1 },
       
       // Services Components
       { componentName: 'Senior Cybersecurity Engineer', componentType: 'labor', unitCost: 175, description: 'Senior-level cybersecurity engineering expertise', leadTimeDays: 1, minimumOrderQuantity: 40 },
