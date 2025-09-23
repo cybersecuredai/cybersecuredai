@@ -293,7 +293,7 @@ export default function Platform() {
             <div className="max-w-5xl mx-auto">
               <img 
                 src={platformOverviewImg}
-                alt="CyberSecured AI Platform Overview"
+                alt="ORCA Federal Platform Overview"
                 className="w-full rounded-2xl shadow-2xl border border-red-500/30"
               />
             </div>
@@ -801,7 +801,7 @@ export default function Platform() {
               </Badge>
               <h2 className="text-4xl md:text-5xl font-bold text-white mb-8">
                 Why Organizations Choose<br />
-                <span className="text-orange-400">CyberSecured AI</span>
+                <span className="text-orange-400">ORCA Federal</span>
               </h2>
               <p className="text-xl text-gray-300 max-w-4xl mx-auto mb-16">
                 Beyond advanced technology, we deliver measurable business outcomes that transform
@@ -1028,7 +1028,7 @@ export default function Platform() {
                 <span className="text-cyan-400">& Government Organizations</span>
               </h2>
               <p className="text-xl text-gray-300 max-w-4xl mx-auto mb-16">
-                CyberSecured AI is purpose-built for your sector. But don't take our word for it – 
+                ORCA Federal is purpose-built for your sector. But don't take our word for it – 
                 see the results from organizations like yours.
               </p>
             </div>
@@ -1276,7 +1276,7 @@ export default function Platform() {
                     ))}
                   </div>
                   <blockquote className="text-2xl md:text-3xl font-bold text-white mb-8 leading-relaxed italic">
-                    "We pushed CyberSecured AI out to four different campuses. What we found was that one site was clean, 
+                    "We pushed ORCA Federal out to four different campuses. What we found was that one site was clean, 
                     two sites had remnants, and one site had an active threat. That was eye-opening to us, 
                     and we knew we needed to install this for every one of our institutions."
                   </blockquote>

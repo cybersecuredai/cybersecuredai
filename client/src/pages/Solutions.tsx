@@ -625,12 +625,12 @@ export default function Solutions() {
           </div>
         </section>
 
-        {/* CyberSecured AI Core Platform */}
+        {/* ORCA Federal Core Platform */}
         <section className="py-20 px-6 bg-slate-800">
           <div className="container mx-auto max-w-7xl">
             <div className="text-center mb-16">
               <Badge className="mb-6 bg-cyan-500/20 text-cyan-300 border-cyan-500/30">
-                CyberSecured AI Core Platform
+                ORCA Federal Core Platform
               </Badge>
               <h2 className="text-4xl md:text-5xl font-bold text-white mb-8">
                 AI-Powered Security<br />
@@ -970,12 +970,12 @@ export default function Solutions() {
           </div>
         </section>
 
-        {/* CyberSecured AI - EDU Solutions */}
+        {/* ORCA Federal - EDU Solutions */}
         <section className="py-20 px-6 bg-slate-800">
           <div className="container mx-auto max-w-7xl">
             <div className="text-center mb-16">
               <Badge className="mb-6 bg-green-500/20 text-green-300 border-green-500/30">
-                CyberSecured AI - EDU
+                ORCA Federal - EDU
               </Badge>
               <h2 className="text-4xl md:text-5xl font-bold text-white mb-8">
                 Educational<br />
@@ -1004,7 +1004,7 @@ export default function Solutions() {
                   <Card className="bg-slate-800/90 border border-blue-500/30">
                     <CardHeader className="p-6 text-center">
                       <Badge className="mb-4 bg-blue-500/20 text-blue-300">Core EDU</Badge>
-                      <CardTitle className="text-xl text-white mb-4">CyberSecured Core EDU</CardTitle>
+                      <CardTitle className="text-xl text-white mb-4">ORCA Core EDU</CardTitle>
                       <div className="text-2xl font-bold text-blue-400 mb-2">Contact for Pricing</div>
                       <p className="text-gray-200 text-sm font-medium">Multiple classrooms and students</p>
                     </CardHeader>
@@ -1038,7 +1038,7 @@ export default function Solutions() {
                     </div>
                     <CardHeader className="p-6 text-center">
                       <Badge className="mb-4 bg-purple-500/20 text-purple-300">Core+ EDU</Badge>
-                      <CardTitle className="text-xl text-white mb-4">CyberSecured Core+ EDU</CardTitle>
+                      <CardTitle className="text-xl text-white mb-4">ORCA Core+ EDU</CardTitle>
                       <div className="text-2xl font-bold text-purple-400 mb-2">Contact for Pricing</div>
                       <p className="text-gray-200 text-sm font-medium">Multiple classrooms and students</p>
                     </CardHeader>
@@ -1069,7 +1069,7 @@ export default function Solutions() {
                   <Card className="bg-slate-800/90 border border-yellow-500/30">
                     <CardHeader className="p-6 text-center">
                       <Badge className="mb-4 bg-yellow-500/20 text-yellow-300">Advanced EDU</Badge>
-                      <CardTitle className="text-xl text-white mb-4">CyberSecured Core Advanced EDU</CardTitle>
+                      <CardTitle className="text-xl text-white mb-4">ORCA Core Advanced EDU</CardTitle>
                       <div className="text-2xl font-bold text-yellow-400 mb-2">Contact for Pricing</div>
                       <p className="text-gray-200 text-sm font-medium">Multiple classrooms and students</p>
                     </CardHeader>
@@ -1102,7 +1102,7 @@ export default function Solutions() {
                   <Card className="bg-slate-800/90 border border-blue-500/30">
                     <CardHeader className="p-6 text-center">
                       <Badge className="mb-4 bg-blue-500/20 text-blue-300">Core HI-EDU</Badge>
-                      <CardTitle className="text-xl text-white mb-4">CyberSecured Core HI-EDU</CardTitle>
+                      <CardTitle className="text-xl text-white mb-4">ORCA Core HI-EDU</CardTitle>
                       <div className="text-2xl font-bold text-blue-400 mb-2">Contact for Pricing</div>
                       <p className="text-gray-200 text-sm font-medium">Multiple departments, buildings, and students</p>
                     </CardHeader>
@@ -1133,7 +1133,7 @@ export default function Solutions() {
                     </div>
                     <CardHeader className="p-6 text-center">
                       <Badge className="mb-4 bg-purple-500/20 text-purple-300">Core+ HI-EDU</Badge>
-                      <CardTitle className="text-xl text-white mb-4">CyberSecured Core+ HI-EDU</CardTitle>
+                      <CardTitle className="text-xl text-white mb-4">ORCA Core+ HI-EDU</CardTitle>
                       <div className="text-2xl font-bold text-purple-400 mb-2">Contact for Pricing</div>
                       <p className="text-gray-200 text-sm font-medium">Multiple departments, buildings, and students</p>
                     </CardHeader>
@@ -1161,7 +1161,7 @@ export default function Solutions() {
                   <Card className="bg-slate-800/90 border border-yellow-500/30">
                     <CardHeader className="p-6 text-center">
                       <Badge className="mb-4 bg-yellow-500/20 text-yellow-300">Advanced HI-EDU</Badge>
-                      <CardTitle className="text-xl text-white mb-4">CyberSecured Core Advanced HI-EDU</CardTitle>
+                      <CardTitle className="text-xl text-white mb-4">ORCA Core Advanced HI-EDU</CardTitle>
                       <div className="text-2xl font-bold text-yellow-400 mb-2">Contact for Pricing</div>
                       <p className="text-gray-200 text-sm font-medium">Multiple departments, buildings, and students</p>
                     </CardHeader>
@@ -1208,7 +1208,7 @@ export default function Solutions() {
               <Card className="bg-slate-800/90 border border-blue-500/30">
                 <CardHeader className="p-6 text-center">
                   <Badge className="mb-4 bg-blue-500/20 text-blue-300 text-xs">Core</Badge>
-                  <CardTitle className="text-lg text-white mb-3">CyberSecured ICN - Core</CardTitle>
+                  <CardTitle className="text-lg text-white mb-3">ORCA ICN - Core</CardTitle>
                   <div className="text-xl font-bold text-blue-400 mb-2">Contact for Pricing</div>
                   <p className="text-gray-100 text-xs">Core AI platform with basic hardware</p>
                 </CardHeader>
@@ -1227,7 +1227,7 @@ export default function Solutions() {
               <Card className="bg-slate-800/90 border border-purple-500/30">
                 <CardHeader className="p-6 text-center">
                   <Badge className="mb-4 bg-purple-500/20 text-purple-300 text-xs">Advanced</Badge>
-                  <CardTitle className="text-lg text-white mb-3">CyberSecured ICN Advanced</CardTitle>
+                  <CardTitle className="text-lg text-white mb-3">ORCA ICN Advanced</CardTitle>
                   <div className="text-xl font-bold text-purple-400 mb-2">Contact for Pricing</div>
                   <p className="text-gray-100 text-xs">Enhanced platform with advanced hardware</p>
                 </CardHeader>
@@ -1246,7 +1246,7 @@ export default function Solutions() {
               <Card className="bg-slate-800/90 border border-yellow-500/30">
                 <CardHeader className="p-6 text-center">
                   <Badge className="mb-4 bg-yellow-500/20 text-yellow-300 text-xs">Enterprise</Badge>
-                  <CardTitle className="text-lg text-white mb-3">CyberSecured ICN Enterprise</CardTitle>
+                  <CardTitle className="text-lg text-white mb-3">ORCA ICN Enterprise</CardTitle>
                   <div className="text-xl font-bold text-yellow-400 mb-2">Contact for Pricing</div>
                   <p className="text-gray-100 text-xs">Complete enterprise solution (unlimited users)</p>
                 </CardHeader>
@@ -1293,7 +1293,7 @@ export default function Solutions() {
                 <span className="text-cyan-400">and Government Sector</span>
               </h2>
               <p className="text-xl text-gray-100 max-w-4xl mx-auto mb-16">
-                CyberSecured AI is custom built for you. But don't take our word for it – 
+                ORCA Federal is custom built for you. But don't take our word for it – 
                 hear directly from institutions like yours.
               </p>
             </div>
@@ -1356,7 +1356,7 @@ export default function Solutions() {
                   Latest Intelligence
                 </Badge>
                 <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-                  CyberSecured AI 2025<br />
+                  ORCA Federal 2025<br />
                   <span className="text-red-400">Cyber Threat Report</span>
                 </h2>
                 <p className="text-xl text-gray-100 mb-8">
@@ -1956,7 +1956,7 @@ export default function Solutions() {
                   <span className="text-purple-400">Managed Cybersecurity</span>
                 </h2>
                 <p className="text-xl text-gray-100 mb-8">
-                  See how CyberSecured AI Managed Security stacks up against enterprise-first platforms – 
+                  See how ORCA Federal Managed Security stacks up against enterprise-first platforms – 
                   reviewed by organizations just like yours.
                 </p>
                 
@@ -2090,7 +2090,7 @@ export default function Solutions() {
             </h2>
             <p className="text-xl text-gray-100 mb-12 max-w-3xl mx-auto">
               Join hundreds of educational institutions and government agencies 
-              who trust CyberSecured AI for enterprise-grade protection.
+              who trust ORCA Federal for enterprise-grade protection.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-6 justify-center">
