@@ -1,0 +1,311 @@
+BR=feature/framer-v0-figma
+mkdir -p apps/web app components packages/design-tokens packages/ui/orca ecs .github/workflows
+# tokens
+cat > packages/design-tokens/tokens.json <<'JSON'
+{
+  "color": {
+    "brand": {"50": "#F0F7FF","100": "#D6E9FF","200": "#ADD4FF","300": "#7FB8FF","400": "#4E98F7","500": "#1F6FE5","600": "#1556B8","700": "#0E3E8A","800": "#0A2A5E","900": "#061B3C"},
+    "accent": {"DEFAULT": "#22D3EE"},
+    "success": {"DEFAULT": "#16A34A"},
+    "warning": {"DEFAULT": "#F59E0B"},
+    "danger": {"DEFAULT": "#DC2626"},
+    "fg": {"DEFAULT": "#E6EAF2","muted": "#B8C0D0","inverse": "#0A0D14"},
+    "bg": {"DEFAULT": "#0B1220","elev": "#0E172A","muted": "#101A2E"},
+    "border": {"DEFAULT": "#1F2A44"}
+  },
+  "typography": {
+    "font": {"sans": "Inter, ui-sans-serif, system-ui"},
+    "size": {"xs": "0.75rem","sm": "0.875rem","base": "1rem","lg": "1.125rem","xl": "1.25rem","2xl": "1.5rem","3xl": "1.875rem","4xl": "2.25rem"},
+    "leading": {"tight": "1.15","snug": "1.25","normal": "1.5"}
+  },
+  "radius": {"sm": "0.25rem","md": "0.5rem","lg": "0.75rem","xl": "1rem","pill": "9999px"},
+  "space": {"0": "0","1": "0.25rem","2": "0.5rem","3": "0.75rem","4": "1rem","6": "1.5rem","8": "2rem","12": "3rem"},
+  "shadow": {"sm": "0 1px 2px 0 rgba(0,0,0,.25)","md": "0 8px 24px rgba(0,0,0,.35)"}
+}
+JSON
+
+# tailwind config (if missing)
+cat > tailwind.config.js <<'JS'
+const tokens = require("./packages/design-tokens/tokens.json");
+module.exports = {
+  darkMode: ["class"],
+  content: [
+    "./apps/web/app/**/*.{ts,tsx}",
+    "./apps/web/components/**/*.{ts,tsx}",
+    "./packages/ui/**/*.{ts,tsx}"
+  ],
+  theme: {
+    extend: {
+      colors: {
+        brand: tokens.color.brand,
+        accent: tokens.color.accent,
+        success: tokens.color.success,
+        warning: tokens.color.warning,
+        danger: tokens.color.danger,
+        fg: tokens.color.fg,
+        bg: tokens.color.bg,
+        border: tokens.color.border
+      },
+      fontFamily: { sans: tokens.typography.font.sans.split(", ") },
+      spacing: tokens.space,
+      borderRadius: tokens.radius,
+      boxShadow: tokens.shadow
+    }
+  },
+  plugins: [require("tailwindcss-animate")]
+};
+JS
+
+# package.json minimal scripts (add if missing)
+jq '(.scripts//{}) + {
+  "dev":"next dev apps/web",
+  "build":"next build apps/web",
+  "start":"next start apps/web"
+}' package.json > package.json.tmp && mv package.json.tmp package.json 2>/dev/null || true
+
+# git
+git checkout -b "$BR" 2>/dev/null || true
+git add -A
+git commit -m "chore: scaffold tokens and configs for Framer+v0+Figma" || true
+# if apps/web does not exist
+mkdir -p apps/web/app/(marketing) apps/web/components
+cat > apps/web/app/layout.tsx <<'TSX'
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en">
+      <body>{children}</body>
+    </html>
+  );
+}
+TSX
+cat > apps/web/app/page.tsx <<'TSX'
+export default function Home() {
+  return (
+    <main style=padding:"24px">
+      <h1>Home</h1>
+      <p><a href="/orca">Go to ORCA</a></p>
+    </main>
+  );
+}
+TSX
+import type { Metadata } from "next";
+import { OrcaHero } from "@/packages/ui/orca/OrcaHero";
+import { ComplianceBadges } from "@/packages/ui/orca/ComplianceBadges";
+import { FeatureGrid } from "@/packages/ui/orca/FeatureGrid";
+import { CTASection } from "@/packages/ui/orca/CTASection";
+
+export const metadata: Metadata = {
+  title: "ORCA Federal — Apex Intelligence for Public Sector Protection",
+  description: "5 AI systems working as one coordinated pod for FISMA/FedRAMP-ready defense."
+};
+
+export default function OrcaPage() {
+  return (
+    <main className="bg-bg text-fg">
+      <OrcaHero
+        eyebrow="ORCA Federal"
+        title="Apex Intelligence for Public Sector Protection"
+        sub="Five coordinated AI systems—APEX, ECHO, PULSE, SURGE, FLOW—delivering 99.2% autonomous accuracy and 90‑day ATO delivery."
+        ctaPrimary= label: "See Pod in Action", href: "/demo" 
+        ctaSecondary= label: "Get Federal Quote", href: "/pricing/federal" 
+        sonar
+      />
+      <section className="py-6">
+        <ComplianceBadges items={["FISMA","FedRAMP","CMMC","FERPA","HIPAA"]} />
+      </section>
+      <FeatureGrid
+        items={[
+          { title: "Pod Intelligence", body: "Five AI systems synchronize threat detection, response, and compliance." },
+          { title: "90‑Day ATO Program", body: "Accelerated authorization with pre‑mapped controls and audit artifacts." },
+          { title: "Hybrid & On‑Prem", body: "Deploy to GovCloud, hybrid, or air‑gapped environments with zero data egress." }
+        ]}
+      />
+      <CTASection
+        title="Join the Pod"
+        sub="Schedule a federal assessment or request a tailored pilot."
+        cta= label: "Schedule Assessment", href: "/contact" 
+      />
+    </main>
+  );
+}
+"use client";
+import { useEffect, useRef } from "react";
+import { z } from "zod";
+export const OrcaHeroProps = z.object({
+  eyebrow: z.string().optional(),
+  title: z.string(),
+  sub: z.string(),
+  ctaPrimary: z.object({ label: z.string(), href: z.string() }),
+  ctaSecondary: z.object({ label: z.string(), href: z.string() }).optional(),
+  sonar: z.boolean().optional()
+});
+export type TOrcaHeroProps = z.infer<typeof OrcaHeroProps>;
+export function OrcaHero({ eyebrow, title, sub, ctaPrimary, ctaSecondary, sonar }: TOrcaHeroProps) {
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  useEffect(() => {
+    if (!sonar || !canvasRef.current) return;
+    const c = canvasRef.current; const ctx = c.getContext("2d"); let raf: number;
+    function resize(){ c.width = c.offsetWidth; c.height = c.offsetHeight; }
+    function draw(t:number){ if(!ctx) return; ctx.clearRect(0,0,c.width,c.height); const cx=c.width*.5, cy=c.height*.55; for(let i=0;i<6;i++){ const r=(i+((t/1000)%1))*80; ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.strokeStyle="rgba(34,211,238,.12)"; ctx.lineWidth=1; ctx.stroke(); } raf=requestAnimationFrame(draw); }
+    resize(); const ro=new ResizeObserver(resize); ro.observe(c); raf=requestAnimationFrame(draw); return ()=>{ cancelAnimationFrame(raf); ro.disconnect(); };
+  }, [sonar]);
+  return (
+    <header className="relative overflow-hidden bg-[linear-gradient(180deg,var(--bg),var(--bg-elev))]">
+      {sonar && <canvas ref={canvasRef} className="pointer-events-none absolute inset-0 w-full h-full" />}
+      <div className="relative mx-auto max-w-6xl px-4 py-16 md:py-24">
+        {eyebrow && <p className="text-sm tracking-wide text-fg-muted">{eyebrow}</p>}
+        <h1 className="mt-2 text-4xl md:text-5xl font-semibold">{title}</h1>
+        <p className="mt-4 text-lg md:text-xl text-fg-muted max-w-3xl">{sub}</p>
+        <div className="mt-8 flex flex-wrap gap-3">
+          <a href={ctaPrimary.href} className="bg-brand text-white px-5 py-2.5 rounded-md">{ctaPrimary.label}</a>
+          {ctaSecondary && <a href={ctaSecondary.href} className="border border-border text-fg px-5 py-2.5 rounded-md hover:bg-bg-elev">{ctaSecondary.label}</a>}
+        </div>
+      </div>
+    </header>
+  );
+}
+import { z } from "zod";
+export const ComplianceBadgesProps = z.object({ items: z.array(z.enum(["FISMA","FedRAMP","CMMC","FERPA","HIPAA"])) });
+export type TComplianceBadgesProps = z.infer<typeof ComplianceBadgesProps>;
+const BADGE_COPY: Record<string,string> = { FISMA:"FISMA", FedRAMP:"FedRAMP", CMMC:"CMMC", FERPA:"FERPA", HIPAA:"HIPAA" };
+export function ComplianceBadges({ items }: TComplianceBadgesProps){
+  return (
+    <div className="mx-auto max-w-6xl px-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+        {items.map(k=> (
+          <div key={k} className="border border-border rounded-md px-3 py-2 text-center text-sm text-fg-muted">{BADGE_COPY[k]}</div>
+        ))}
+      </div>
+    </div>
+  );import { z } from "zod";
+export const Feature = z.object({ title: z.string(), body: z.string(), icon: z.string().optional() });
+export const FeatureGridProps = z.object({ items: z.array(Feature).min(3) });
+export type TFeatureGridProps = z.infer<typeof FeatureGridProps>;
+export function FeatureGrid({ items }: TFeatureGridProps){
+  return (
+    <section className="py-10">
+      <div className="mx-auto max-w-6xl px-4 grid md:grid-cols-3 gap-6">
+        {items.map((f,i)=> (
+          <article key={i} className="rounded-lg border border-border bg-bg-elev p-5">
+            <h3 className="text-lg font-semibold">{f.title}</h3>
+            <p className="mt-2 text-fg-muted">{f.body}</p>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+}import { z } from "zod";
+export const CTASectionProps = z.object({ title: z.string(), sub: z.string(), cta: z.object({ label: z.string(), href: z.string() }) });
+export type TCTASectionProps = z.infer<typeof CTASectionProps>;
+export function CTASection({ title, sub, cta }: TCTASectionProps){
+  return (
+    <section className="py-12">
+      <div className="mx-auto max-w-4xl px-4 text-center">
+        <h2 className="text-2xl md:text-3xl font-semibold">{title}</h2>
+        <p className="mt-3 text-fg-muted">{sub}</p>
+        <div className="mt-6"><a href={cta.href} className="bg-brand text-white px-5 py-2.5 rounded-md">{cta.label}</a></div>
+      </div>
+    </section>
+  );
+}name: Deploy (GovCloud)
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch: {}
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  AWS_ACCOUNT_ID: "123456789012"       # GovCloud account
+  AWS_REGION: us-gov-west-1            # or us-gov-east-1
+  ECR_UI: router-ui
+  ECR_API: router-api
+  ECS_CLUSTER: orca-cluster
+  ECS_SERVICE_UI: router-ui
+  ECS_SERVICE_API: router-api
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure AWS credentials (GovCloud OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws-us-gov:iam::$ env.AWS_ACCOUNT_ID :role/github-oidc-deploy
+          aws-region: $ env.AWS_REGION 
+          audience: sts.amazonaws.com
+      - name: Login to ECR
+        uses: aws-actions/amazon-ecr-login@v2
+      - name: Build & push UI image
+        run: |
+          UI_TAG=$ env.AWS_ACCOUNT_ID .dkr.ecr.$ env.AWS_REGION .amazonaws.com/$ env.ECR_UI :$ github.sha 
+          docker build -f Dockerfile.ui -t "$UI_TAG" .
+          docker push "$UI_TAG"
+          echo "UI_IMAGE=$UI_TAG" >> $GITHUB_ENV
+      - name: Build & push API image
+        run: |
+          API_TAG=$ env.AWS_ACCOUNT_ID .dkr.ecr.$ env.AWS_REGION .amazonaws.com/$ env.ECR_API :$ github.sha 
+          docker build -f Dockerfile.api -t "$API_TAG" .
+          docker push "$API_TAG"
+          echo "API_IMAGE=$API_TAG" >> $GITHUB_ENV
+      - name: Render task definitions
+        run: |
+          jq --arg IMG "$UI_IMAGE" '.containerDefinitions |= (map(if .name=="router-ui" then (.image=$IMG) else . end))' ecs/taskdef.ui.json > ecs/taskdef.ui.rendered.json
+          jq --arg IMG "$API_IMAGE" '.containerDefinitions |= (map(if .name=="router-api" then (.image=$IMG) else . end))' ecs/taskdef.api.json > ecs/taskdef.api.rendered.json
+      - name: Register task definitions
+        run: |
+          UI_TD_ARN=$(aws ecs register-task-definition --cli-input-json file://ecs/taskdef.ui.rendered.json --query taskDefinition.taskDefinitionArn --output text)
+          API_TD_ARN=$(aws ecs register-task-definition --cli-input-json file://ecs/taskdef.api.rendered.json --query taskDefinition.taskDefinitionArn --output text)
+          echo "UI_TD_ARN=$UI_TD_ARN" >> $GITHUB_ENV
+          echo "API_TD_ARN=$API_TD_ARN" >> $GITHUB_ENV
+      - name: Update services
+        run: |
+          aws ecs update-service --cluster "$ECS_CLUSTER" --service "$ECS_SERVICE_UI" --task-definition "$UI_TD_ARN"
+          aws ecs update-service --cluster "$ECS_CLUSTER" --service "$ECS_SERVICE_API" --task-definition "$API_TD_ARN"
+      - name: Wait for stability
+        run: |
+          aws ecs wait services-stable --cluster "$ECS_CLUSTER" --services "$ECS_SERVICE_UI" "$ECS_SERVICE_API"
+          {
+  "family": "router-ui",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "512",
+  "memory": "1024",
+  "executionRoleArn": "arn:aws-us-gov:iam::ACCOUNT:role/ecsTaskExecutionRole",
+  "taskRoleArn": "arn:aws-us-gov:iam::ACCOUNT:role/routerUiTaskRole",
+  "containerDefinitions": [
+    {
+      "name": "router-ui",
+      "image": "REPLACED_BY_CI",
+      "portMappings": [{ "containerPort": 3000, "hostPort": 3000, "protocol": "tcp" }],
+      "essential": true,
+      "logConfiguration": {"logDriver": "awslogs", "options": {"awslogs-group": "/ecs/router-ui","awslogs-region": "us-gov-west-1","awslogs-stream-prefix": "ecs"}}
+    }
+  ]
+}{
+  "family": "router-api",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "512",
+  "memory": "1024",
+  "executionRoleArn": "arn:aws-us-gov:iam::ACCOUNT:role/ecsTaskExecutionRole",
+  "taskRoleArn": "arn:aws-us-gov:iam::ACCOUNT:role/routerApiTaskRole",
+  "containerDefinitions": [
+    {
+      "name": "router-api",
+      "image": "REPLACED_BY_CI",
+      "portMappings": [{ "containerPort": 8080, "hostPort": 8080, "protocol": "tcp" }],
+      "environment": [],
+      "essential": true,
+      "logConfiguration": {"logDriver": "awslogs", "options": {"awslogs-group": "/ecs/router-api","awslogs-region": "us-gov-west-1","awslogs-stream-prefix": "ecs"}}
+    }
+  ]
+}git add -A
+git commit -m "feat(orca): add ORCA page, UI components, GovCloud workflow template, ECS taskdef placeholders"
+git push -u origin feature/framer-v0-figma

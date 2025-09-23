@@ -45,6 +45,45 @@ const upload = multer({
 // Engine instances will be lazily initialized inside registerRoutes()
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // List available image providers
+  app.get('/api/ai/image/providers', async (_req, res) => {
+    // Only return providers that support image
+    const { getAdapter, listAdapters } = await import('./adapters/manager');
+    const providers = listAdapters()
+      .map((name: string) => getAdapter(name as string))
+      .filter((adapter: any) => adapter && adapter.supportsImage)
+      .map((adapter: any) => ({
+        name: adapter.name,
+        supportsInvoke: !!adapter.supportsInvoke,
+        supportsImage: !!adapter.supportsImage
+      }));
+    res.json({ providers });
+  });
+  // Scene endpoint (DAG-style multi-node execution)
+  if (process.env.FEATURE_SCENE_ENDPOINT === '1') {
+    const { SceneReq } = require('./scene/schema');
+    const { stableVirtualCamera, hunyuanVoyager } = require('./scene/providers');
+      app.post('/api/ai/scene', async (req, res) => {
+        try {
+          const body = SceneReq.parse(req.body ?? {});
+          let result;
+          if (body.provider === "seva") {
+            result = await stableVirtualCamera(body);
+          } else if (body.provider === "hunyuan") {
+            result = await hunyuanVoyager(body);
+          } else if (body.provider === "cat4d") {
+            result = await cat4dProvider(body);
+          } else if (body.provider === "4diff") {
+            result = await fourDiffProvider(body);
+          } else {
+            return res.status(400).json({ error: "Unsupported provider" });
+          }
+          res.json(result);
+        } catch (err) {
+          res.status(400).json({ error: err.message });
+        }
+      });
+  }
   // Static asset serving removed for deployment size optimization
   
   // Auth0 configuration

@@ -23,4 +23,4 @@ jobs:
         run: |
           gcloud auth list
           echo "Project number should be 623664514494:"
-          gcloud projects describe pacific-diode-471015-r7 --format='value(projectNumber)'
+          gcloud projects describe pacific-diode-471015-r7 - format='value(projectNumber)'

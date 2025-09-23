@@ -6,7 +6,7 @@ export const loadGoogleAuth = loadGoogleCredentials;
 import fs from 'fs';
 
 export function loadGoogleCredentials(): any | null {
-  const raw = process.env.GOOGLE_CREDENTIALS_JSON || process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON;
+  const raw = process.env.GOOGLE_CREDENTIALS1_JSON || process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON;
   if (!raw) return null;
 
   try {

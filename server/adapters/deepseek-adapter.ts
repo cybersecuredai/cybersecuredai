@@ -10,32 +10,32 @@ export const DeepSeekAdapter: AIAdapter = {
   supportsImage: true,
   image: async (req: ImageRequest): Promise<ImageResponse> => {
     const start = Date.now();
-    const auth = loadDeepSeekAuth();
-    if (!auth.apiKey) {
+    try {
+      const auth = loadDeepSeekAuth();
+      if (!auth.apiKey) {
+        throw new Error('auth_missing');
+      }
+      const sizeCheck = validateImageSize(req.size);
+      if (!sizeCheck.ok) {
+        throw new Error(sizeCheck.error || 'invalid_size');
+      }
+      // Simulated image response
+      const b64 = Buffer.from(`deepseek-placeholder:${req.prompt}`).toString('base64');
+      return {
+        id: crypto.randomUUID(), provider: NAME, model: req.model || 'deepseek-sim', url: null,
+        b64: `data:image/png;base64,${b64}`,
+        metadata: { width: sizeCheck.width || 512, height: sizeCheck.height || 512, format: 'png', sizeBytes: b64.length },
+        raw: { simulated: true },
+        meta: { latencyMs: Date.now() - start, status: 'ok' }
+      };
+    } catch (err: any) {
+      console.error('[DeepSeekAdapter] Error in image method:', err);
       return {
         id: crypto.randomUUID(), provider: NAME, model: req.model || 'deepseek-sim', url: null, b64: null,
-        meta: { latencyMs: Date.now() - start, status: 'error', error: 'auth_missing' }
+        raw: { error: err?.message || err },
+        meta: { latencyMs: Date.now() - start, status: 'error', error: err?.message || 'Unknown error' }
       };
     }
-
-    const sizeCheck = validateImageSize(req.size);
-    if (!sizeCheck.ok) {
-      return {
-        id: crypto.randomUUID(), provider: NAME, model: req.model || 'deepseek-sim', url: null, b64: null,
-        meta: { latencyMs: Date.now() - start, status: 'error', error: sizeCheck.error }
-      };
-    }
-
-    // Simulated image response
-    const b64 = Buffer.from(`deepseek-placeholder:${req.prompt}`).toString('base64');
-
-    return {
-      id: crypto.randomUUID(), provider: NAME, model: req.model || 'deepseek-sim', url: null,
-      b64: `data:image/png;base64,${b64}`,
-      metadata: { width: sizeCheck.width || 512, height: sizeCheck.height || 512, format: 'png', sizeBytes: b64.length },
-      raw: { simulated: true },
-      meta: { latencyMs: Date.now() - start, status: 'ok' }
-    };
   }
 };
 

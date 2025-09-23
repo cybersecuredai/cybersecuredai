@@ -25,23 +25,34 @@ export const OpenAIAdapter: AIAdapter = {
   },
   image: async (req: ImageRequest): Promise<ImageResponse> => {
     const start = Date.now();
-    const id = crypto.randomUUID();
-    const latencyMs = Date.now() - start;
-
-    // return data URL placeholder
-    const b64 = Buffer.from(`placeholder image for ${req.prompt}`).toString('base64');
-
-    return {
-      id,
-      provider: NAME,
-      model: req.model || 'dall-e-sim',
-      url: null,
-      b64: `data:image/png;base64,${b64}`,
-      metadata: { width: 512, height: 512, format: 'png', sizeBytes: b64.length },
-      raw: { simulated: true },
-      meta: { latencyMs, status: 'ok' }
-    };
-  }
+    try {
+      const id = crypto.randomUUID();
+      // return data URL placeholder
+      const b64 = Buffer.from(`placeholder image for ${req.prompt}`).toString('base64');
+      const latencyMs = Date.now() - start;
+      return {
+        id,
+        provider: NAME,
+        model: req.model || 'dall-e-sim',
+        url: null,
+        b64: `data:image/png;base64,${b64}`,
+        metadata: { width: 512, height: 512, format: 'png', sizeBytes: b64.length },
+        raw: { simulated: true },
+        meta: { latencyMs, status: 'ok' }
+      };
+    } catch (err: any) {
+      console.error('[OpenAIAdapter] Error in image method:', err);
+      return {
+        id: crypto.randomUUID(),
+        provider: NAME,
+        model: req.model || 'dall-e-sim',
+        url: null,
+        b64: null,
+        raw: { error: err?.message || err },
+        meta: { latencyMs: Date.now() - start, status: 'error', error: err?.message || 'Unknown error' }
+      };
+    }
+  },
 };
 
 // Auto-register when env present or FEATURE_OPENAI=true

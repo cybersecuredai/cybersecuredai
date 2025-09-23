@@ -1,0 +1,249 @@
+// app/types.ts
+export type SceneProviderInput = {
+  spec?: unknown;
+  mode: "nvs" | "i2v3d" | "v2-4d";
+  inputs?: { imageUrl?: string; videoUrl?: string };
+  cameraPath?: { kind: string; durationSec: number; params?: Record<string, unknown> };
+  params?: Record<string, unknown>;
+};
+
+export type SceneResponse = {
+  id: string;
+  provider: "seva" | "hunyuan" | "cat4d" | "4diff";
+  mode: "nvs" | "i2v3d" | "v2-4d";
+  videoUrl?: string;
+  depthUrls?: string[];
+  pointCloudUrl?: string;
+  viewerUrl?: string; // e.g., /viewer/scene?pc=<encoded-url>
+  metadata?: Record<string, unknown>;
+};
+import type { FastifyInstance } from "fastify";
+import { z } from "zod";
+import type { SceneResponse } from "./types";
+import { stableVirtualCamera } from "./providers/vision/stableVirtualCamera";
+import { hunyuanVoyager } from "./providers/vision/hunyuanVoyager";
+
+const SceneReq = z.object({
+  spec: z.union([z.string(), z.record(z.string(), z.unknown())]).optional(),
+  mode: z.enum(["nvs","i2v3d","v2-4d"]).default("nvs"),
+  inputs: z.object({
+    imageUrl: z.string().url().optional(),
+    videoUrl: z.string().url().optional()
+  }).optional(),
+  cameraPath: z.object({
+    kind: z.enum(["orbit","dolly","spiral","custom"]).default("orbit"),
+    durationSec: z.number().int().min(1).max(60).default(8),
+    params: z.record(z.string(), z.unknown()).optional()
+  }).optional(),
+  provider: z.enum(["seva","hunyuan","cat4d","4diff"]).default("seva"),
+  params: z.record(z.string(), z.unknown()).optional()
+});
+
+export async function registerSceneRoutes(app: FastifyInstance) {
+  app.post("/scene", async (req, reply) => {
+    const body = SceneReq.parse(req.body ?? {});
+    let result: SceneResponse;
+
+    if (body.provider === "seva") {
+      result = await stableVirtualCamera(body as any);
+    } else if (body.provider === "hunyuan") {
+      result = await hunyuanVoyager(body as any);
+    } else {
+      return reply.code(400).send({ error: "Unsupported provider" });
+    }
+
+    return reply.send(result satisfies SceneResponse);
+  });
+}import { randomUUID } from "node:crypto";
+import type { SceneProviderInput, SceneResponse } from "../../types";
+import { reconstructDepthToPLY } from "../../utils/reconstructDepthToPLY";
+
+/**
+ * TODO (Copilot): Implement call to Stable Virtual Camera (SEVA) API or local runner.
+ * Inputs: imageUrl (required for i2v3d/nvs), cameraPath; Optional: params
+ * Expected output from your runner/API: { videoUrl: string, depthUrls?: string[] }
+ */
+export async function stableVirtualCamera(req: SceneProviderInput): Promise<SceneResponse> {
+  const id = randomUUID();
+
+  // Example scaffold (replace with real call):
+  // const r = await fetch(`${process.env.SEVA_URL}/generate`, {
+  //   method: "POST",
+  //   headers: { "Content-Type": "application/json" },
+  //   body: JSON.stringify({ imageUrl: req.inputs?.imageUrl, cameraPath: req.cameraPath, params: req.params })
+  // });
+  // const out = await r.json();
+
+  const assets = process.env.ASSETS_BASE_URL || "https://assets.example.com";
+  const videoUrl = `${assets}/${id}.mp4`;
+  const depthUrls: string[] = [];
+
+  let pointCloudUrl: string | undefined;
+  if (depthUrls.length) {
+    pointCloudUrl = await reconstructDepthToPLY(depthUrls, { id, assetsBase: assets });
+  }
+
+  return {
+    id,
+    provider: "seva",
+    mode: req.mode,
+    videoUrl,
+    depthUrls,
+    pointCloudUrl,
+    viewerUrl: pointCloudUrl ? `/viewer/scene?pc=${encodeURIComponent(pointCloudUrl)}` : undefined,
+    metadata: { camera: req.cameraPath?.kind ?? "orbit" }
+  };
+}import { randomUUID } from "node:crypto";
+import type { SceneProviderInput, SceneResponse } from "../../types";
+import { reconstructDepthToPLY } from "../../utils/reconstructDepthToPLY";
+
+/**
+ * TODO (Copilot): Implement HunyuanWorld-Voyager pipeline call.
+ * Expected output: { videoUrl: string, depthUrls?: string[] }
+ */
+export async function hunyuanVoyager(req: SceneProviderInput): Promise<SceneResponse> {
+  const id = randomUUID();
+
+  // Example scaffold (replace with real call):
+  // const r = await fetch(`${process.env.HUNYUAN_URL}/generate`, { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify({...}) });
+  // const out = await r.json();
+
+  const assets = process.env.ASSETS_BASE_URL || "https://assets.example.com";
+  const videoUrl = `${assets}/${id}.mp4`;
+  const depthUrls: string[] = [ `${assets}/${id}/depth-0001.png` ];
+
+  let pointCloudUrl: string | undefined;
+  if (depthUrls.length) {
+    pointCloudUrl = await reconstructDepthToPLY(depthUrls, { id, assetsBase: assets });
+  }
+
+  return {
+    id,
+    provider: "hunyuan",
+    mode: req.mode,
+    videoUrl,
+    depthUrls,
+    pointCloudUrl,
+    viewerUrl: pointCloudUrl ? `/viewer/scene?pc=${encodeURIComponent(pointCloudUrl)}` : undefined,
+    metadata: {}
+  };
+}// Minimal placeholder: combine one or more depth maps into a simple PLY point cloud.
+// Copilot: replace math with real camera intrinsics if available.
+import fs from "node:fs/promises";
+
+export async function reconstructDepthToPLY(depthUrls: string[], opts: { id: string; assetsBase: string }): Promise<string> {
+  // TODO: download depth images, convert to point cloud using pinhole camera model
+  // For now, emit a tiny dummy PLY so viewer wiring works.
+  const ply = [`ply`,`format ascii 1.0`,`element vertex 3`,`property float x`,`property float y`,`property float z`,`end_header`,`0 0 0`,`0.5 0 0`,`0 0.5 0`].join("\n");
+  const outPath = `/tmp/${opts.id}.ply`;
+  await fs.writeFile(outPath, ply, "utf8");
+  // In production, upload to object storage and return HTTPS URL
+  return `${opts.assetsBase}/${opts.id}.ply`;
+}<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Scene Viewer</title>
+    <style>
+      html, body { margin:0; padding:0; height:100%; overflow:hidden; background:#111; }
+      #c { width:100%; height:100%; display:block; }
+      #hud { position:fixed; top:10px; left:10px; color:#eee; font:13px/1.4 system-ui, -apple-system, Segoe UI, Roboto, sans-serif; background:rgba(0,0,0,.35); padding:8px 10px; border-radius:8px; }
+      a { color:#8ad; text-decoration:none; }
+    </style>
+  </head>
+  <body>
+    <div id="hud">Scene Viewer • Use mouse to orbit. Load: ?pc=<em>PLY/GLB URL</em></div>
+    <canvas id="c"></canvas>
+    <script type="module">
+      import * as THREE from "https://unpkg.com/three@0.158.0/build/three.module.js";
+      import { OrbitControls } from "https://unpkg.com/three@0.158.0/examples/jsm/controls/OrbitControls.js";
+      import { PLYLoader } from "https://unpkg.com/three@0.158.0/examples/jsm/loaders/PLYLoader.js";
+      import { GLTFLoader } from "https://unpkg.com/three@0.158.0/examples/jsm/loaders/GLTFLoader.js";
+
+      const params = new URLSearchParams(location.search);
+      const pcUrl = params.get("pc");
+
+      const canvas = document.getElementById("c");
+      const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+      const scene = new THREE.Scene();
+      scene.background = new THREE.Color("#111318");
+
+      const camera = new THREE.PerspectiveCamera(60, 2, 0.1, 5000);
+      camera.position.set(0, 1.2, 3.5);
+      const controls = new OrbitControls(camera, renderer.domElement);
+
+      scene.add(new THREE.AmbientLight(0xffffff, 1.0));
+      const dir = new THREE.DirectionalLight(0xffffff, 0.6);
+      dir.position.set(3, 5, 2);
+      scene.add(dir);
+
+      const grid = new THREE.GridHelper(10, 10, 0x444444, 0x222222);
+      grid.position.y = -1;
+      scene.add(grid);
+
+      function resize() {
+        const w = window.innerWidth, h = window.innerHeight;
+        renderer.setSize(w, h, false);
+        camera.aspect = w / h; camera.updateProjectionMatrix();
+      }
+      window.addEventListener("resize", resize); resize();
+
+      async function loadPointCloud(url) {
+        if (!url) return;
+        const ext = url.split("?")[0].split("#")[0].split(".").pop()?.toLowerCase();
+        if (ext === "ply") {
+          const loader = new PLYLoader();
+          const geo = await new Promise((res, rej) => loader.load(url, res, undefined, rej));
+          const mat = new THREE.PointsMaterial({ size: 0.01, color: 0xffffff });
+          const points = new THREE.Points(geo, mat);
+          scene.add(points);
+        } else if (ext === "glb" || ext === "gltf") {
+          const loader = new GLTFLoader();
+          const gltf = await new Promise((res, rej) => loader.load(url, res, undefined, rej));
+          scene.add(gltf.scene);
+        }
+      }
+
+      loadPointCloud(pcUrl).catch(console.error);
+      renderer.setAnimationLoop(() => { renderer.render(scene, camera); });
+    </script>
+  </body>
+</html>
+name: Scene Endpoint Smoke
+on: { workflow_dispatch: {} }
+permissions: { id-token: write, contents: read }
+jobs:
+  scene:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: "20" }
+      - run: npm ci
+      - name: Build
+        run: npm run build --if-present
+      - name: Start server
+        run: node dist/server.js &
+      - name: Wait for health
+        run: |
+          for i in {1..30}; do
+            curl -sf http://localhost:3000/health && exit 0
+            sleep 2
+          done
+          echo "Server not healthy" && exit 1
+      - name: Call /scene (SEVA placeholder)
+        run: |
+          curl -s -X POST http://localhost:3000/scene \
+            -H "Content-Type: application/json" \
+            -d '{"mode":"nvs","provider":"seva","inputs":{"imageUrl":"https://picsum.photos/1024"},"cameraPath":{"kind":"orbit","durationSec":6}}' | tee scene.json
+          jq -r '.videoUrl' scene.json | grep -q http
+SEVA_URL=
+HUNYUAN_URL=
+ASSETS_BASE_URL=  
+import { readFileSync } from "node:fs";
+import { registerSceneRoutes } from "./scene";
+
+await registerSceneRoutes(app);
+app.get("/viewer/scene", async (_req, reply) => {
+  reply.type("text/html").send(readFileSync("app/viewers/sceneViewer.html","utf8"));
+});      

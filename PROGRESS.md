@@ -1,6 +1,6 @@
 # Project Progress Snapshot
 
-_Last updated: 2025-09-19_
+_Last updated: 2025-09-22_
 
 ## TODO List (with status)
 
@@ -35,6 +35,14 @@ _Last updated: 2025-09-19_
 
 ## Current Branch
 - `feature/adapters-stubs`
+
+## This Week's Plan (Track A)
+- [ ] Structured logging context with requestId propagation (pino-http)
+	- Acceptance: API logs include requestId, provider, latency, status, error code when applicable
+- [ ] Single retry to alternate provider
+	- Acceptance: Retry once on retryable error and fallback provider attempted per AI_PROVIDER_ORDER; unit test covers path
+- [ ] Dockerfile & docker-compose verification
+	- Acceptance: Local build succeeds; container runs /api/health and minimal /api/ai/invoke
 
 ## Last Actions
 - P0 items (timeouts, structured errors) implemented and tested

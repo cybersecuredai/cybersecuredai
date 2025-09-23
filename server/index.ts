@@ -1,9 +1,29 @@
+// Register all adapters at startup (must be before routes)
+import './adapters/vertex-image-adapter';
+import './adapters/gemini-image-adapter';
+import './adapters/gemini-image-adapter';
+import './adapters/google-image-adapter';
+import './adapters/anthropic-adapter';
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupOtel, shutdownOtel } from './observability/otel';
 import { setupVite, serveStatic, log } from "./vite";
+import pino from 'pino';
+import pinoHttp from 'pino-http';
 
 const app = express();
+// Structured logging
+const logger = pino({ level: process.env.LOG_LEVEL || 'info' });
+app.use(pinoHttp({
+  logger,
+  genReqId: (req) => req.headers['x-request-id'] as string || `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+  customLogLevel: function (res, err) {
+    if (res.statusCode >= 500 || err) return 'error'
+    if (res.statusCode >= 400) return 'warn'
+    return 'info'
+  },
+  autoLogging: { ignore: (req) => !req.url?.startsWith('/api') },
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
@@ -26,11 +46,16 @@ app.use((req, res, next) => {
         logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
       }
 
-      if (logLine.length > 80) {
-        logLine = logLine.slice(0, 79) + "…";
-      }
-
+      if (logLine.length > 80) logLine = logLine.slice(0, 79) + "…";
+      // dual log: pretty short line and structured entry
       log(logLine);
+      (req as any).log?.info({
+        requestId: (req as any).id,
+        method: req.method,
+        path,
+        statusCode: res.statusCode,
+        durationMs: duration,
+      }, 'api_request_completed');
     }
   });
 
@@ -41,7 +66,10 @@ app.use((req, res, next) => {
   try {
     // If running with mock adapter enabled, load it before registering routes
     if (process.env.ENABLE_MOCK_ADAPTER === 'true') {
-      await import('./adapters/mock-adapter');
+      // Deterministically register mock adapter to avoid race with module-level env gating
+      const { registerAdapter } = await import('./adapters/manager');
+      const { MockAdapter } = await import('./adapters/mock-adapter');
+      registerAdapter(MockAdapter);
     }
     // Initialize OpenTelemetry SDK
     try {

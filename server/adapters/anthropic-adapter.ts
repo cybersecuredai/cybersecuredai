@@ -1,33 +1,64 @@
-import { AIAdapter, InvokeRequest, InvokeResponse, ImageRequest, ImageResponse } from './adapter-types';
-import crypto from 'crypto';
+// adapters/anthropic.ts
+import { z } from "zod";
+import { Anthropic } from "@anthropic-ai/sdk";
 
-const NAME = 'anthropic';
+export const AnthropicImageInput = z.object({
+  prompt: z.string(),
+  size: z.string().optional(),      // keep same shape as other providers
+  format: z.enum(["url","b64"]).optional(),
+  // ...any shared image params
+});
 
-export const AnthropicAdapter: AIAdapter = {
-  name: NAME,
-  supportsInvoke: true,
-  supportsImage: false,
-  invoke: async (req: InvokeRequest): Promise<InvokeResponse> => {
-    const start = Date.now();
-    const output = `Simulated Anthropic response for task=${req.task} input=${req.input.substring(0,120)}`;
-    const latencyMs = Date.now() - start;
+export type TAnthropicImageInput = z.infer<typeof AnthropicImageInput>;
 
+type ImageResult =
+  | { provider: "anthropic"; supported: false; message: string; fallbackUsed?: boolean }
+  | { provider: "anthropic"; supported: true; url?: string; b64?: string };
+
+export class AnthropicAdapter {
+  public readonly name = "anthropic";
+  public readonly supportsText = true;
+  public readonly supportsImage = true; // advertise capability for routing, stub inside
+  private client: Anthropic;
+  private fallback?: { image: (input: any) => Promise<any> };
+
+  constructor(opts: { apiKey: string; fallbackImageAdapter?: { image: (input: any) => Promise<any> } }) {
+    this.client = new Anthropic({ apiKey: opts.apiKey });
+    this.fallback = opts.fallbackImageAdapter;
+  }
+
+  async invoke(input: { messages: Array<{ role: "user"|"assistant"|"system"; content: string }> }) {
+    // existing text impl (stub)
     return {
-      id: crypto.randomUUID(),
-      provider: NAME,
-      model: req.model || 'claude-sim-1',
-      usage: { tokens: Math.min(1000, Math.max(1, Math.floor(req.input.length / 3))) },
-      output,
+      id: "anthropic-stub-text",
+      provider: this.name,
+      model: "claude-sim-1",
+      usage: { tokens: 1 },
+      output: "Simulated Anthropic text response.",
       raw: { simulated: true },
-      meta: { latencyMs, status: 'ok' }
+      meta: { latencyMs: 1, status: "ok" }
     };
   }
-};
 
+  async image(input: TAnthropicImageInput): Promise<ImageResult> {
+    if (this.fallback) {
+      await this.fallback.image(input); // ignore return, let router handle unified result shape
+      return { provider: "anthropic", supported: false, message: "Routed to fallback image provider", fallbackUsed: true };
+    }
+    // Return a structured, typed “not supported” signal the router can interpret
+    return {
+      provider: "anthropic",
+      supported: false,
+      message: "Anthropic does not support image generation. Provide a fallbackImageAdapter to route."
+    };
+  }
+}
+
+// Registration logic for compatibility with existing manager
 if (process.env.ANTHROPIC_API_KEY || process.env.FEATURE_ANTHROPIC === 'true') {
   try {
     const { registerAdapter } = require('./manager');
-    registerAdapter(AnthropicAdapter);
+    registerAdapter(new AnthropicAdapter({ apiKey: process.env.ANTHROPIC_API_KEY || 'sk-anthropic-stub' }));
   } catch (err) {
     // ignore during static analysis
   }

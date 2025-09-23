@@ -1,0 +1,121 @@
+
+export const metadata = { title: "ORCA Docs — Static Pages Index" };
+
+const groups = [
+  {
+    title: "Root",
+    items: [
+      { href: "/reference-html/index.html", label: "Homepage" },
+      { href: "/reference-html/water-animations-demo.html", label: "Water Animations Demo" }
+    ]
+  },
+  {
+    title: "Platform",
+    items: [
+      { href: "/reference-html/Platform/index.html", label: "Platform Overview" },
+      { href: "/reference-html/Platform/apex.html", label: "APEX — Genetic AI" },
+      { href: "/reference-html/Platform/echo.html", label: "ECHO — 5D Interface" },
+      { href: "/reference-html/Platform/pulse.html", label: "PULSE — Location Tracking" },
+      { href: "/reference-html/Platform/surge.html", label: "SURGE — Defense Swarms" },
+      { href: "/reference-html/Platform/flow.html", label: "FLOW — Operations AI" },
+      { href: "/reference-html/Platform/pod-intelligence.html", label: "Pod Intelligence" },
+      { href: "/reference-html/Platform/cloud-security.html", label: "Cloud Security" },
+      { href: "/reference-html/Platform/network-infrastructure.html", label: "Network Infrastructure" },
+      { href: "/reference-html/Platform/endpoint-security.html", label: "Endpoint Security" },
+      { href: "/reference-html/Platform/compliance-risk.html", label: "Compliance & Risk Management" }
+    ]
+  },
+  {
+    title: "Solutions",
+    items: [
+      { href: "/reference-html/Solutions/index.html", label: "Solutions Overview" },
+      { href: "/reference-html/Solutions/by-industry.html", label: "Solutions by Industry" },
+      { href: "/reference-html/Solutions/by-topic.html", label: "Solutions by Topic" },
+      { href: "/reference-html/Solutions/education.html", label: "Education Solutions" },
+      { href: "/reference-html/Solutions/federal.html", label: "Federal Government" },
+      { href: "/reference-html/Solutions/healthcare.html", label: "Healthcare Solutions" },
+      { href: "/reference-html/Solutions/state-local.html", label: "State & Local Government" }
+    ]
+  },
+  {
+    title: "Services",
+    items: [
+      { href: "/reference-html/Services/index.html", label: "Services Overview" },
+      { href: "/reference-html/Services/managed-services.html", label: "Managed Services" },
+      { href: "/reference-html/Services/professional-services.html", label: "Professional Services" },
+      { href: "/reference-html/Services/implementation.html", label: "Implementation Services" }
+    ]
+  },
+  {
+    title: "Resources",
+    items: [
+      { href: "/reference-html/Resources/index.html", label: "Resources Overview" },
+      { href: "/reference-html/Resources/resource-center.html", label: "Resource Center" },
+      { href: "/reference-html/Resources/knowledge-center.html", label: "Knowledge Center" },
+      { href: "/reference-html/Resources/documentation.html", label: "Documentation" },
+      { href: "/reference-html/Resources/blogs.html", label: "Blog Posts" },
+      { href: "/reference-html/Resources/whitepapers.html", label: "Whitepapers" },
+      { href: "/reference-html/Resources/case-studies.html", label: "Case Studies" },
+      { href: "/reference-html/Resources/client-stories.html", label: "Client Success Stories" },
+      { href: "/reference-html/Resources/reports.html", label: "Research Reports" },
+      { href: "/reference-html/Resources/ebooks.html", label: "eBooks" },
+      { href: "/reference-html/Resources/datasheets.html", label: "Product Datasheets" },
+      { href: "/reference-html/Resources/demos.html", label: "Product Demos" },
+      { href: "/reference-html/Resources/courses.html", label: "Training Courses" },
+      { href: "/reference-html/Resources/use-cases.html", label: "Use Cases" }
+    ]
+  },
+  {
+    title: "About",
+    items: [
+      { href: "/reference-html/About/index.html", label: "About Overview" },
+      { href: "/reference-html/About/company.html", label: "Company Information" },
+      { href: "/reference-html/About/leadership.html", label: "Leadership Team" },
+      { href: "/reference-html/About/mission.html", label: "Mission & Vision" },
+      { href: "/reference-html/About/our-story.html", label: "Our Story" },
+      { href: "/reference-html/About/values.html", label: "Company Values" },
+      { href: "/reference-html/About/partners.html", label: "Partners & Alliances" }
+    ]
+  },
+  {
+    title: "Why ORCA Federal",
+    items: [
+      { href: "/reference-html/Why ORCA Federal/index.html", label: "Why Choose ORCA" },
+      { href: "/reference-html/Why ORCA Federal/advantages.html", label: "Competitive Advantages" },
+      { href: "/reference-html/Why ORCA Federal/pod-vs-solo.html", label: "Pod vs Solo Solutions" }
+    ]
+  },
+  {
+    title: "Pricing",
+    items: [
+      { href: "/reference-html/Pricing/index.html", label: "Pricing Plans" }
+    ]
+  },
+  {
+    title: "Portal",
+    items: [
+      { href: "/reference-html/Portal/demo.html", label: "Demo Portal" }
+    ]
+  }
+];
+
+export default function DocsIndex() {
+  return (
+    <main style= maxWidth: 980, margin: "0 auto", padding: "40px 20px" >
+      <h1>ORCA Static Pages Index</h1>
+      {groups.map(g => (
+        <section key={g.title} style= marginTop: 24 >
+          <h2>{g.title}</h2>
+          <ul>
+            {g.items.map(item => (
+              <li key={item.href}>
+                <a href={item.href}>{item.label}</a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ))}
+    </main>
+  );
+}
+
