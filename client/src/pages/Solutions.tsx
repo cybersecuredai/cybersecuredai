@@ -56,31 +56,6 @@ export default function Solutions() {
   // POD Intelligence Solution Categories with Platform Page Mappings
   const podIntelligenceSolutions = [
     {
-      category: "ORCA Platform Overview",
-      icon: <img src={orcaLogoImg} alt="ORCA" className="w-8 h-8" />,
-      description: "Complete cybersecurity platform integrating all POD Intelligence systems",
-      color: "border-spring-500/50",
-      gradient: "from-spring-900/50 to-cyan-900/50",
-      platformLink: "/platform/orca",
-      solutions: [
-        {
-          title: "Unified Platform Command",
-          description: "Central orchestration of all five POD Intelligence systems",
-          benefits: ["99.2% system accuracy", "Real-time coordination", "Federal-grade security"]
-        },
-        {
-          title: "Cross-System Intelligence",
-          description: "Advanced correlation across APEX, ECHO, PULSE, SURGE, and FLOW",
-          benefits: ["Multi-vector analysis", "Predictive threat modeling", "Automated response"]
-        },
-        {
-          title: "Federal Compliance Integration",
-          description: "FERPA, FISMA, and NIST compliance across all systems",
-          benefits: ["Automated compliance", "Audit trail generation", "Policy enforcement"]
-        }
-      ]
-    },
-    {
       category: "APEX Genetic AI Solutions",
       icon: <img src={apexLogoImg} alt="APEX" className="w-8 h-8" />,
       description: "Self-evolving threat detection powered by genetic algorithms",
@@ -202,6 +177,35 @@ export default function Solutions() {
           title: "Federated Learning Operations",
           description: "Cross-organizational knowledge sharing and learning",
           benefits: ["92% knowledge retention", "Collaborative intelligence", "Shared expertise"]
+        }
+      ]
+    }
+  ];
+
+  // Feature-based Solutions with ORCA Platform
+  const featureSolutions = [
+    {
+      category: "ORCA Platform",
+      icon: <img src={orcaLogoImg} alt="ORCA" className="w-8 h-8" />,
+      description: "Complete cybersecurity platform integrating all POD Intelligence systems",
+      color: "border-spring-500/50",
+      gradient: "from-spring-900/50 to-cyan-900/50",
+      platformLink: "/platform/orca",
+      solutions: [
+        {
+          title: "Unified Platform Command",
+          description: "Central orchestration of all five POD Intelligence systems",
+          benefits: ["99.2% system accuracy", "Real-time coordination", "Federal-grade security"]
+        },
+        {
+          title: "Cross-System Intelligence",
+          description: "Advanced correlation across APEX, ECHO, PULSE, SURGE, and FLOW",
+          benefits: ["Multi-vector analysis", "Predictive threat modeling", "Automated response"]
+        },
+        {
+          title: "Federal Compliance Integration",
+          description: "FERPA, FISMA, and NIST compliance across all systems",
+          benefits: ["Automated compliance", "Audit trail generation", "Policy enforcement"]
         }
       ]
     }
@@ -510,28 +514,49 @@ export default function Solutions() {
               </Card>
             </div>
 
-            {/* POD Intelligence Technical Categories */}
+            {/* Solutions BY TOPIC and BY FEATURE */}
             <div className="text-center mb-16">
               <Badge className="mb-8 bg-spring-500/20 text-spring-300 border-spring-500/30 text-xl px-8 py-4 flex items-center justify-center w-fit mx-auto">
                 <img src={orcaLogoImg} alt="ORCA" className="h-6 w-6 mr-3" />
-                POD INTELLIGENCE TECHNICAL CAPABILITIES
+                CYBERSECURITY SOLUTIONS
               </Badge>
               <h2 className="text-5xl md:text-7xl font-bold text-white mb-8 leading-tight">
-                Complete POD Intelligence<br />
+                Browse Solutions<br />
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-spring-400 via-cyan-400 to-blue-500">
-                  Solution Ecosystem
+                  Your Way
                 </span>
               </h2>
               <p className="text-xl md:text-2xl text-gray-200 max-w-5xl mx-auto mb-12 leading-relaxed">
-                From genetic AI algorithms to holographic interfaces, from location intelligence to autonomous defense - 
-                discover how each POD Intelligence system addresses specific cybersecurity challenges while working 
-                together as a unified ecosystem.
+                Explore our comprehensive cybersecurity solutions organized by topic areas or 
+                discover our flagship features and platform capabilities.
               </p>
             </div>
 
-            {/* POD Intelligence Solution Categories */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8 mb-20">
-              {podIntelligenceSolutions.map((category, index) => (
+            <Tabs defaultValue="by-topic" className="w-full">
+              <div className="text-center mb-12">
+                <TabsList className="grid w-full max-w-md mx-auto grid-cols-2 bg-slate-700">
+                  <TabsTrigger value="by-topic" className="data-[state=active]:bg-spring-600 text-lg py-4">
+                    BY TOPIC
+                  </TabsTrigger>
+                  <TabsTrigger value="by-feature" className="data-[state=active]:bg-spring-600 text-lg py-4">
+                    BY FEATURE
+                  </TabsTrigger>
+                </TabsList>
+              </div>
+
+              <TabsContent value="by-topic" className="space-y-8">
+                <div className="text-center mb-12">
+                  <h3 className="text-3xl md:text-4xl font-bold text-white mb-4">
+                    POD Intelligence Technical Topics
+                  </h3>
+                  <p className="text-lg text-gray-300 max-w-4xl mx-auto">
+                    Explore individual POD Intelligence systems and their specialized capabilities
+                  </p>
+                </div>
+
+                {/* POD Intelligence Solution Categories */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8 mb-20">
+                  {podIntelligenceSolutions.map((category, index) => (
                 <Card key={index} className={`bg-gradient-to-br ${category.gradient} border-2 ${category.color} hover:scale-105 transition-all duration-500 group`}>
                   <CardContent className="p-8">
                     <div className="flex items-center mb-6">
@@ -575,6 +600,66 @@ export default function Solutions() {
                 </Card>
               ))}
             </div>
+              </TabsContent>
+
+              <TabsContent value="by-feature" className="space-y-8">
+                <div className="text-center mb-12">
+                  <h3 className="text-3xl md:text-4xl font-bold text-white mb-4">
+                    ORCA Platform Features
+                  </h3>
+                  <p className="text-lg text-gray-300 max-w-4xl mx-auto">
+                    Discover our flagship ORCA platform and comprehensive feature set
+                  </p>
+                </div>
+
+                {/* Feature-based Solution Categories */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8 mb-20">
+                  {featureSolutions.map((category, index) => (
+                    <Card key={index} className={`bg-gradient-to-br ${category.gradient} border-2 ${category.color} hover:scale-105 transition-all duration-500 group`}>
+                      <CardContent className="p-8">
+                        <div className="flex items-center mb-6">
+                          {category.icon}
+                          <div className="ml-4">
+                            <h3 className="text-2xl font-bold text-white">{category.category}</h3>
+                            <p className="text-sm text-gray-400">{category.description}</p>
+                          </div>
+                        </div>
+                        
+                        <div className="space-y-6">
+                          {category.solutions.map((solution, solutionIndex) => (
+                            <div key={solutionIndex} className="bg-black/30 rounded-lg p-4">
+                              <h4 className="text-lg font-bold text-white mb-2">{solution.title}</h4>
+                              <p className="text-gray-300 text-sm mb-3">{solution.description}</p>
+                              <div className="space-y-1">
+                                {solution.benefits.map((benefit, benefitIndex) => (
+                                  <div key={benefitIndex} className="flex items-center space-x-2">
+                                    <Enhanced4DCheckCircleIcon className="w-3 h-3 text-spring-400" size={12} />
+                                    <span className="text-xs text-gray-400">{benefit}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                        
+                        <div className="mt-6 space-y-3">
+                          <Link href={category.platformLink}>
+                            <Button className="w-full bg-gradient-to-r from-spring-500 to-cyan-500 hover:from-spring-600 hover:to-cyan-600 transition-colors" data-testid={`button-platform-${category.category.toLowerCase().replace(/\s+/g, '-')}`}>
+                              Technical Details
+                              <Enhanced4DExternalLinkIcon className="ml-2 w-4 h-4" size={16} />
+                            </Button>
+                          </Link>
+                          <Button className="w-full group-hover:bg-spring-500 transition-colors" data-testid={`button-explore-${category.category.toLowerCase().replace(/\s+/g, '-')}`}>
+                            Explore Solutions
+                            <Enhanced4DArrowRightIcon className="ml-2 w-4 h-4" size={16} />
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </TabsContent>
+            </Tabs>
 
             {/* Individual System Solutions */}
             <div className="space-y-20">
