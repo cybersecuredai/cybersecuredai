@@ -56,6 +56,31 @@ export default function Solutions() {
   // POD Intelligence Solution Categories with Platform Page Mappings
   const podIntelligenceSolutions = [
     {
+      category: "ORCA Platform Overview",
+      icon: <img src={orcaLogoImg} alt="ORCA" className="w-8 h-8" />,
+      description: "Complete cybersecurity platform integrating all POD Intelligence systems",
+      color: "border-spring-500/50",
+      gradient: "from-spring-900/50 to-cyan-900/50",
+      platformLink: "/platform/orca",
+      solutions: [
+        {
+          title: "Unified Platform Command",
+          description: "Central orchestration of all five POD Intelligence systems",
+          benefits: ["99.2% system accuracy", "Real-time coordination", "Federal-grade security"]
+        },
+        {
+          title: "Cross-System Intelligence",
+          description: "Advanced correlation across APEX, ECHO, PULSE, SURGE, and FLOW",
+          benefits: ["Multi-vector analysis", "Predictive threat modeling", "Automated response"]
+        },
+        {
+          title: "Federal Compliance Integration",
+          description: "FERPA, FISMA, and NIST compliance across all systems",
+          benefits: ["Automated compliance", "Audit trail generation", "Policy enforcement"]
+        }
+      ]
+    },
+    {
       category: "APEX Genetic AI Solutions",
       icon: <img src={apexLogoImg} alt="APEX" className="w-8 h-8" />,
       description: "Self-evolving threat detection powered by genetic algorithms",
