@@ -108,6 +108,13 @@ const HigherEducation = lazy(() => import("@/pages/solutions/HigherEducation"));
 const MunicipalGovernment = lazy(() => import("@/pages/solutions/MunicipalGovernment"));
 const FederalAgencies = lazy(() => import("@/pages/solutions/FederalAgencies"));
 
+// POD Intelligence System Pages - Lazy loaded
+const APEXSystem = lazy(() => import("@/pages/APEXSystem"));
+const ECHOSystem = lazy(() => import("@/pages/ECHOSystem"));
+const PULSESystem = lazy(() => import("@/pages/PULSESystem"));
+const SURGESystem = lazy(() => import("@/pages/SURGESystem"));
+const FLOWSystem = lazy(() => import("@/pages/FLOWSystem"));
+
 // Platform Pages - Lazy loaded
 const Platform = lazy(() => import("@/pages/Platform"));
 const AutomatedIncidentResponse = lazy(() => import("@/pages/platform/AutomatedIncidentResponse"));
@@ -285,6 +292,13 @@ function Router() {
       <Route path="/solutions/higher-ed" component={HigherEducation} />
       <Route path="/solutions/municipal" component={MunicipalGovernment} />
       <Route path="/solutions/federal" component={FederalAgencies} />
+      
+      {/* POD Intelligence System Pages */}
+      <Route path="/pod-intelligence/apex" component={APEXSystem} />
+      <Route path="/pod-intelligence/echo" component={ECHOSystem} />
+      <Route path="/pod-intelligence/pulse" component={PULSESystem} />
+      <Route path="/pod-intelligence/surge" component={SURGESystem} />
+      <Route path="/pod-intelligence/flow" component={FLOWSystem} />
       
       {/* Platform Pages */}
       <Route path="/platform" component={Platform} />
