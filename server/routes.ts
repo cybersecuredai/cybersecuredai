@@ -1895,8 +1895,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/ai/analytics", async (req, res) => {
     try {
       // Comprehensive AI analytics combining threat detection and behavioral analysis
+      const mlThreatEngine = await getMlThreatEngine();
+      const behavioralEngine = await getBehavioralEngine();
+      
+      if (!mlThreatEngine) {
+        return res.status(503).json({ error: 'ML threat engine not available' });
+      }
+      
       const threatStats = mlThreatEngine.getThreatStatistics();
-      const behavioralAnalytics = behavioralEngine.getAnalytics();
+      const behavioralAnalytics = behavioralEngine?.getAnalytics() || { totalUsers: 0 };
       
       // Generate some data if we don't have any yet
       if (threatStats.totalThreats === 0) {
@@ -1904,7 +1911,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         threats.forEach(threat => mlThreatEngine.addThreatVector(threat));
       }
       
-      if (behavioralAnalytics.totalUsers === 0) {
+      if (behavioralEngine && behavioralAnalytics.totalUsers === 0) {
         const userIds = ['admin-1', 'user-1', 'user-2', 'user-3', 'user-4'];
         const activities = behavioralEngine.generateSimulatedActivities(userIds, 300);
         
@@ -1914,7 +1921,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const updatedThreatStats = mlThreatEngine.getThreatStatistics();
-      const updatedBehavioralAnalytics = behavioralEngine.getAnalytics();
+      const updatedBehavioralAnalytics = behavioralEngine?.getAnalytics() || {
+        totalUsers: 0,
+        highRiskUsers: 0,
+        averageRiskScore: 0,
+        anomalyTrends: [],
+        topRiskyUsers: [],
+        riskDistribution: {}
+      };
       
       res.json({
         threatDetection: {
@@ -4036,9 +4050,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const user = await storage.getUser(userId);
         const userRole = user?.role || 'user';
         
+        const cypherAI = await getCypherAI();
+        const mlThreatEngine = await getMlThreatEngine();
+        const behavioralEngine = await getBehavioralEngine();
+        
+        if (!cypherAI) {
+          return res.status(503).json({ error: 'Cypher AI service not available' });
+        }
+        
         const insights = cypherAI.getProactiveInsights(userRole, {
-          threatStats: mlThreatEngine.getThreatStatistics(),
-          behavioralStats: behavioralEngine.getAnalytics()
+          threatStats: mlThreatEngine?.getThreatStatistics() || { totalThreats: 0 },
+          behavioralStats: behavioralEngine?.getAnalytics() || { totalUsers: 0 }
         });
         
         res.json({
@@ -4056,6 +4078,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     app.get("/api/cypher/conversation/:userId", async (req, res) => {
       try {
         const userId = req.params.userId;
+        const cypherAI = await getCypherAI();
+        
+        if (!cypherAI) {
+          return res.status(503).json({ error: 'Cypher AI service not available' });
+        }
+        
         const history = cypherAI.getConversationHistory(userId);
         res.json({ userId, history, count: history.length });
       } catch (error) {
@@ -4068,6 +4096,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     app.get("/api/cypher/daily-recommendations/:userId", async (req, res) => {
       try {
         const userId = req.params.userId;
+        const cypherAI = await getCypherAI();
+        
+        if (!cypherAI) {
+          return res.status(503).json({ error: 'Cypher AI service not available' });
+        }
+        
         const recommendations = await cypherAI.generateDailyRecommendations(userId);
         res.json(recommendations);
       } catch (error) {
@@ -13413,7 +13447,7 @@ startxref
     };
 
     // Initialize PULSE service and setup listeners
-    getCydefService().then(service => {
+    getPulseService().then(service => {
       service.on('realtimeEvent', handleRealtimeEvent);
       
       // Send current system status on connect
@@ -13453,7 +13487,7 @@ startxref
     ws.on('close', () => {
       console.log('🔌 PULSE WebSocket client disconnected');
       // Remove event listeners when client disconnects
-      getCydefService().then(service => {
+      getPulseService().then(service => {
         service.removeListener('realtimeEvent', handleRealtimeEvent);
       }).catch(() => {
         // Service may not be initialized
