@@ -1,5 +1,5 @@
 /**
- * ORCA Federal Chrome Extension - Content Script
+ * CyberSecured AI Chrome Extension - Content Script
  * Phase 3: External Integrations Content Enhancement
  */
 
@@ -15,7 +15,7 @@ let contentState = {
 function init() {
   if (contentState.initialized) return;
   
-  console.log(`🔒 ORCA Federal: Initializing on ${contentState.platform}`);
+  console.log(`🔒 CyberSecured AI: Initializing on ${contentState.platform}`);
   
   // Add security enhancements based on platform
   switch (contentState.platform) {
@@ -147,7 +147,7 @@ function initializeGoogleCalendarIntegration() {
   // Monitor meeting scheduling
   observeMeetingEvents('google-calendar');
   
-  // Add ORCA Federal meeting intelligence
+  // Add CyberSecured AI meeting intelligence
   addMeetingIntelligenceWidget();
 }
 
@@ -171,7 +171,7 @@ function initializeZoomIntegration() {
   // Meeting intelligence integration
   const meetingControls = document.querySelector('#meeting-controls');
   if (meetingControls) {
-    addORCAMeetingControls(meetingControls);
+    addCyberSecuredAIMeetingControls(meetingControls);
   }
   
   // Track meeting events
@@ -201,10 +201,10 @@ function createSecurityOverlay() {
   if (contentState.securityOverlay) return;
   
   const overlay = document.createElement('div');
-  overlay.id = 'orca-security-overlay';
-  overlay.className = 'orca-overlay';
+  overlay.id = 'cybersecured-security-overlay';
+  overlay.className = 'cybersecured-overlay';
   overlay.innerHTML = `
-    <div class="orca-security-status">
+    <div class="cybersecured-security-status">
       <div class="status-indicator safe" id="security-status">
         <span class="status-icon">🛡️</span>
         <span class="status-text">Protected</span>
@@ -227,8 +227,8 @@ function createAIAssistant() {
   if (contentState.aiAssistant) return;
   
   const assistant = document.createElement('div');
-  assistant.id = 'orca-ai-assistant';
-  assistant.className = 'orca-assistant';
+  assistant.id = 'cybersecured-ai-assistant';
+  assistant.className = 'cybersecured-assistant';
   assistant.innerHTML = `
     <button class="assistant-toggle" id="ai-toggle">
       <span class="ai-icon">🤖</span>
@@ -409,4 +409,4 @@ if (document.readyState === 'loading') {
   init();
 }
 
-console.log(`🚀 ORCA Federal Content Script loaded on ${contentState.platform}`);
+console.log(`🚀 CyberSecured AI Content Script loaded on ${contentState.platform}`);

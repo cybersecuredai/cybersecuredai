@@ -1,5 +1,5 @@
 /**
- * ORCA Federal Chrome Extension - Styles
+ * CyberSecured AI Chrome Extension - Styles
  * Phase 3: External Integrations Design System
  */
 
@@ -422,7 +422,7 @@ section h3 {
 }
 
 /* Content script overlay styles */
-.orca-overlay {
+.cybersecured-overlay {
   position: fixed;
   top: 20px;
   right: 20px;
@@ -436,7 +436,7 @@ section h3 {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
-.orca-security-status {
+.cybersecured-security-status {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -464,7 +464,7 @@ section h3 {
 }
 
 /* AI Assistant widget */
-.orca-assistant {
+.cybersecured-assistant {
   position: fixed;
   bottom: 20px;
   right: 20px;

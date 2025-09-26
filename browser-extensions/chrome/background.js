@@ -1,12 +1,12 @@
 /**
- * ORCA Federal Chrome Extension - Background Service Worker
+ * CyberSecured AI Chrome Extension - Background Service Worker
  * Phase 3: External Integrations with Revolutionary Dual AI System
  */
 
 // Extension state management
 let extensionState = {
   isConnected: false,
-  apiUrl: 'https://orcafederal.com',
+  apiUrl: 'https://cybersecuredai.com',
   user: null,
   notifications: [],
   threats: [],
@@ -15,17 +15,17 @@ let extensionState = {
 
 // Initialize extension
 chrome.runtime.onInstalled.addListener((details) => {
-  console.log('🔒 ORCA Federal Extension installed/updated');
+  console.log('🔒 CyberSecured AI Extension installed/updated');
   
   // Create context menus
   chrome.contextMenus.create({
-    id: 'orca-analyze',
-    title: 'Analyze with ORCA Federal',
+    id: 'cybersecured-analyze',
+    title: 'Analyze with CyberSecured AI',
     contexts: ['selection', 'link', 'page']
   });
   
   chrome.contextMenus.create({
-    id: 'orca-threat-check',
+    id: 'cybersecured-threat-check',
     title: 'Check for Security Threats',
     contexts: ['link', 'page']
   });
@@ -38,10 +38,10 @@ chrome.runtime.onInstalled.addListener((details) => {
 // Handle context menu clicks
 chrome.contextMenus.onClicked.addListener(async (info, tab) => {
   switch (info.menuItemId) {
-    case 'orca-analyze':
+    case 'cybersecured-analyze':
       await analyzeContent(info, tab);
       break;
-    case 'orca-threat-check':
+    case 'cybersecured-threat-check':
       await checkForThreats(info, tab);
       break;
   }
@@ -64,7 +64,7 @@ async function analyzeContent(info, tab) {
   try {
     const content = info.selectionText || info.linkUrl || tab.url;
     
-    // Send to ORCA Federal platform for analysis
+    // Send to CyberSecured AI platform for analysis
     const response = await fetch(`${extensionState.apiUrl}/api/ai/analyze`, {
       method: 'POST',
       headers: {
@@ -88,7 +88,7 @@ async function analyzeContent(info, tab) {
       chrome.notifications.create({
         type: 'basic',
         iconUrl: 'icons/icon-48.png',
-        title: 'ORCA Federal Analysis',
+        title: 'CyberSecured AI Analysis',
         message: `Security Score: ${analysis.securityScore}% - ${analysis.summary}`,
         priority: analysis.threatLevel === 'high' ? 2 : 1
       });
@@ -180,7 +180,7 @@ async function monitorThreats() {
   }
 }
 
-// Sync with ORCA Federal platform
+// Sync with CyberSecured AI platform
 async function syncWithPlatform() {
   try {
     // Get user settings
@@ -210,7 +210,7 @@ async function syncWithPlatform() {
         lastSync: extensionState.lastSync
       });
       
-      console.log('✅ Synced with ORCA Federal platform');
+      console.log('✅ Synced with CyberSecured AI platform');
     }
   } catch (error) {
     console.error('❌ Platform sync failed:', error);
@@ -314,4 +314,4 @@ chrome.webRequest.onBeforeRequest.addListener(
   ["blocking"]
 );
 
-console.log('🚀 ORCA Federal Chrome Extension - Background service worker loaded');
+console.log('🚀 CyberSecured AI Chrome Extension - Background service worker loaded');

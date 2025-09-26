@@ -1,5 +1,5 @@
 /**
- * ORCA Federal Chrome Extension - Popup Interface
+ * CyberSecured AI Chrome Extension - Popup Interface
  * Phase 3: External Integrations Dashboard
  */
 
@@ -14,7 +14,7 @@ let popupState = {
 
 // Initialize popup
 document.addEventListener('DOMContentLoaded', async () => {
-    console.log('🔒 ORCA Federal Popup initialized');
+    console.log('🔒 CyberSecured AI Popup initialized');
     
     // Load extension state
     await loadExtensionState();
@@ -268,7 +268,7 @@ async function checkThreats() {
 
 function openDashboard() {
     chrome.tabs.create({ 
-        url: 'https://orcafederal.com/dashboard' 
+        url: 'https://cybersecuredai.com/dashboard' 
     });
 }
 
@@ -278,26 +278,26 @@ function openSettings() {
 
 function openHelp() {
     chrome.tabs.create({ 
-        url: 'https://orcafederal.com/support' 
+        url: 'https://cybersecuredai.com/support' 
     });
 }
 
 function openExternalIntegrations() {
     chrome.tabs.create({ 
-        url: 'https://orcafederal.com/integrations/external' 
+        url: 'https://cybersecuredai.com/integrations/external' 
     });
 }
 
 function openPlatformSettings(platform) {
     const platformUrls = {
-        linkedin: 'https://orcafederal.com/integrations/external?tab=social',
-        twitter: 'https://orcafederal.com/integrations/external?tab=social',
-        github: 'https://orcafederal.com/integrations/external?tab=social',
-        calendar: 'https://orcafederal.com/integrations/external?tab=calendar'
+        linkedin: 'https://cybersecuredai.com/integrations/external?tab=social',
+        twitter: 'https://cybersecuredai.com/integrations/external?tab=social',
+        github: 'https://cybersecuredai.com/integrations/external?tab=social',
+        calendar: 'https://cybersecuredai.com/integrations/external?tab=calendar'
     };
     
     chrome.tabs.create({ 
-        url: platformUrls[platform] || 'https://orcafederal.com/integrations/external'
+        url: platformUrls[platform] || 'https://cybersecuredai.com/integrations/external'
     });
 }
 
@@ -395,4 +395,4 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     sendResponse({ received: true });
 });
 
-console.log('🚀 ORCA Federal Popup script loaded');
+console.log('🚀 CyberSecured AI Popup script loaded');
