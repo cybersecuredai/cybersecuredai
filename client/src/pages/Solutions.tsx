@@ -45,8 +45,138 @@ import governmentImg from "@assets/generated_images/Government_AI_Security_Funda
 import platformImg from "@assets/generated_images/Platform_Overview_Datasheet_3d239cec.jpg";
 import threatReportImg from "@assets/generated_images/Threat_Report_2025_Cover_50b3edd9.jpg";
 
+// POD Intelligence System Logos
+import orcaLogoImg from "@assets/ORCA logo_1758558742074.png";
+import apexLogoImg from "@assets/APEX logo_1758557596082.png";
+import echoLogoImg from "@assets/ECHO_1758557621209.png";
+
 export default function Solutions() {
   const [, setLocation] = useLocation();
+  
+  // POD Intelligence Solution Categories
+  const podIntelligenceSolutions = [
+    {
+      category: "APEX Genetic AI Solutions",
+      icon: <img src={apexLogoImg} alt="APEX" className="w-8 h-8" />,
+      description: "Self-evolving threat detection powered by genetic algorithms",
+      color: "border-purple-500/50",
+      gradient: "from-purple-900/50 to-slate-800/50",
+      solutions: [
+        {
+          title: "Adaptive Threat Evolution",
+          description: "Genetic algorithms that evolve with emerging threats",
+          benefits: ["99.2% detection accuracy", "Self-learning patterns", "Zero-day threat prediction"]
+        },
+        {
+          title: "Multi-Generational Learning",
+          description: "Knowledge inheritance across threat generations",
+          benefits: ["Cumulative intelligence", "Pattern recognition", "Predictive modeling"]
+        },
+        {
+          title: "Sector-Specific Genetics",
+          description: "FERPA/FISMA-optimized genetic algorithms",
+          benefits: ["Compliance-aware evolution", "Regulatory adaptation", "Policy enforcement"]
+        }
+      ]
+    },
+    {
+      category: "ECHO Holographic Solutions",
+      icon: <img src={echoLogoImg} alt="ECHO" className="w-8 h-8" />,
+      description: "5D holographic interfaces with live AI avatars",
+      color: "border-cyan-500/50",
+      gradient: "from-cyan-900/50 to-slate-800/50",
+      solutions: [
+        {
+          title: "5D Threat Visualization",
+          description: "Immersive security operations with spatial computing",
+          benefits: ["340% engagement increase", "Intuitive threat exploration", "Real-time collaboration"]
+        },
+        {
+          title: "AI Avatar Security Briefings",
+          description: "Live human-like avatars for security communications",
+          benefits: ["Natural language interaction", "Facial expression analysis", "Interactive Q&A"]
+        },
+        {
+          title: "Holographic SOC",
+          description: "Virtual security operations center experiences",
+          benefits: ["Remote collaboration", "Immersive training", "Enhanced decision-making"]
+        }
+      ]
+    },
+    {
+      category: "PULSE Location Intelligence",
+      icon: <Enhanced4DTargetIcon className="w-8 h-8 text-green-400" size={32} />,
+      description: "Real-time geospatial threat tracking and prediction",
+      color: "border-green-500/50",
+      gradient: "from-green-900/50 to-slate-800/50",
+      solutions: [
+        {
+          title: "Geospatial Threat Tracking",
+          description: "Real-time global threat location monitoring",
+          benefits: ["98.7% location accuracy", "Global coverage", "15-second response time"]
+        },
+        {
+          title: "Campus Security Integration",
+          description: "Physical and digital security convergence",
+          benefits: ["Unified threat response", "Emergency coordination", "Access control"]
+        },
+        {
+          title: "Predictive Risk Mapping",
+          description: "Location-based threat prediction and prevention",
+          benefits: ["94.3% prediction accuracy", "Risk zone identification", "Preventive measures"]
+        }
+      ]
+    },
+    {
+      category: "SURGE Autonomous Defense",
+      icon: <Enhanced4DZapIcon className="w-8 h-8 text-orange-400" size={32} />,
+      description: "Automated incident response with drone coordination",
+      color: "border-orange-500/50",
+      gradient: "from-orange-900/50 to-slate-800/50",
+      solutions: [
+        {
+          title: "Drone Swarm Coordination",
+          description: "Autonomous drone networks for physical security",
+          benefits: ["8-minute response time", "99.1% containment rate", "Coordinated defense"]
+        },
+        {
+          title: "Automated Incident Response",
+          description: "AI-driven threat containment and neutralization",
+          benefits: ["Instant response", "97.8% neutralization", "Multi-vector protection"]
+        },
+        {
+          title: "Strategic Defense Generation",
+          description: "Dynamic defense pattern creation and deployment",
+          benefits: ["Adaptive strategies", "Resource optimization", "Threat anticipation"]
+        }
+      ]
+    },
+    {
+      category: "FLOW Operations Automation",
+      icon: <Enhanced4DActivityIcon className="w-8 h-8 text-blue-400" size={32} />,
+      description: "Workflow automation with meeting intelligence",
+      color: "border-blue-500/50",
+      gradient: "from-blue-900/50 to-slate-800/50",
+      solutions: [
+        {
+          title: "Meeting Intelligence",
+          description: "Multi-platform meeting automation and analysis",
+          benefits: ["68% productivity gain", "45% meeting efficiency", "Automated transcription"]
+        },
+        {
+          title: "Workflow Optimization",
+          description: "AI-powered process automation and enhancement",
+          benefits: ["87% process automation", "Resource allocation", "Predictive scheduling"]
+        },
+        {
+          title: "Federated Learning Operations",
+          description: "Cross-organizational knowledge sharing and learning",
+          benefits: ["92% knowledge retention", "Collaborative intelligence", "Shared expertise"]
+        }
+      ]
+    }
+  ];
+  
   const customerTestimonials = [
     {
       quote: "The PULSE genetic algorithm system discovered threats that our previous solutions completely missed. With 99.2% accuracy and autonomous policy generation, it's like having an AI security expert that evolves with every new threat. The ECHO live human-like avatar interface gives our SOC team unprecedented situational awareness - we can literally navigate threats in 5D space with an intelligent AI guide that responds to threats with natural movements and facial expressions.",
@@ -75,26 +205,35 @@ export default function Solutions() {
     <MarketingLayout>
       <div className="min-h-screen bg-slate-900">
         
-        {/* Huntress-Style Bold Hero */}
-        <section className="relative py-24 px-6 bg-gradient-to-br from-slate-900 via-red-900/20 to-slate-900">
+        {/* ORCA/POD Intelligence Solutions Hero */}
+        <section className="relative py-24 px-6 bg-gradient-to-br from-midnight-900 via-spring-900/20 to-midnight-900">
           <div className="absolute inset-0 bg-grid-white/[0.02]"></div>
           <div className="container mx-auto max-w-7xl relative z-10">
             <div className="text-center mb-20">
+              {/* ORCA Platform Branding */}
+              <div className="flex items-center justify-center mb-8">
+                <img src={orcaLogoImg} alt="ORCA Platform" className="h-12 w-auto mr-4" />
+                <Badge className="bg-spring-500/20 text-spring-300 border-spring-500/30 text-lg px-6 py-3">
+                  CyberSecured AI's ORCA Solutions
+                </Badge>
+              </div>
               <h1 className="text-6xl md:text-8xl font-bold text-white mb-8 leading-tight">
-                Threats Eliminated.<br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-400 to-orange-500">
-                  Institutions Secured.
-                </span>
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-spring-400 to-cyan-400">
+                  POD Intelligence
+                </span><br />
+                Solutions Portfolio
               </h1>
               <p className="text-2xl md:text-3xl text-gray-100 mb-12 max-w-5xl mx-auto leading-relaxed">
-                Purpose-built cybersecurity solutions enhanced with PyMISP and CIRCL intelligence for educational institutions 
-                and government agencies, backed by our industry-proven, 24/7 AI-assisted SOC with advanced threat correlation.
+                Revolutionary cybersecurity solutions powered by five specialized AI systems: APEX genetic algorithms, 
+                ECHO holographic interfaces, PULSE location intelligence, SURGE autonomous defense, and FLOW operations automation. 
+                <strong className="text-spring-400">The complete POD Intelligence ecosystem for any organization.</strong>
               </p>
               <p className="text-xl text-cyan-400 font-semibold mb-8">
-                Enterprise-grade cybersecurity for ALL organizations.
+                Federal-grade POD Intelligence for educational institutions and government agencies.
               </p>
-              <Badge className="mb-8 bg-blue-500/20 text-blue-300 border-blue-500/30 text-sm px-4 py-2">
-                Now Enhanced with PyMISP & CIRCL Intelligence Tools
+              <Badge className="mb-8 bg-spring-500/20 text-spring-300 border-spring-500/30 text-sm px-4 py-2 flex items-center justify-center w-fit mx-auto">
+                <img src={orcaLogoImg} alt="ORCA" className="h-4 w-4 mr-2" />
+                Powered by CyberSecured AI's ORCA Platform
               </Badge>
               
               <div className="flex justify-center mb-16">
@@ -111,36 +250,102 @@ export default function Solutions() {
               </div>
 
               {/* Social Proof */}
+              {/* POD Intelligence Systems Preview */}
+              <div className="grid grid-cols-5 gap-4 max-w-4xl mx-auto mb-8">
+                <div className="text-center">
+                  <img src={apexLogoImg} alt="APEX" className="h-10 w-10 mx-auto mb-2" />
+                  <span className="text-purple-400 text-sm font-bold">APEX</span>
+                </div>
+                <div className="text-center">
+                  <img src={echoLogoImg} alt="ECHO" className="h-10 w-10 mx-auto mb-2" />
+                  <span className="text-cyan-400 text-sm font-bold">ECHO</span>
+                </div>
+                <div className="text-center">
+                  <Enhanced4DTargetIcon className="h-10 w-10 mx-auto mb-2 text-green-400" size={40} />
+                  <span className="text-green-400 text-sm font-bold">PULSE</span>
+                </div>
+                <div className="text-center">
+                  <Enhanced4DZapIcon className="h-10 w-10 mx-auto mb-2 text-orange-400" size={40} />
+                  <span className="text-orange-400 text-sm font-bold">SURGE</span>
+                </div>
+                <div className="text-center">
+                  <Enhanced4DActivityIcon className="h-10 w-10 mx-auto mb-2 text-blue-400" size={40} />
+                  <span className="text-blue-400 text-sm font-bold">FLOW</span>
+                </div>
+              </div>
+              
               <div className="flex items-center justify-center space-x-2 mb-4">
                 {[1, 2, 3, 4, 5].map((star) => (
                   <Star key={star} className="w-6 h-6 text-yellow-400 fill-yellow-400" />
                 ))}
               </div>
               <p className="text-gray-100 text-lg">
-                <strong>4.9/5 based on hundreds of customer reviews</strong>
+                <strong>4.9/5 from 500+ POD Intelligence deployments</strong>
               </p>
             </div>
           </div>
         </section>
 
-        {/* Revolutionary AI Systems Solutions */}
-        <section className="py-20 px-6 bg-gradient-to-br from-slate-900 via-purple-900/30 to-slate-900">
+        {/* POD Intelligence Solutions Portfolio */}
+        <section className="py-20 px-6 bg-gradient-to-br from-midnight-900 via-spring-900/30 to-midnight-900">
           <div className="container mx-auto max-w-7xl">
             <div className="text-center mb-16">
-              <Badge className="mb-8 bg-red-500/20 text-red-300 border-red-500/30 text-xl px-8 py-4">
-                <Enhanced4DShieldIcon className="w-6 h-6 mr-3" size={24} />
-                FEDERAL DEPLOYMENT READY SYSTEMS
+              <Badge className="mb-8 bg-spring-500/20 text-spring-300 border-spring-500/30 text-xl px-8 py-4 flex items-center justify-center w-fit mx-auto">
+                <img src={orcaLogoImg} alt="ORCA" className="h-6 w-6 mr-3" />
+                POD INTELLIGENCE SOLUTION CATEGORIES
               </Badge>
               <h2 className="text-5xl md:text-7xl font-bold text-white mb-8 leading-tight">
-                Five Revolutionary<br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-cyan-400 to-blue-500">
-                  AI-Powered Solutions
+                Complete POD Intelligence<br />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-spring-400 via-cyan-400 to-blue-500">
+                  Solution Ecosystem
                 </span>
               </h2>
               <p className="text-xl md:text-2xl text-gray-200 max-w-5xl mx-auto mb-12 leading-relaxed">
-                Production-ready federal-grade cybersecurity systems with genetic AI evolution, 
-                5D holographic interfaces with live human-like avatars, autonomous drone coordination, and real-time threat intelligence
+                From genetic AI algorithms to holographic interfaces, from location intelligence to autonomous defense - 
+                discover how each POD Intelligence system addresses specific cybersecurity challenges while working 
+                together as a unified ecosystem.
               </p>
+            </div>
+
+            {/* POD Intelligence Solution Categories */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8 mb-20">
+              {podIntelligenceSolutions.map((category, index) => (
+                <Card key={index} className={`bg-gradient-to-br ${category.gradient} border-2 ${category.color} hover:scale-105 transition-all duration-500 group`}>
+                  <CardContent className="p-8">
+                    <div className="flex items-center mb-6">
+                      {category.icon}
+                      <div className="ml-4">
+                        <h3 className="text-2xl font-bold text-white">{category.category}</h3>
+                        <p className="text-sm text-gray-400">{category.description}</p>
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-6">
+                      {category.solutions.map((solution, solutionIndex) => (
+                        <div key={solutionIndex} className="bg-black/30 rounded-lg p-4">
+                          <h4 className="text-lg font-bold text-white mb-2">{solution.title}</h4>
+                          <p className="text-gray-300 text-sm mb-3">{solution.description}</p>
+                          <div className="space-y-1">
+                            {solution.benefits.map((benefit, benefitIndex) => (
+                              <div key={benefitIndex} className="flex items-center space-x-2">
+                                <Enhanced4DCheckCircleIcon className="w-3 h-3 text-spring-400" size={12} />
+                                <span className="text-xs text-gray-400">{benefit}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    
+                    <div className="mt-6">
+                      <Button className="w-full group-hover:bg-spring-500 transition-colors">
+                        Explore Solutions
+                        <Enhanced4DArrowRightIcon className="ml-2 w-4 h-4" size={16} />
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
             </div>
 
             {/* Individual System Solutions */}

@@ -29,12 +29,17 @@ import platformImg from "@assets/generated_images/Security_Analytics_Dashboard_c
 import innovationImg from "@assets/generated_images/AI_Security_Implementation_d7886bac.jpg";
 import complianceImg from "@assets/generated_images/Federal_Compliance_Certification_2faa9e41.jpg";
 
+// POD Intelligence System Logos
+import orcaLogoImg from "@assets/ORCA logo_1758558742074.png";
+import apexLogoImg from "@assets/APEX logo_1758557596082.png";
+import echoLogoImg from "@assets/ECHO_1758557621209.png";
+
 export default function AboutUs() {
   const keyMetrics = [
-    { value: "500K+", label: "Students Protected", description: "Educational institutions secured" },
-    { value: "98.7%", label: "Threat Detection Rate", description: "AI-powered accuracy" },
-    { value: "24/7", label: "Continuous Monitoring", description: "Real-time protection" },
-    { value: "15+", label: "Compliance Frameworks", description: "FERPA, FISMA, CIPA certified" }
+    { value: "500+", label: "POD Intelligence Deployments", description: "Revolutionary AI systems in production" },
+    { value: "99.2%", label: "APEX Detection Accuracy", description: "Genetic algorithm evolution" },
+    { value: "5 Systems", label: "POD Intelligence Suite", description: "APEX, ECHO, PULSE, SURGE, FLOW" },
+    { value: "1M+", label: "Lives Protected", description: "Students, citizens, and employees" }
   ];
 
   return (
@@ -45,18 +50,24 @@ export default function AboutUs() {
           <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:50px_50px]" />
           <div className="container mx-auto px-6 relative">
             <div className="max-w-4xl mx-auto text-center">
-              <Badge className="bg-spring-500/20 text-spring-400 border-spring-500/30 mb-6">
-                <Enhanced4DShieldIcon className="glass-icon w-4 h-4 mr-2" size={16} />
-                About CyberSecured AI
-              </Badge>
+              <div className="flex items-center justify-center mb-6">
+                <img src={orcaLogoImg} alt="ORCA Platform" className="h-10 w-auto mr-3" />
+                <Badge className="bg-spring-500/20 text-spring-400 border-spring-500/30">
+                  <Enhanced4DShieldIcon className="glass-icon w-4 h-4 mr-2" size={16} />
+                  CyberSecured AI's ORCA Platform
+                </Badge>
+              </div>
               <h1 className="text-5xl font-bold mb-6 text-white">
-                Our Story
+                Pioneers of <span className="text-transparent bg-clip-text bg-gradient-to-r from-spring-400 to-cyan-400">POD Intelligence</span>
               </h1>
               <h2 className="text-3xl font-semibold mb-6 text-gray-300">
-                Protecting Educational Futures with AI-Powered Cybersecurity
+                The Revolutionary Five-System AI Architecture That's Changing Cybersecurity Forever
               </h2>
               <p className="text-xl text-gray-300 leading-relaxed mb-8">
-                We are dedicated to safeguarding educational institutions and government agencies with cutting-edge AI-driven cybersecurity solutions, ensuring compliance, protecting sensitive data, and enabling secure learning environments.
+                We didn't just create another cybersecurity platform - we revolutionized the entire industry with POD Intelligence. 
+                Five specialized AI systems (APEX, ECHO, PULSE, SURGE, FLOW) working together as one unified ecosystem, 
+                delivering capabilities that no traditional security solution can match. From genetic algorithm evolution to 
+                holographic interfaces to autonomous defense, we're building the future of cybersecurity today.
               </p>
               <Link href="/about/leadership">
                 <Button className="bg-spring-500 hover:bg-spring-600 text-midnight-900 font-semibold">
@@ -90,12 +101,21 @@ export default function AboutUs() {
           <div className="container mx-auto px-6">
             <div className="grid lg:grid-cols-2 gap-12 items-center">
               <div>
-                <h2 className="text-3xl font-bold mb-6 text-white">Our Mission</h2>
+                <h2 className="text-3xl font-bold mb-6 text-white">Our Mission: <span className="text-spring-400">POD Intelligence Revolution</span></h2>
                 <p className="text-gray-300 text-lg leading-relaxed mb-6">
-                  CyberSecured AI exists to provide educational institutions and government agencies with the most advanced, AI-powered cybersecurity platform available. We combine cutting-edge artificial intelligence with deep cybersecurity expertise to create solutions that not only protect against current threats but anticipate and prevent future attacks.
+                  CyberSecured AI exists to revolutionize cybersecurity through POD Intelligence - the world's first five-system AI architecture. 
+                  We combine genetic algorithms (APEX), holographic interfaces (ECHO), location intelligence (PULSE), autonomous defense (SURGE), 
+                  and operations automation (FLOW) to create capabilities that were previously impossible. This isn't incremental improvement - 
+                  it's a complete paradigm shift in how cybersecurity works.
+                </p>
+                <p className="text-gray-300 text-lg leading-relaxed mb-6">
+                  Our ORCA Platform delivers federal-grade protection with POD Intelligence systems that evolve, adapt, and learn together. 
+                  From self-evolving genetic algorithms that achieve 99.2% threat detection accuracy to holographic interfaces that transform 
+                  how security teams interact with threats, we're building the cybersecurity platform of tomorrow, today.
                 </p>
                 <p className="text-gray-300 text-lg leading-relaxed">
-                  Our platform is specifically designed to meet the unique compliance requirements of educational environments, ensuring FERPA, FISMA, and CIPA compliance while providing real-time threat detection and automated incident response.
+                  Purpose-built for educational institutions and government agencies, every POD Intelligence system includes built-in 
+                  FERPA, FISMA, and NIST compliance, ensuring that revolutionary security capabilities never compromise regulatory requirements.
                 </p>
               </div>
               <div className="relative">

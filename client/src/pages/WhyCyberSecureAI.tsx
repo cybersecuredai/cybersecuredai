@@ -130,7 +130,7 @@ export default function WhyORCAFederal() {
     },
     {
       category: "Platform Integration",
-      cyberSecureAI: 9,
+      cyberSecuredAI: 9,
       competition: 5,
       advantage: "Unified cybersecurity and IT management in single platform",
       differentiator: "Native integration with SIS, LMS, ERP, and government systems"

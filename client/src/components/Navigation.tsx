@@ -6,6 +6,11 @@ import { ChevronDown, Menu, X } from "lucide-react";
 // Use optimized logo from public assets to avoid bundling
 const cyberSecuredLogoImg = "/assets-optimized/Cypher AI Assist_1757956837639-BFbk9fYh.webp";
 
+// Import ORCA and POD Intelligence system logos
+import orcaLogoImg from "@assets/ORCA logo_1758558742074.png";
+import apexLogoImg from "@assets/APEX logo_1758557596082.png";
+import echoLogoImg from "@assets/ECHO_1758557621209.png";
+
 export function Navigation() {
   const [location] = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -16,6 +21,12 @@ export function Navigation() {
       label: "Platform",
       href: "/platform",
       dropdown: [
+        { label: "POD Intelligence Systems", href: "/platform#pod-intelligence", isHeader: true },
+        { label: "APEX - Advanced Pattern Exchange", href: "/platform/apex-genetic-ai" },
+        { label: "ECHO - 5D Holographic Interface", href: "/platform/echo-holographic" },
+        { label: "PULSE - Location Intelligence", href: "/platform/pulse-predictive" },
+        { label: "SURGE - Autonomous Defense", href: "/platform/surge-unified-response" },
+        { label: "FLOW - Operations Automation", href: "/platform/flow-federated-learning" },
         { label: "Cloud Security & AI Analytics", href: "/platform#cloud-security", isHeader: true },
         { label: "Automated Incident Response", href: "/platform/automated-incident-response" },
         { label: "Threat Detection System", href: "/platform/threat-detection" },
@@ -100,15 +111,28 @@ export function Navigation() {
     <nav className="bg-background/95 backdrop-blur-md border-b border-surface sticky top-0 z-50">
       <div className="w-full px-4 md:px-6">
         <div className="flex items-center justify-between h-16 sm:h-18 md:h-20 lg:h-24">
-          {/* Logo */}
+          {/* Logo Section - CyberSecured AI & ORCA Platform */}
           <Link href="/" className="flex-shrink-0 mr-2 sm:mr-4 md:mr-6 lg:mr-8">
-            <div className="flex items-center cursor-pointer hover:opacity-80 transition-opacity">
+            <div className="flex items-center cursor-pointer hover:opacity-80 transition-opacity space-x-3">
               <img 
                 src={cyberSecuredLogoImg} 
                 alt="CyberSecured AI" 
                 className="h-8 sm:h-10 md:h-12 lg:h-16 xl:h-18 w-auto max-w-[120px] sm:max-w-[150px] md:max-w-[180px] lg:max-w-[220px] xl:max-w-[250px]"
                 data-testid="logo-home-link"
               />
+              {/* ORCA Platform Branding */}
+              <div className="hidden lg:flex items-center space-x-2 border-l border-cyan-500/30 pl-3">
+                <img 
+                  src={orcaLogoImg} 
+                  alt="ORCA Platform" 
+                  className="h-6 md:h-8 lg:h-10 w-auto"
+                  data-testid="orca-logo"
+                />
+                <div className="flex flex-col">
+                  <span className="text-cyan-400 text-xs lg:text-sm font-bold cyber-font">ORCA</span>
+                  <span className="text-gray-400 text-xs cyber-font">Platform</span>
+                </div>
+              </div>
             </div>
           </Link>
 
@@ -184,8 +208,43 @@ export function Navigation() {
                           </div>
                         ) : item.label === 'Platform' ? (
                           <div className="py-3">
-                            <div className="grid grid-cols-2 gap-x-8">
-                              {/* Left Column - Cloud Security & Network Infrastructure */}
+                            <div className="grid grid-cols-3 gap-x-6">
+                              {/* Left Column - POD Intelligence Systems */}
+                              <div>
+                                <div className="px-5 py-3 text-xs font-bold text-spring-400 uppercase tracking-wider bg-spring-500/20 border-b border-spring-500/30 geometric-text flex items-center space-x-2">
+                                  <img src={orcaLogoImg} alt="ORCA" className="h-4 w-4" />
+                                  <span>POD Intelligence Systems</span>
+                                </div>
+                                <Link href="/platform/apex-genetic-ai">
+                                  <div className="px-5 py-3 text-sm text-white hover:text-spring-400 hover:bg-spring-500/20 cursor-pointer transition-all duration-200 border-l-3 border-transparent hover:border-spring-400 cyber-font flex items-center space-x-2">
+                                    <img src={apexLogoImg} alt="APEX" className="h-4 w-4" />
+                                    <span>APEX - Genetic AI Engine</span>
+                                  </div>
+                                </Link>
+                                <Link href="/platform/echo-holographic">
+                                  <div className="px-5 py-3 text-sm text-white hover:text-spring-400 hover:bg-spring-500/20 cursor-pointer transition-all duration-200 border-l-3 border-transparent hover:border-spring-400 cyber-font flex items-center space-x-2">
+                                    <img src={echoLogoImg} alt="ECHO" className="h-4 w-4" />
+                                    <span>ECHO - 5D Holographic Interface</span>
+                                  </div>
+                                </Link>
+                                <Link href="/platform/pulse-predictive">
+                                  <div className="px-5 py-3 text-sm text-white hover:text-spring-400 hover:bg-spring-500/20 cursor-pointer transition-all duration-200 border-l-3 border-transparent hover:border-spring-400 cyber-font">
+                                    PULSE - Location Intelligence
+                                  </div>
+                                </Link>
+                                <Link href="/platform/surge-unified-response">
+                                  <div className="px-5 py-3 text-sm text-white hover:text-spring-400 hover:bg-spring-500/20 cursor-pointer transition-all duration-200 border-l-3 border-transparent hover:border-spring-400 cyber-font">
+                                    SURGE - Autonomous Defense
+                                  </div>
+                                </Link>
+                                <Link href="/platform/flow-federated-learning">
+                                  <div className="px-5 py-3 text-sm text-white hover:text-spring-400 hover:bg-spring-500/20 cursor-pointer transition-all duration-200 border-l-3 border-transparent hover:border-spring-400 cyber-font">
+                                    FLOW - Operations Automation
+                                  </div>
+                                </Link>
+                              </div>
+                              
+                              {/* Middle Column - Cloud Security & Network Infrastructure */}
                               <div className="space-y-4">
                                 {/* Cloud Security & AI Analytics */}
                                 <div>
@@ -212,7 +271,7 @@ export function Navigation() {
                                 {/* Network Infrastructure & Management */}
                                 <div>
                                   <div className="px-5 py-3 text-xs font-bold text-green-400 uppercase tracking-wider bg-green-500/20 border-b border-green-500/30 geometric-text">
-                                    Network Infrastructure & Management
+                                    Network Infrastructure
                                   </div>
                                   <Link href="/platform/firewall-management">
                                     <div className="px-5 py-3 text-sm text-white hover:text-green-400 hover:bg-green-500/20 cursor-pointer transition-all duration-200 border-l-3 border-transparent hover:border-green-400 cyber-font">
@@ -221,7 +280,7 @@ export function Navigation() {
                                   </Link>
                                   <Link href="/platform/network-monitoring">
                                     <div className="px-5 py-3 text-sm text-white hover:text-green-400 hover:bg-green-500/20 cursor-pointer transition-all duration-200 border-l-3 border-transparent hover:border-green-400 cyber-font">
-                                      Router & Switch Monitoring
+                                      Network Monitoring
                                     </div>
                                   </Link>
                                   <Link href="/platform/zero-trust">
@@ -237,11 +296,11 @@ export function Navigation() {
                                 {/* Endpoint Security & Management */}
                                 <div>
                                   <div className="px-5 py-3 text-xs font-bold text-purple-400 uppercase tracking-wider bg-purple-500/20 border-b border-purple-500/30 geometric-text">
-                                    Endpoint Security & Management
+                                    Endpoint Security
                                   </div>
                                   <Link href="/platform/monitoring-vulnerability">
                                     <div className="px-5 py-3 text-sm text-white hover:text-purple-400 hover:bg-purple-500/20 cursor-pointer transition-all duration-200 border-l-3 border-transparent hover:border-purple-400 cyber-font">
-                                      24/7 Monitoring & Vulnerability Management
+                                      24/7 Monitoring
                                     </div>
                                   </Link>
                                   <Link href="/platform/iam">
@@ -259,7 +318,7 @@ export function Navigation() {
                                 {/* Compliance & Risk Management */}
                                 <div>
                                   <div className="px-5 py-3 text-xs font-bold text-orange-400 uppercase tracking-wider bg-orange-500/20 border-b border-orange-500/30 geometric-text">
-                                    Compliance & Risk Management
+                                    Compliance & Risk
                                   </div>
                                   <Link href="/platform/compliance-automation">
                                     <div className="px-5 py-3 text-sm text-white hover:text-orange-400 hover:bg-orange-500/20 cursor-pointer transition-all duration-200 border-l-3 border-transparent hover:border-orange-400 cyber-font">
@@ -268,7 +327,7 @@ export function Navigation() {
                                   </Link>
                                   <Link href="/platform/security-training">
                                     <div className="px-5 py-3 text-sm text-white hover:text-orange-400 hover:bg-orange-500/20 cursor-pointer transition-all duration-200 border-l-3 border-transparent hover:border-orange-400 cyber-font">
-                                      Security Awareness Training
+                                      Security Training
                                     </div>
                                   </Link>
                                 </div>
