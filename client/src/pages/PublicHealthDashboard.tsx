@@ -32,7 +32,6 @@ import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { apiRequest } from '@/lib/queryClient';
 import { format } from 'date-fns';
-import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 // Icons for public health interface
 import { 
@@ -200,6 +199,13 @@ export default function PublicHealthDashboard() {
   const [isMapReady, setIsMapReady] = useState(false);
   const [mapsFallbackMode, setMapsFallbackMode] = useState(false);
   const [isMapInitialized, setIsMapInitialized] = useState(false);
+  
+  // Recharts dynamic import state management
+  const [isRechartsLoaded, setIsRechartsLoaded] = useState(false);
+  const [rechartsLoading, setRechartsLoading] = useState(false);
+  const [rechartsError, setRechartsError] = useState<string | null>(null);
+  const [rechartsRetryCount, setRechartsRetryCount] = useState(0);
+  const rechartsComponents = useRef<any>(null);
   
   // Refs for map integration
   const mapRef = useRef<HTMLDivElement>(null);
@@ -484,6 +490,95 @@ export default function PublicHealthDashboard() {
     };
   }, [hasPublicHealthAccess, hasContactTracingAccess, user, queryClient, toast]);
 
+  // Dynamic import recharts library with error handling and retry
+  useEffect(() => {
+    if (!hasPublicHealthAccess || isRechartsLoaded || rechartsLoading) return;
+
+    const loadRecharts = async (attempt = 1) => {
+      try {
+        setRechartsLoading(true);
+        setRechartsError(null);
+        
+        console.log(`📊 Loading recharts library (attempt ${attempt})...`);
+        
+        // Dynamic import with proper TypeScript typing
+        const recharts = await import('recharts');
+        
+        // Destructure all needed components from the dynamic import
+        const { 
+          LineChart, 
+          Line, 
+          BarChart, 
+          Bar, 
+          PieChart, 
+          Pie, 
+          Cell, 
+          XAxis, 
+          YAxis, 
+          CartesianGrid, 
+          Tooltip, 
+          Legend, 
+          ResponsiveContainer 
+        } = recharts;
+
+        // Store components in ref for use in render
+        rechartsComponents.current = {
+          LineChart,
+          Line,
+          BarChart,
+          Bar,
+          PieChart,
+          Pie,
+          Cell,
+          XAxis,
+          YAxis,
+          CartesianGrid,
+          Tooltip,
+          Legend,
+          ResponsiveContainer
+        };
+
+        setIsRechartsLoaded(true);
+        setRechartsLoading(false);
+        setRechartsRetryCount(0);
+        
+        console.log('✅ Recharts library loaded successfully');
+        
+        toast({
+          title: "Charts Ready",
+          description: "Chart visualization library loaded successfully.",
+          variant: "default",
+        });
+
+      } catch (error) {
+        console.error(`❌ Failed to load recharts library (attempt ${attempt}):`, error);
+        setRechartsLoading(false);
+        
+        const maxRetries = 3;
+        if (attempt < maxRetries) {
+          const retryDelay = Math.min(1000 * Math.pow(2, attempt - 1), 5000); // Exponential backoff, max 5s
+          console.log(`🔄 Retrying recharts load in ${retryDelay}ms...`);
+          
+          setTimeout(() => {
+            setRechartsRetryCount(attempt);
+            loadRecharts(attempt + 1);
+          }, retryDelay);
+        } else {
+          setRechartsError(`Failed to load charts after ${maxRetries} attempts. Please refresh the page.`);
+          setRechartsRetryCount(maxRetries);
+          
+          toast({
+            title: "Chart Loading Failed",
+            description: "Unable to load chart library. Some visualizations may not be available.",
+            variant: "destructive",
+          });
+        }
+      }
+    };
+
+    loadRecharts();
+  }, [hasPublicHealthAccess, isRechartsLoaded, rechartsLoading, toast]);
+
   // Load Google Maps script with proper error handling
   useEffect(() => {
     if (!hasPublicHealthAccess) return;
@@ -679,6 +774,49 @@ export default function PublicHealthDashboard() {
       console.error('❌ Failed to update map markers:', error);
     }
   }, [mapData]);
+
+  // Helper function to render chart loading skeleton
+  const renderChartLoadingSkeleton = (height = 300) => (
+    <div className={`h-[${height}px] flex flex-col items-center justify-center text-gray-500 dark:text-gray-400 space-y-4`}>
+      {rechartsLoading ? (
+        <>
+          <Loader className="h-8 w-8 animate-spin" />
+          <div className="text-center">
+            <p className="text-sm font-medium">Loading Charts...</p>
+            {rechartsRetryCount > 0 && (
+              <p className="text-xs text-gray-400">Retry attempt {rechartsRetryCount}</p>
+            )}
+          </div>
+        </>
+      ) : rechartsError ? (
+        <>
+          <AlertCircle className="h-8 w-8 text-red-500" />
+          <div className="text-center">
+            <p className="text-sm font-medium text-red-600 dark:text-red-400">Chart Loading Failed</p>
+            <p className="text-xs text-gray-500">{rechartsError}</p>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="mt-2"
+              onClick={() => {
+                setRechartsError(null);
+                setRechartsRetryCount(0);
+                setIsRechartsLoaded(false);
+              }}
+            >
+              <RefreshCw className="h-4 w-4 mr-2" />
+              Retry
+            </Button>
+          </div>
+        </>
+      ) : (
+        <>
+          <BarChart3 className="h-8 w-8 text-gray-400" />
+          <p className="text-sm">Chart library not loaded</p>
+        </>
+      )}
+    </div>
+  );
 
   // Helper functions
   const getSeverityColor = (severity: string) => {
@@ -925,31 +1063,38 @@ export default function PublicHealthDashboard() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                {dashboardData?.outbreakTrends ? (
-                  <ResponsiveContainer width="100%" height={300}>
-                    <LineChart data={dashboardData.outbreakTrends}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                      <XAxis 
-                        dataKey="date" 
-                        stroke="#6B7280"
-                        tickFormatter={(value) => format(new Date(value), 'MM/dd')}
-                      />
-                      <YAxis stroke="#6B7280" />
-                      <Tooltip 
-                        contentStyle={{ 
-                          backgroundColor: '#1F2937', 
-                          border: '1px solid #374151',
-                          borderRadius: '8px'
-                        }}
-                        labelStyle={{ color: '#F3F4F6' }}
-                      />
-                      <Legend />
-                      <Line type="monotone" dataKey="newCases" stroke="#EF4444" strokeWidth={2} name="New Cases" />
-                      <Line type="monotone" dataKey="totalCases" stroke="#F59E0B" strokeWidth={2} name="Total Cases" />
-                      <Line type="monotone" dataKey="deaths" stroke="#6B7280" strokeWidth={2} name="Deaths" />
-                      <Line type="monotone" dataKey="recovered" stroke="#10B981" strokeWidth={2} name="Recovered" />
-                    </LineChart>
-                  </ResponsiveContainer>
+                {!isRechartsLoaded ? (
+                  renderChartLoadingSkeleton(300)
+                ) : dashboardData?.outbreakTrends && rechartsComponents.current ? (
+                  (() => {
+                    const { ResponsiveContainer, LineChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend, Line } = rechartsComponents.current;
+                    return (
+                      <ResponsiveContainer width="100%" height={300}>
+                        <LineChart data={dashboardData.outbreakTrends}>
+                          <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                          <XAxis 
+                            dataKey="date" 
+                            stroke="#6B7280"
+                            tickFormatter={(value) => format(new Date(value), 'MM/dd')}
+                          />
+                          <YAxis stroke="#6B7280" />
+                          <Tooltip 
+                            contentStyle={{ 
+                              backgroundColor: '#1F2937', 
+                              border: '1px solid #374151',
+                              borderRadius: '8px'
+                            }}
+                            labelStyle={{ color: '#F3F4F6' }}
+                          />
+                          <Legend />
+                          <Line type="monotone" dataKey="newCases" stroke="#EF4444" strokeWidth={2} name="New Cases" />
+                          <Line type="monotone" dataKey="totalCases" stroke="#F59E0B" strokeWidth={2} name="Total Cases" />
+                          <Line type="monotone" dataKey="deaths" stroke="#6B7280" strokeWidth={2} name="Deaths" />
+                          <Line type="monotone" dataKey="recovered" stroke="#10B981" strokeWidth={2} name="Recovered" />
+                        </LineChart>
+                      </ResponsiveContainer>
+                    );
+                  })()
                 ) : (
                   <div className="h-[300px] flex items-center justify-center text-gray-500">
                     <Loader className="h-6 w-6 animate-spin" />
@@ -967,34 +1112,41 @@ export default function PublicHealthDashboard() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                {dashboardData?.geographicDistribution ? (
-                  <ResponsiveContainer width="100%" height={300}>
-                    <PieChart>
-                      <Pie
-                        data={dashboardData.geographicDistribution}
-                        cx="50%"
-                        cy="50%"
-                        outerRadius={100}
-                        fill="#8884d8"
-                        dataKey="cases"
-                        label={({ region, cases }) => `${region}: ${cases}`}
-                      >
-                        {dashboardData.geographicDistribution.map((entry, index) => (
-                          <Cell 
-                            key={`cell-${index}`} 
-                            fill={['#EF4444', '#F59E0B', '#10B981', '#3B82F6', '#8B5CF6'][index % 5]} 
+                {!isRechartsLoaded ? (
+                  renderChartLoadingSkeleton(300)
+                ) : dashboardData?.geographicDistribution && rechartsComponents.current ? (
+                  (() => {
+                    const { ResponsiveContainer, PieChart, Pie, Cell, Tooltip } = rechartsComponents.current;
+                    return (
+                      <ResponsiveContainer width="100%" height={300}>
+                        <PieChart>
+                          <Pie
+                            data={dashboardData.geographicDistribution}
+                            cx="50%"
+                            cy="50%"
+                            outerRadius={100}
+                            fill="#8884d8"
+                            dataKey="cases"
+                            label={({ region, cases }) => `${region}: ${cases}`}
+                          >
+                            {dashboardData.geographicDistribution.map((entry, index) => (
+                              <Cell 
+                                key={`cell-${index}`} 
+                                fill={['#EF4444', '#F59E0B', '#10B981', '#3B82F6', '#8B5CF6'][index % 5]} 
+                              />
+                            ))}
+                          </Pie>
+                          <Tooltip 
+                            contentStyle={{ 
+                              backgroundColor: '#1F2937', 
+                              border: '1px solid #374151',
+                              borderRadius: '8px'
+                            }}
                           />
-                        ))}
-                      </Pie>
-                      <Tooltip 
-                        contentStyle={{ 
-                          backgroundColor: '#1F2937', 
-                          border: '1px solid #374151',
-                          borderRadius: '8px'
-                        }}
-                      />
-                    </PieChart>
-                  </ResponsiveContainer>
+                        </PieChart>
+                      </ResponsiveContainer>
+                    );
+                  })()
                 ) : (
                   <div className="h-[300px] flex items-center justify-center text-gray-500">
                     <Loader className="h-6 w-6 animate-spin" />
@@ -1352,40 +1504,47 @@ export default function PublicHealthDashboard() {
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    {contactStats?.riskDistribution ? (
-                      <ResponsiveContainer width="100%" height={300}>
-                        <PieChart>
-                          <Pie
-                            data={[
-                              { name: 'High Risk', value: contactStats.riskDistribution.high, color: '#EF4444' },
-                              { name: 'Medium Risk', value: contactStats.riskDistribution.medium, color: '#F59E0B' },
-                              { name: 'Low Risk', value: contactStats.riskDistribution.low, color: '#10B981' },
-                              { name: 'Minimal Risk', value: contactStats.riskDistribution.minimal, color: '#6B7280' }
-                            ]}
-                            cx="50%"
-                            cy="50%"
-                            outerRadius={100}
-                            dataKey="value"
-                            label={({ name, value }) => `${name}: ${value}`}
-                          >
-                            {[
-                              { name: 'High Risk', value: contactStats.riskDistribution.high, color: '#EF4444' },
-                              { name: 'Medium Risk', value: contactStats.riskDistribution.medium, color: '#F59E0B' },
-                              { name: 'Low Risk', value: contactStats.riskDistribution.low, color: '#10B981' },
-                              { name: 'Minimal Risk', value: contactStats.riskDistribution.minimal, color: '#6B7280' }
-                            ].map((entry, index) => (
-                              <Cell key={`cell-${index}`} fill={entry.color} />
-                            ))}
-                          </Pie>
-                          <Tooltip 
-                            contentStyle={{ 
-                              backgroundColor: '#1F2937', 
-                              border: '1px solid #374151',
-                              borderRadius: '8px'
-                            }}
-                          />
-                        </PieChart>
-                      </ResponsiveContainer>
+                    {!isRechartsLoaded ? (
+                      renderChartLoadingSkeleton(300)
+                    ) : contactStats?.riskDistribution && rechartsComponents.current ? (
+                      (() => {
+                        const { ResponsiveContainer, PieChart, Pie, Cell, Tooltip } = rechartsComponents.current;
+                        return (
+                          <ResponsiveContainer width="100%" height={300}>
+                            <PieChart>
+                              <Pie
+                                data={[
+                                  { name: 'High Risk', value: contactStats.riskDistribution.high, color: '#EF4444' },
+                                  { name: 'Medium Risk', value: contactStats.riskDistribution.medium, color: '#F59E0B' },
+                                  { name: 'Low Risk', value: contactStats.riskDistribution.low, color: '#10B981' },
+                                  { name: 'Minimal Risk', value: contactStats.riskDistribution.minimal, color: '#6B7280' }
+                                ]}
+                                cx="50%"
+                                cy="50%"
+                                outerRadius={100}
+                                dataKey="value"
+                                label={({ name, value }) => `${name}: ${value}`}
+                              >
+                                {[
+                                  { name: 'High Risk', value: contactStats.riskDistribution.high, color: '#EF4444' },
+                                  { name: 'Medium Risk', value: contactStats.riskDistribution.medium, color: '#F59E0B' },
+                                  { name: 'Low Risk', value: contactStats.riskDistribution.low, color: '#10B981' },
+                                  { name: 'Minimal Risk', value: contactStats.riskDistribution.minimal, color: '#6B7280' }
+                                ].map((entry, index) => (
+                                  <Cell key={`cell-${index}`} fill={entry.color} />
+                                ))}
+                              </Pie>
+                              <Tooltip 
+                                contentStyle={{ 
+                                  backgroundColor: '#1F2937', 
+                                  border: '1px solid #374151',
+                                  borderRadius: '8px'
+                                }}
+                              />
+                            </PieChart>
+                          </ResponsiveContainer>
+                        );
+                      })()
                     ) : (
                       <div className="h-[300px] flex items-center justify-center text-gray-500">
                         <Loader className="h-6 w-6 animate-spin" />
@@ -1558,28 +1717,35 @@ export default function PublicHealthDashboard() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                {epidemiologicalData ? (
-                  <ResponsiveContainer width="100%" height={300}>
-                    <LineChart data={dashboardData?.outbreakTrends || []}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                      <XAxis 
-                        dataKey="date" 
-                        stroke="#6B7280"
-                        tickFormatter={(value) => format(new Date(value), 'MM/dd')}
-                      />
-                      <YAxis stroke="#6B7280" />
-                      <Tooltip 
-                        contentStyle={{ 
-                          backgroundColor: '#1F2937', 
-                          border: '1px solid #374151',
-                          borderRadius: '8px'
-                        }}
-                      />
-                      <Legend />
-                      <Line type="monotone" dataKey="newCases" stroke="#EF4444" strokeWidth={2} name="New Cases" />
-                      <Line type="monotone" dataKey="totalCases" stroke="#F59E0B" strokeWidth={2} name="Total Cases" />
-                    </LineChart>
-                  </ResponsiveContainer>
+                {!isRechartsLoaded ? (
+                  renderChartLoadingSkeleton(300)
+                ) : epidemiologicalData && rechartsComponents.current ? (
+                  (() => {
+                    const { ResponsiveContainer, LineChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend, Line } = rechartsComponents.current;
+                    return (
+                      <ResponsiveContainer width="100%" height={300}>
+                        <LineChart data={dashboardData?.outbreakTrends || []}>
+                          <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                          <XAxis 
+                            dataKey="date" 
+                            stroke="#6B7280"
+                            tickFormatter={(value) => format(new Date(value), 'MM/dd')}
+                          />
+                          <YAxis stroke="#6B7280" />
+                          <Tooltip 
+                            contentStyle={{ 
+                              backgroundColor: '#1F2937', 
+                              border: '1px solid #374151',
+                              borderRadius: '8px'
+                            }}
+                          />
+                          <Legend />
+                          <Line type="monotone" dataKey="newCases" stroke="#EF4444" strokeWidth={2} name="New Cases" />
+                          <Line type="monotone" dataKey="totalCases" stroke="#F59E0B" strokeWidth={2} name="Total Cases" />
+                        </LineChart>
+                      </ResponsiveContainer>
+                    );
+                  })()
                 ) : (
                   <div className="h-[300px] flex items-center justify-center text-gray-500">
                     <Loader className="h-6 w-6 animate-spin" />
@@ -1597,32 +1763,39 @@ export default function PublicHealthDashboard() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                {dashboardData?.facilityCapacity ? (
-                  <ResponsiveContainer width="100%" height={300}>
-                    <BarChart data={dashboardData.facilityCapacity.slice(0, 8)}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                      <XAxis 
-                        dataKey="facilityName" 
-                        stroke="#6B7280"
-                        angle={-45}
-                        textAnchor="end"
-                        height={100}
-                        interval={0}
-                        fontSize={12}
-                      />
-                      <YAxis stroke="#6B7280" />
-                      <Tooltip 
-                        contentStyle={{ 
-                          backgroundColor: '#1F2937', 
-                          border: '1px solid #374151',
-                          borderRadius: '8px'
-                        }}
-                      />
-                      <Legend />
-                      <Bar dataKey="occupiedBeds" stackId="a" fill="#EF4444" name="Occupied Beds" />
-                      <Bar dataKey="availableBeds" stackId="a" fill="#10B981" name="Available Beds" />
-                    </BarChart>
-                  </ResponsiveContainer>
+                {!isRechartsLoaded ? (
+                  renderChartLoadingSkeleton(300)
+                ) : dashboardData?.facilityCapacity && rechartsComponents.current ? (
+                  (() => {
+                    const { ResponsiveContainer, BarChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend, Bar } = rechartsComponents.current;
+                    return (
+                      <ResponsiveContainer width="100%" height={300}>
+                        <BarChart data={dashboardData.facilityCapacity.slice(0, 8)}>
+                          <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                          <XAxis 
+                            dataKey="facilityName" 
+                            stroke="#6B7280"
+                            angle={-45}
+                            textAnchor="end"
+                            height={100}
+                            interval={0}
+                            fontSize={12}
+                          />
+                          <YAxis stroke="#6B7280" />
+                          <Tooltip 
+                            contentStyle={{ 
+                              backgroundColor: '#1F2937', 
+                              border: '1px solid #374151',
+                              borderRadius: '8px'
+                            }}
+                          />
+                          <Legend />
+                          <Bar dataKey="occupiedBeds" stackId="a" fill="#EF4444" name="Occupied Beds" />
+                          <Bar dataKey="availableBeds" stackId="a" fill="#10B981" name="Available Beds" />
+                        </BarChart>
+                      </ResponsiveContainer>
+                    );
+                  })()
                 ) : (
                   <div className="h-[300px] flex items-center justify-center text-gray-500">
                     <Loader className="h-6 w-6 animate-spin" />
@@ -1844,34 +2017,41 @@ export default function PublicHealthDashboard() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  {dashboardData?.facilityCapacity ? (
-                    <ResponsiveContainer width="100%" height={400}>
-                      <BarChart data={dashboardData.facilityCapacity}>
-                        <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                        <XAxis 
-                          dataKey="facilityName" 
-                          stroke="#6B7280"
-                          angle={-45}
-                          textAnchor="end"
-                          height={120}
-                          interval={0}
-                          fontSize={11}
-                        />
-                        <YAxis stroke="#6B7280" />
-                        <Tooltip 
-                          contentStyle={{ 
-                            backgroundColor: '#1F2937', 
-                            border: '1px solid #374151',
-                            borderRadius: '8px'
-                          }}
-                        />
-                        <Legend />
-                        <Bar dataKey="totalBeds" fill="#6B7280" name="Total Beds" />
-                        <Bar dataKey="occupiedBeds" fill="#EF4444" name="Occupied Beds" />
-                        <Bar dataKey="availableBeds" fill="#10B981" name="Available Beds" />
-                        <Bar dataKey="icuBeds" fill="#3B82F6" name="ICU Beds" />
-                      </BarChart>
-                    </ResponsiveContainer>
+                  {!isRechartsLoaded ? (
+                    renderChartLoadingSkeleton(400)
+                  ) : dashboardData?.facilityCapacity && rechartsComponents.current ? (
+                    (() => {
+                      const { ResponsiveContainer, BarChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend, Bar } = rechartsComponents.current;
+                      return (
+                        <ResponsiveContainer width="100%" height={400}>
+                          <BarChart data={dashboardData.facilityCapacity}>
+                            <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                            <XAxis 
+                              dataKey="facilityName" 
+                              stroke="#6B7280"
+                              angle={-45}
+                              textAnchor="end"
+                              height={120}
+                              interval={0}
+                              fontSize={11}
+                            />
+                            <YAxis stroke="#6B7280" />
+                            <Tooltip 
+                              contentStyle={{ 
+                                backgroundColor: '#1F2937', 
+                                border: '1px solid #374151',
+                                borderRadius: '8px'
+                              }}
+                            />
+                            <Legend />
+                            <Bar dataKey="totalBeds" fill="#6B7280" name="Total Beds" />
+                            <Bar dataKey="occupiedBeds" fill="#EF4444" name="Occupied Beds" />
+                            <Bar dataKey="availableBeds" fill="#10B981" name="Available Beds" />
+                            <Bar dataKey="icuBeds" fill="#3B82F6" name="ICU Beds" />
+                          </BarChart>
+                        </ResponsiveContainer>
+                      );
+                    })()
                   ) : (
                     <div className="h-[400px] flex items-center justify-center text-gray-500">
                       <Loader className="h-6 w-6 animate-spin" />
