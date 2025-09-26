@@ -14,7 +14,7 @@ import type { DbProvider } from '../db.js';
 import { PulseService } from './pulse-service.js';
 import { CypherAIService } from './cypher-ai.js';
 import { LiveLocationService } from './live-location-service.js';
-import { GeospatialIntelligenceService } from './geospatial-intelligence.js';
+import { geospatialIntelligenceService } from './geospatial-intelligence.js';
 import type { 
   EchoSession,
   InsertEchoSession,
@@ -169,7 +169,7 @@ export class EchoService extends EventEmitter {
     });
     this.cypherAIService = cypherAIService || new CypherAIService();
     this.liveLocationService = liveLocationService || new LiveLocationService();
-    this.geospatialService = geospatialService || new GeospatialIntelligenceService();
+    this.geospatialService = geospatialService || geospatialIntelligenceService;
   }
 
   async initialize(): Promise<void> {
