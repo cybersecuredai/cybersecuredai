@@ -3,13 +3,8 @@ import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, Menu, X } from "lucide-react";
 
-// Use optimized logo from public assets to avoid bundling
-const cyberSecuredLogoImg = "/assets-optimized/Cypher AI Assist_1757956837639-BFbk9fYh.webp";
-
-// Import ORCA and POD Intelligence system logos
-import orcaLogoImg from "@assets/ORCA logo_1758558742074.png";
-import apexLogoImg from "@assets/APEX logo_1758557596082.png";
-import echoLogoImg from "@assets/ECHO_1758557621209.png";
+// Import CyberSecured AI logo from attached assets
+import cyberSecuredLogoImg from "@assets/CyberSecured AI logo_1757954427635.webp";
 
 export function Navigation() {
   const [location] = useLocation();
@@ -17,18 +12,6 @@ export function Navigation() {
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
   const navItems = [
-    {
-      label: "POD Intelligence",
-      href: "/pod-intelligence",
-      dropdown: [
-        { label: "POD Intelligence Systems", href: "/pod-intelligence", isHeader: true },
-        { label: "APEX - Advanced Pattern Exchange", href: "/pod-intelligence/apex" },
-        { label: "ECHO - Enhanced Cybersecurity Holographic Operations", href: "/pod-intelligence/echo" },
-        { label: "PULSE - Predictive Universal Learning Security Engine", href: "/pod-intelligence/pulse" },
-        { label: "SURGE - Strategic Unified Response Generation Engine", href: "/pod-intelligence/surge" },
-        { label: "FLOW - Federated Learning Operations Workflow", href: "/pod-intelligence/flow" }
-      ]
-    },
     {
       label: "Platform",
       href: "/platform",
@@ -132,19 +115,6 @@ export function Navigation() {
                 className="h-8 sm:h-10 md:h-12 lg:h-16 xl:h-18 w-auto max-w-[120px] sm:max-w-[150px] md:max-w-[180px] lg:max-w-[220px] xl:max-w-[250px]"
                 data-testid="logo-home-link"
               />
-              {/* ORCA Platform Branding */}
-              <div className="hidden lg:flex items-center space-x-2 border-l border-cyan-500/30 pl-3">
-                <img 
-                  src={orcaLogoImg} 
-                  alt="ORCA Platform" 
-                  className="h-6 md:h-8 lg:h-10 w-auto"
-                  data-testid="orca-logo"
-                />
-                <div className="flex flex-col">
-                  <span className="text-cyan-400 text-xs lg:text-sm font-bold cyber-font">ORCA</span>
-                  <span className="text-gray-400 text-xs cyber-font">Platform</span>
-                </div>
-              </div>
             </div>
           </Link>
 
@@ -170,7 +140,6 @@ export function Navigation() {
                         item.label === 'Resources' ? 'w-96' : 
                         item.label === 'Solutions' ? 'w-80' : 
                         item.label === 'Platform' ? 'w-[900px]' :
-                        item.label === 'POD Intelligence' ? 'w-80' :
                         item.label === 'Why CyberSecured AI' ? 'w-80' : 
                         'w-72'
                       } bg-slate-800/95 backdrop-blur-xl border-2 border-cyan-400/50 rounded-xl shadow-2xl cyber-glow-strong z-50 animate-in fade-in-0 zoom-in-95 duration-200`}>
@@ -224,20 +193,17 @@ export function Navigation() {
                             <div className="grid grid-cols-3 gap-x-6">
                               {/* Left Column - POD Intelligence Systems */}
                               <div>
-                                <div className="px-5 py-3 text-xs font-bold text-spring-400 uppercase tracking-wider bg-spring-500/20 border-b border-spring-500/30 geometric-text flex items-center space-x-2">
-                                  <img src={orcaLogoImg} alt="ORCA" className="h-4 w-4" />
-                                  <span>POD Intelligence Systems</span>
+                                <div className="px-5 py-3 text-xs font-bold text-spring-400 uppercase tracking-wider bg-spring-500/20 border-b border-spring-500/30 geometric-text">
+                                  POD Intelligence Systems
                                 </div>
                                 <Link href="/platform/apex-genetic-ai">
-                                  <div className="px-5 py-3 text-sm text-white hover:text-spring-400 hover:bg-spring-500/20 cursor-pointer transition-all duration-200 border-l-3 border-transparent hover:border-spring-400 cyber-font flex items-center space-x-2">
-                                    <img src={apexLogoImg} alt="APEX" className="h-4 w-4" />
-                                    <span>APEX - Genetic AI Engine</span>
+                                  <div className="px-5 py-3 text-sm text-white hover:text-spring-400 hover:bg-spring-500/20 cursor-pointer transition-all duration-200 border-l-3 border-transparent hover:border-spring-400 cyber-font">
+                                    APEX - Genetic AI Engine
                                   </div>
                                 </Link>
                                 <Link href="/platform/echo-holographic">
-                                  <div className="px-5 py-3 text-sm text-white hover:text-spring-400 hover:bg-spring-500/20 cursor-pointer transition-all duration-200 border-l-3 border-transparent hover:border-spring-400 cyber-font flex items-center space-x-2">
-                                    <img src={echoLogoImg} alt="ECHO" className="h-4 w-4" />
-                                    <span>ECHO - 5D Holographic Interface</span>
+                                  <div className="px-5 py-3 text-sm text-white hover:text-spring-400 hover:bg-spring-500/20 cursor-pointer transition-all duration-200 border-l-3 border-transparent hover:border-spring-400 cyber-font">
+                                    ECHO - 5D Holographic Interface
                                   </div>
                                 </Link>
                                 <Link href="/platform/pulse-predictive">
@@ -346,40 +312,6 @@ export function Navigation() {
                                 </div>
                               </div>
                             </div>
-                          </div>
-                        ) : item.label === 'POD Intelligence' ? (
-                          <div className="py-3">
-                            <div className="px-5 py-3 text-xs font-bold text-spring-400 uppercase tracking-wider bg-spring-500/20 border-b border-spring-500/30 geometric-text flex items-center space-x-2">
-                              <img src={orcaLogoImg} alt="ORCA" className="h-4 w-4" />
-                              <span>POD Intelligence Systems</span>
-                            </div>
-                            <Link href="/pod-intelligence/apex">
-                              <div className="px-5 py-3 text-sm text-white hover:text-purple-400 hover:bg-purple-500/20 cursor-pointer transition-all duration-200 border-l-3 border-transparent hover:border-purple-400 cyber-font flex items-center space-x-2">
-                                <img src={apexLogoImg} alt="APEX" className="h-4 w-4" />
-                                <span>APEX - Advanced Pattern Exchange</span>
-                              </div>
-                            </Link>
-                            <Link href="/pod-intelligence/echo">
-                              <div className="px-5 py-3 text-sm text-white hover:text-cyan-400 hover:bg-cyan-500/20 cursor-pointer transition-all duration-200 border-l-3 border-transparent hover:border-cyan-400 cyber-font flex items-center space-x-2">
-                                <img src={echoLogoImg} alt="ECHO" className="h-4 w-4" />
-                                <span>ECHO - Enhanced Cybersecurity Holographic Operations</span>
-                              </div>
-                            </Link>
-                            <Link href="/pod-intelligence/pulse">
-                              <div className="px-5 py-3 text-sm text-white hover:text-green-400 hover:bg-green-500/20 cursor-pointer transition-all duration-200 border-l-3 border-transparent hover:border-green-400 cyber-font">
-                                PULSE - Predictive Universal Learning Security Engine
-                              </div>
-                            </Link>
-                            <Link href="/pod-intelligence/surge">
-                              <div className="px-5 py-3 text-sm text-white hover:text-orange-400 hover:bg-orange-500/20 cursor-pointer transition-all duration-200 border-l-3 border-transparent hover:border-orange-400 cyber-font">
-                                SURGE - Strategic Unified Response Generation Engine
-                              </div>
-                            </Link>
-                            <Link href="/pod-intelligence/flow">
-                              <div className="px-5 py-3 text-sm text-white hover:text-blue-400 hover:bg-blue-500/20 cursor-pointer transition-all duration-200 border-l-3 border-transparent hover:border-blue-400 cyber-font">
-                                FLOW - Federated Learning Operations Workflow
-                              </div>
-                            </Link>
                           </div>
                         ) : item.label === 'Solutions' ? (
                           <div className="py-3">
