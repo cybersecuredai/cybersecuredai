@@ -23,6 +23,11 @@ import {
 import { Link } from "wouter";
 import { MarketingLayout } from "@/components/MarketingLayout";
 
+// POD Intelligence System Logos
+import orcaLogoImg from "@assets/ORCA logo_1758558742074.png";
+import apexLogoImg from "@assets/APEX logo_1758557596082.png";
+import echoLogoImg from "@assets/ECHO_1758557621209.png";
+
 export default function Pricing() {
   const pricingPlans = [
     {
@@ -138,30 +143,64 @@ export default function Pricing() {
     <MarketingLayout>
       <div className="min-h-screen bg-slate-900">
         
-        {/* Bold Pricing Hero */}
-        <section className="relative py-24 px-6 bg-gradient-to-br from-slate-900 via-green-900/20 to-slate-900">
+        {/* ORCA Platform Pricing Hero */}
+        <section className="relative py-24 px-6 bg-gradient-to-br from-midnight-900 via-spring-900/20 to-midnight-900">
           <div className="absolute inset-0 bg-grid-white/[0.02]"></div>
           <div className="container mx-auto max-w-7xl relative z-10">
             <div className="text-center mb-20">
-              <Badge className="mb-8 bg-green-500/20 text-green-300 border-green-500/30 text-lg px-6 py-3">
-                Enterprise Cybersecurity Pricing
-              </Badge>
+              {/* ORCA Platform Branding */}
+              <div className="flex items-center justify-center mb-8">
+                <img src={orcaLogoImg} alt="ORCA Platform" className="h-12 w-auto mr-4" />
+                <Badge className="bg-spring-500/20 text-spring-300 border-spring-500/30 text-lg px-6 py-3">
+                  CyberSecured AI's ORCA Platform Pricing
+                </Badge>
+              </div>
               <h1 className="text-6xl md:text-8xl font-bold text-white mb-8 leading-tight">
-                Threats Stopped.<br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-cyan-500">
-                  Budgets Protected.
-                </span>
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-spring-400 to-cyan-500">
+                  POD Intelligence
+                </span><br />
+                Investment Plans
               </h1>
               <p className="text-2xl md:text-3xl text-gray-300 mb-12 max-w-5xl mx-auto leading-relaxed">
-                Transparent, predictable pricing for organizations of all sizes. 
-                No hidden fees, no surprise charges.
+                Revolutionary pricing for revolutionary technology. Five POD Intelligence systems 
+                (APEX, ECHO, PULSE, SURGE, FLOW) working together to deliver unparalleled cybersecurity protection. 
+                <strong className="text-spring-400">Transparent, scalable, and designed for your organization's growth.</strong>
               </p>
+              
+              {/* POD Intelligence Systems Value Preview */}
+              <div className="grid grid-cols-5 gap-4 max-w-4xl mx-auto mb-8">
+                <div className="text-center">
+                  <img src={apexLogoImg} alt="APEX" className="h-10 w-10 mx-auto mb-2" />
+                  <span className="text-purple-400 text-sm font-bold">APEX</span>
+                  <p className="text-xs text-gray-400">Genetic AI</p>
+                </div>
+                <div className="text-center">
+                  <img src={echoLogoImg} alt="ECHO" className="h-10 w-10 mx-auto mb-2" />
+                  <span className="text-cyan-400 text-sm font-bold">ECHO</span>
+                  <p className="text-xs text-gray-400">5D Interface</p>
+                </div>
+                <div className="text-center">
+                  <Enhanced4DZapIcon className="h-10 w-10 mx-auto mb-2 text-green-400" size={40} />
+                  <span className="text-green-400 text-sm font-bold">PULSE</span>
+                  <p className="text-xs text-gray-400">Location Intel</p>
+                </div>
+                <div className="text-center">
+                  <Enhanced4DZapIcon className="h-10 w-10 mx-auto mb-2 text-orange-400" size={40} />
+                  <span className="text-orange-400 text-sm font-bold">SURGE</span>
+                  <p className="text-xs text-gray-400">Auto Defense</p>
+                </div>
+                <div className="text-center">
+                  <Enhanced4DZapIcon className="h-10 w-10 mx-auto mb-2 text-blue-400" size={40} />
+                  <span className="text-blue-400 text-sm font-bold">FLOW</span>
+                  <p className="text-xs text-gray-400">Operations</p>
+                </div>
+              </div>
               
               <div className="flex items-center justify-center space-x-2 mb-8">
                 {[1, 2, 3, 4, 5].map((star) => (
                   <Enhanced4DStarIcon key={star} className="w-6 h-6 text-yellow-400 fill-yellow-400" size={24} />
                 ))}
-                <span className="ml-4 text-white font-semibold text-lg">4.9/5 value rating from customers</span>
+                <span className="ml-4 text-white font-semibold text-lg">4.9/5 ROI satisfaction from POD Intelligence deployments</span>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-3xl mx-auto">

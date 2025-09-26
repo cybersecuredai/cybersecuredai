@@ -25,7 +25,18 @@ import {
 } from "lucide-react";
 import resourcesImg from "@assets/generated_images/Resource_Library_Hub_1661d0f4.jpg";
 
+// POD Intelligence System Logos
+import orcaLogoImg from "@assets/ORCA logo_1758558742074.png";
+import apexLogoImg from "@assets/APEX logo_1758557596082.png";
+import echoLogoImg from "@assets/ECHO_1758557621209.png";
+
 const categories = [
+  "POD Intelligence Systems",
+  "APEX Genetic AI",
+  "ECHO Holographic", 
+  "PULSE Location Intelligence",
+  "SURGE Autonomous Defense",
+  "FLOW Operations",
   "AI & Machine Learning",
   "Threat Intelligence",
   "Cloud Security", 
@@ -63,42 +74,101 @@ const resourceTypes = [
 
 const featuredResources = [
   {
-    title: "2025 AI Security Threat Report",
-    description: "Adversaries weaponize and target AI at scale - comprehensive analysis of emerging threats.",
-    type: "Report",
-    category: "AI & Machine Learning",
+    title: "Complete POD Intelligence Systems Guide",
+    description: "Comprehensive guide to all five POD Intelligence systems: APEX, ECHO, PULSE, SURGE, and FLOW working together as a unified ecosystem.",
+    type: "Guide",
+    category: "POD Intelligence Systems",
     sector: "general",
-    downloadCount: "15,400",
+    downloadCount: "25,800",
     featured: true,
-    image: resourcesImg
+    image: resourcesImg,
+    badge: "NEW"
   },
   {
-    title: "CyberSecured AI named Leader in Cybersecurity",
-    description: "Leading the way in AI-powered cybersecurity solutions for educational institutions and government.",
-    type: "Report", 
-    category: "Industry Recognition",
+    title: "ORCA Platform: Revolutionary Cybersecurity Architecture",
+    description: "Deep dive into CyberSecured AI's ORCA Platform and how POD Intelligence delivers unprecedented security capabilities.",
+    type: "White Paper", 
+    category: "POD Intelligence Systems",
     sector: "general",
-    downloadCount: "8,900",
+    downloadCount: "18,600",
     featured: true,
-    image: resourcesImg
+    image: resourcesImg,
+    badge: "FEATURED"
   },
   {
-    title: "CyberSecured AI 2025 Global Security Report",
-    description: "Get your copy of the must-read cybersecurity report of the year - comprehensive threat landscape.",
+    title: "2025 POD Intelligence Threat Report",
+    description: "How genetic algorithms, holographic interfaces, location intelligence, autonomous defense, and operations automation are revolutionizing cybersecurity.",
     type: "Report",
-    category: "Threat Intelligence", 
+    category: "POD Intelligence Systems", 
     sector: "general",
-    downloadCount: "22,300",
+    downloadCount: "32,400",
     featured: true,
-    image: resourcesImg
+    image: resourcesImg,
+    badge: "HOT"
   }
 ];
 
 const allResources = [
-  // Courses
+  // POD Intelligence Resources
+  {
+    title: "APEX Genetic AI Implementation Guide",
+    description: "Complete guide to deploying genetic algorithm-based threat detection with PyTorch & DEAP integration",
+    type: "Guide",
+    category: "APEX Genetic AI",
+    sector: "general",
+    duration: "2 hours",
+    level: "Advanced",
+    downloadCount: "3,847",
+    link: "/resources/apex-guide"
+  },
+  {
+    title: "ECHO Holographic Interface Training",
+    description: "Master the 5D security visualization environment and live AI avatar interactions",
+    type: "Course",
+    category: "ECHO Holographic",
+    sector: "general",
+    duration: "4 hours",
+    level: "Intermediate",
+    downloadCount: "2,956",
+    link: "/courses/echo-training"
+  },
+  {
+    title: "PULSE Location Intelligence Deployment",
+    description: "Real-time geospatial threat tracking and predictive location-based security implementation",
+    type: "White Paper",
+    category: "PULSE Location Intelligence",
+    sector: "general",
+    duration: "30 min",
+    level: "Intermediate",
+    downloadCount: "4,123",
+    link: "/resources/pulse-whitepaper"
+  },
+  {
+    title: "SURGE Autonomous Defense Protocols",
+    description: "Drone swarm coordination and automated incident response best practices",
+    type: "Handbook",
+    category: "SURGE Autonomous Defense",
+    sector: "federal",
+    duration: "1.5 hours",
+    level: "Advanced",
+    downloadCount: "1,892",
+    link: "/resources/surge-handbook"
+  },
+  {
+    title: "FLOW Operations Automation Mastery",
+    description: "Meeting intelligence, workflow optimization, and federated learning operations",
+    type: "Course",
+    category: "FLOW Operations",
+    sector: "general",
+    duration: "3 hours",
+    level: "Beginner",
+    downloadCount: "5,234",
+    link: "/courses/flow-mastery"
+  },
+  // Traditional Courses
   {
     title: "Federal AI Security Fundamentals",
-    description: "Government-specific threats, FISMA compliance, and federal security frameworks",
+    description: "Government-specific threats, FISMA compliance, and federal security frameworks with POD Intelligence integration",
     type: "Course",
     category: "Federal Government",
     sector: "federal",
