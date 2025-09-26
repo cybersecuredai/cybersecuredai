@@ -123,6 +123,28 @@ import { eq, and, desc, sql, isNotNull } from "drizzle-orm";
 import { randomUUID } from "crypto";
 import * as crypto from "crypto";
 
+// Type aliases for CypherHUM (using Echo as base) and ACDS (using Surge as base)
+type CypherhumSession = EchoSession;
+type InsertCypherhumSession = InsertEchoSession;
+type CypherhumVisualization = EchoVisualization;
+type InsertCypherhumVisualization = InsertEchoVisualization;
+type CypherhumInteraction = EchoInteraction;
+type InsertCypherhumInteraction = InsertEchoInteraction;
+type CypherhumThreatModel = EchoThreatModel;
+type InsertCypherhumThreatModel = InsertEchoThreatModel;
+type CypherhumAnalytics = EchoAnalytics;
+type InsertCypherhumAnalytics = InsertEchoAnalytics;
+type AcdsDrone = SurgeDrone;
+type InsertAcdsDrone = InsertSurgeDrone;
+type AcdsSwarmMission = SurgeSwarmMission;
+type InsertAcdsSwarmMission = InsertSurgeSwarmMission;
+type AcdsDeployment = SurgeDeployment;
+type InsertAcdsDeployment = InsertSurgeDeployment;
+type AcdsCoordination = SurgeCoordination;
+type InsertAcdsCoordination = InsertSurgeCoordination;
+type AcdsAnalytics = SurgeAnalytics;
+type InsertAcdsAnalytics = InsertSurgeAnalytics;
+
 // FIPS 140-2 Compliant Cryptographic Service
 class FIPSCryptographicService {
   private static readonly ALGORITHM = 'aes-256-gcm';

@@ -70,7 +70,7 @@ async function validateContactTracingSchemas() {
           WHERE table_schema = 'public' AND table_name = ${tableName}
         `);
         
-        if (result.length === 0) {
+        if (result.rowCount === 0) {
           throw new Error(`Required table '${tableName}' is missing`);
         }
         
