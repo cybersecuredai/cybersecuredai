@@ -135,6 +135,7 @@ const ECHOHolographic = lazy(() => import("@/pages/platform/ECHOHolographic"));
 const PULSELocationIntelligence = lazy(() => import("@/pages/platform/PULSELocationIntelligence"));
 const SURGEAutonomousDefense = lazy(() => import("@/pages/platform/SURGEAutonomousDefense"));
 const FLOWOperationsAutomation = lazy(() => import("@/pages/platform/FLOWOperationsAutomation"));
+const ORCAPlatform = lazy(() => import("@/pages/platform/ORCAPlatform"));
 
 // Catalog Management System - Internal pricing and product management
 const Catalog = lazy(() => import("@/pages/Catalog"));
@@ -307,6 +308,7 @@ function Router() {
       
       {/* Platform Pages */}
       <Route path="/platform" component={Platform} />
+      <Route path="/platform/orca" component={ORCAPlatform} />
       <Route path="/platform/apex-genetic-ai" component={APEXGeneticAI} />
       <Route path="/platform/echo-holographic" component={ECHOHolographic} />
       <Route path="/platform/pulse-predictive" component={PULSELocationIntelligence} />
