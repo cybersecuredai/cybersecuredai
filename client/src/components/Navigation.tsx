@@ -43,6 +43,8 @@ export function Navigation() {
       label: "Solutions",
       href: "/solutions",
       dropdown: [
+        { label: "By Feature", href: "/solutions#features", isHeader: true },
+        { label: "ORCA Platform", href: "/platform/orca" },
         { label: "By Topic", href: "/solutions#topics", isHeader: true },
         { label: "Ransomware Protection", href: "/solutions/ransomware" },
         { label: "Zero Trust Security", href: "/solutions/zero-trust" },
@@ -315,13 +317,25 @@ export function Navigation() {
                           </div>
                         ) : item.label === 'Solutions' ? (
                           <div className="py-3">
-                            <div className="grid grid-cols-2 gap-x-6">
-                              {/* Left Column - By Topic */}
+                            <div className="grid grid-cols-3 gap-x-6">
+                              {/* Left Column - By Feature */}
+                              <div>
+                                <div className="px-5 py-3 text-xs font-bold text-spring-400 uppercase tracking-wider bg-spring-500/20 border-b border-spring-500/30">
+                                  By Feature
+                                </div>
+                                <Link href="/platform/orca">
+                                  <div className="px-5 py-3 text-sm text-white hover:text-spring-400 hover:bg-spring-500/20 cursor-pointer transition-all duration-200 border-l-3 border-transparent hover:border-spring-400 cyber-font">
+                                    ORCA Platform
+                                  </div>
+                                </Link>
+                              </div>
+                              
+                              {/* Middle Column - By Topic */}
                               <div>
                                 <div className="px-5 py-3 text-xs font-bold text-cyan-400 uppercase tracking-wider bg-cyan-500/20 border-b border-cyan-500/30">
                                   By Topic
                                 </div>
-                                {item.dropdown.slice(1, 5).map((dropdownItem, index) => (
+                                {item.dropdown.slice(3, 7).map((dropdownItem, index) => (
                                   <Link key={index} href={dropdownItem.href}>
                                     <div className="px-5 py-3 text-sm text-white hover:text-cyan-400 hover:bg-cyan-500/20 cursor-pointer transition-all duration-200 border-l-3 border-transparent hover:border-cyan-400 cyber-font">
                                       {dropdownItem.label}
@@ -335,7 +349,7 @@ export function Navigation() {
                                 <div className="px-5 py-3 text-xs font-bold text-green-400 uppercase tracking-wider bg-green-500/20 border-b border-green-500/30">
                                   By Industry
                                 </div>
-                                {item.dropdown.slice(6).map((dropdownItem, index) => (
+                                {item.dropdown.slice(8).map((dropdownItem, index) => (
                                   <Link key={index} href={dropdownItem.href}>
                                     <div className="px-5 py-3 text-sm text-white hover:text-green-400 hover:bg-green-500/20 cursor-pointer transition-all duration-200 border-l-3 border-transparent hover:border-green-400 cyber-font">
                                       {dropdownItem.label}
