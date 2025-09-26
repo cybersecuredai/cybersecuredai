@@ -4070,7 +4070,7 @@ export type InsertHipaaEncryptionKey = z.infer<typeof insertHipaaEncryptionKeySc
 // ===== CYBERSECURED AI CATALOG SYSTEM =====
 
 // Catalog Categories - Core categories for organizing products, services, and solutions
-export const catalogCategories = pgTable("catalog_categories", {
+export const catalogCategories: ReturnType<typeof pgTable> = pgTable("catalog_categories", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   name: varchar("name").notNull(),
   slug: varchar("slug").notNull().unique(),

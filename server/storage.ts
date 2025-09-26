@@ -88,6 +88,16 @@ import {
   type InsertDiseaseSurveillance,
   type ContactTracing,
   type InsertContactTracing,
+  type ContactTracingLocationHistory,
+  type InsertContactTracingLocationHistory,
+  type ContactProximityDetection,
+  type InsertContactProximityDetection,
+  type ContactTracingNotificationTemplate,
+  type InsertContactTracingNotificationTemplate,
+  type ContactTracingNotificationLog,
+  type InsertContactTracingNotificationLog,
+  type ContactTracingPrivacyConsent,
+  type InsertContactTracingPrivacyConsent,
   type HealthFacility,
   type InsertHealthFacility,
   type PublicHealthAlert,
@@ -146,6 +156,18 @@ import {
   type InsertCompetitiveAnalysis
 } from "@shared/schema";
 import { randomUUID } from "crypto";
+
+// Type aliases for CypherHUM (using Echo as base) and ACDS (using Surge as base)
+type CypherhumSession = EchoSession;
+type CypherhumVisualization = EchoVisualization;
+type CypherhumInteraction = EchoInteraction;
+type CypherhumThreatModel = EchoThreatModel;
+type CypherhumAnalytics = EchoAnalytics;
+type AcdsDrone = SurgeDrone;
+type AcdsSwarmMission = SurgeSwarmMission;
+type AcdsDeployment = SurgeDeployment;
+type AcdsCoordination = SurgeCoordination;
+type AcdsAnalytics = SurgeAnalytics;
 
 export interface IStorage {
   // User operations
