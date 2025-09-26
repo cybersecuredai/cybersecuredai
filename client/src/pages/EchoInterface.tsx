@@ -1,12 +1,12 @@
 /**
- * CypherHUM Interface - Revolutionary 3D Holographic AI Interface
+ * ECHO Interface - Enhanced Cybersecurity Holographic Operations
  * 
  * Advanced threat visualization and AI-powered command interface featuring:
  * - Immersive 3D holographic threat landscape visualization
  * - Real-time AI-powered threat analysis and natural language processing
  * - Interactive 3D threat exploration with spatial relationships
  * - WebSocket-powered real-time updates and animations
- * - Integration with CyDEF genetic AI and Live Location systems
+ * - Integration with PULSE genetic AI and Live Location systems
  */
 
 import { useState, useEffect, useRef } from 'react';
@@ -53,7 +53,7 @@ import {
   RefreshCw
 } from 'lucide-react';
 
-interface CypherHumSession {
+interface EchoSession {
   id: string;
   userId: string;
   sessionType: string;
@@ -113,13 +113,13 @@ interface ThreatVisualization3D {
   };
 }
 
-export default function CypherHumInterface() {
+export default function EchoInterface() {
   const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   
   // Session management state
-  const [currentSession, setCurrentSession] = useState<CypherHumSession | null>(null);
+  const [currentSession, setCurrentSession] = useState<EchoSession | null>(null);
   const [isSessionActive, setIsSessionActive] = useState(false);
   
   // AI interface state
@@ -149,31 +149,31 @@ export default function CypherHumInterface() {
   
   // Dashboard data query
   const { data: dashboardData, refetch: refetchDashboard } = useQuery({
-    queryKey: ['/api/cypherhum/dashboard'],
+    queryKey: ['/api/echo/dashboard'],
     enabled: !!user
   });
 
   // Create session mutation
   const createSessionMutation = useMutation({
     mutationFn: async (sessionData: any) => {
-      return await apiRequest('/api/cypherhum/sessions', {
+      return await apiRequest('/api/echo/sessions', {
         method: 'POST',
         body: sessionData
       });
     },
-    onSuccess: (session: CypherHumSession) => {
+    onSuccess: (session: EchoSession) => {
       setCurrentSession(session);
       setIsSessionActive(true);
       setupWebSocketConnection(session.id);
       toast({
-        title: '🚀 CypherHUM Session Initialized',
+        title: '🚀 ECHO Session Initialized',
         description: 'Revolutionary holographic interface is now active!'
       });
     },
     onError: (error: any) => {
       toast({
         title: '❌ Session Creation Failed',
-        description: error.message || 'Failed to initialize CypherHUM session'
+        description: error.message || 'Failed to initialize ECHO session'
       });
     }
   });
@@ -181,7 +181,7 @@ export default function CypherHumInterface() {
   // AI analysis mutation
   const aiAnalysisMutation = useMutation({
     mutationFn: async ({ sessionId, query, contextData }: { sessionId: string; query: string; contextData?: any }) => {
-      return await apiRequest('/api/cypherhum/ai-analysis', {
+      return await apiRequest('/api/echo/ai-analysis', {
         method: 'POST',
         body: { sessionId, query, contextData }
       });
@@ -358,12 +358,12 @@ export default function CypherHumInterface() {
     setWsConnectionStatus('connecting');
     
     const token = localStorage.getItem('auth_token') || 'demo-token';
-    const wsUrl = `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}/ws/cypherhum?token=${token}&sessionId=${sessionId}`;
+    const wsUrl = `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}/ws/echo?token=${token}&sessionId=${sessionId}`;
     
     const ws = new WebSocket(wsUrl);
     
     ws.onopen = () => {
-      console.log('✅ CypherHUM WebSocket connected');
+      console.log('✅ ECHO WebSocket connected');
       setWsConnectionStatus('connected');
       wsRef.current = ws;
     };
@@ -378,25 +378,25 @@ export default function CypherHumInterface() {
     };
 
     ws.onclose = () => {
-      console.log('🔌 CypherHUM WebSocket disconnected');
+      console.log('🔌 ECHO WebSocket disconnected');
       setWsConnectionStatus('disconnected');
       wsRef.current = null;
     };
 
     ws.onerror = (error) => {
-      console.error('❌ CypherHUM WebSocket error:', error);
+      console.error('❌ ECHO WebSocket error:', error);
       setWsConnectionStatus('disconnected');
     };
   };
 
   const handleWebSocketMessage = (data: any) => {
     switch (data.type) {
-      case 'cypherhum_initial_data':
+      case 'echo_initial_data':
         if (data.data?.threats) {
           setThreats3D(data.data.threats);
         }
         break;
-      case 'cypherhum_3d_update':
+      case 'echo_3d_update':
         if (data.data?.threats) {
           setThreats3D(data.data.threats);
         }
@@ -481,9 +481,9 @@ export default function CypherHumInterface() {
             </div>
             <div>
               <h1 className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
-                CypherHUM Interface
+                ECHO Interface
               </h1>
-              <p className="text-sm text-gray-400">Revolutionary 3D Holographic AI Threat Visualization</p>
+              <p className="text-sm text-gray-400">Enhanced Cybersecurity Holographic Operations</p>
             </div>
           </div>
 
@@ -763,7 +763,7 @@ export default function CypherHumInterface() {
             <div className="w-full h-full flex items-center justify-center bg-black/20">
               <div className="text-center">
                 <Brain className="w-20 h-20 text-cyan-400 mx-auto mb-4 animate-pulse" />
-                <h2 className="text-2xl font-bold text-cyan-400 mb-2">CypherHUM Awaiting Initialization</h2>
+                <h2 className="text-2xl font-bold text-cyan-400 mb-2">ECHO Awaiting Initialization</h2>
                 <p className="text-gray-400">Start a session to activate the holographic interface</p>
               </div>
             </div>

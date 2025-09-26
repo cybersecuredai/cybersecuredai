@@ -11,7 +11,7 @@ import { AuthService, authenticateJWT, authorizeRoles, sensitiveOperationLimiter
 import { phiRedactionMiddleware, contactTracingPhiMinimization, phiAuditMiddleware, validatePublicHealthAccess } from "./hipaa-compliance";
 import { convertToMMWRFormat, convertToNNDSSFormat, convertToNEDSSFormat, convertToHANFormat, MMWRDataSchema, NNDSSDataSchema, NEDSSDataSchema, HANAlertSchema, getCDCIntegrationService, createPHINMessageHeader } from "./cdc-integration";
 import { registerHipaaAdminRoutes } from "./hipaa-api-routes";
-import { insertUserSchema, insertThreatSchema, insertFileSchema, insertIncidentSchema, insertThreatNotificationSchema, insertSubscriberSchema, insertLiveLocationDeviceSchema, insertLiveLocationHistorySchema, insertLiveLocationAlertSchema, insertLiveLocationGeoFenceSchema, insertLiveLocationAssetSchema, insertLiveLocationNetworkSegmentSchema, insertCypherhumSessionSchema, insertCypherhumVisualizationSchema, insertCypherhumInteractionSchema, insertCypherhumThreatModelSchema, insertCypherhumAnalyticsSchema, insertAcdsDroneSchema, insertAcdsSwarmMissionSchema, insertAcdsDeploymentSchema, insertAcdsCoordinationSchema, insertAcdsAnalyticsSchema, insertPublicHealthIncidentSchema, insertDiseaseSurveillanceSchema, insertContactTracingSchema, insertContactTracingLocationHistorySchema, insertContactProximityDetectionSchema, insertContactTracingNotificationTemplateSchema, insertContactTracingNotificationLogSchema, insertContactTracingPrivacyConsentSchema, insertHealthFacilitySchema, insertPublicHealthAlertSchema, insertEpidemiologicalDataSchema, insertCatalogCategorySchema, insertBomComponentSchema, insertCatalogProductSchema, insertProductBomSchema, insertCatalogServiceSchema, insertCatalogSolutionSchema, insertSolutionComponentSchema, insertPricingHistorySchema, insertCompetitiveAnalysisSchema } from "@shared/schema";
+import { insertUserSchema, insertThreatSchema, insertFileSchema, insertIncidentSchema, insertThreatNotificationSchema, insertSubscriberSchema, insertLiveLocationDeviceSchema, insertLiveLocationHistorySchema, insertLiveLocationAlertSchema, insertLiveLocationGeoFenceSchema, insertLiveLocationAssetSchema, insertLiveLocationNetworkSegmentSchema, insertEchoSessionSchema, insertEchoVisualizationSchema, insertEchoInteractionSchema, insertEchoThreatModelSchema, insertEchoAnalyticsSchema, insertSurgeDroneSchema, insertSurgeSwarmMissionSchema, insertSurgeDeploymentSchema, insertSurgeCoordinationSchema, insertSurgeAnalyticsSchema, insertPublicHealthIncidentSchema, insertDiseaseSurveillanceSchema, insertContactTracingSchema, insertContactTracingLocationHistorySchema, insertContactProximityDetectionSchema, insertContactTracingNotificationTemplateSchema, insertContactTracingNotificationLogSchema, insertContactTracingPrivacyConsentSchema, insertHealthFacilitySchema, insertPublicHealthAlertSchema, insertEpidemiologicalDataSchema, insertCatalogCategorySchema, insertBomComponentSchema, insertCatalogProductSchema, insertProductBomSchema, insertCatalogServiceSchema, insertCatalogSolutionSchema, insertSolutionComponentSchema, insertPricingHistorySchema, insertCompetitiveAnalysisSchema } from "@shared/schema";
 import { ObjectStorageService } from "./objectStorage";
 import { initializeDataRetentionService, getDataRetentionService } from "./services/data-retention-service";
 // Engine types only - no instantiation imports
@@ -3148,7 +3148,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     return liveLocationService;
   };
 
-  // Initialize CypherHUM Service instance
+  // Initialize ECHO Service instance
   let cypherhumService: any = null;
   const initCypherHumService = async () => {
     if (!cypherhumService) {
@@ -3686,9 +3686,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   const initACDSService = async () => {
     if (!acdsService) {
-      const { ACDSService } = await import('./services/acds-service.js');
+      const { SurgeService } = await import('./services/surge-service.js');
       
-      acdsService = new ACDSService({
+      acdsService = new SurgeService({
         organizationId: 'default-org',
         swarmSize: 10,
         autonomyLevel: 'autonomous',
@@ -12834,10 +12834,10 @@ startxref
   let cydefService: any = null;
   const getCydefService = async () => {
     if (!cydefService) {
-      const { CydefService } = await import('./services/cydef-service.js');
-      cydefService = new CydefService({
+      const { PulseService } = await import('./services/pulse-service.js');
+      cydefService = new PulseService({
         organizationId: 'default-org',
-        systemName: 'CyDEF-Primary',
+        systemName: 'PULSE-Primary',
         targetAccuracy: 992, // 99.2%
         autonomousMode: true,
         threatDetectionEngine: 'pytorch_deap',
@@ -13018,9 +13018,9 @@ startxref
     }
   });
 
-  // ===== CypherHUM API Endpoints =====
+  // ===== ECHO API Endpoints =====
   
-  // CypherHUM Dashboard - Main interface status and overview
+  // ECHO Dashboard - Main interface status and overview
   app.get("/api/cypherhum/dashboard", authenticateJWT, async (req: AuthenticatedRequest, res) => {
     try {
       const userId = req.user?.id;
@@ -13028,7 +13028,7 @@ startxref
         return res.status(401).json({ error: "User not authenticated" });
       }
 
-      // Get user's active CypherHUM sessions
+      // Get user's active ECHO sessions
       const sessions = await storage.getCypherhumSessions(userId);
       const activeSessions = sessions.filter(s => s.status === "active");
       
@@ -13056,12 +13056,12 @@ startxref
       
       res.json(dashboardData);
     } catch (error) {
-      console.error('Error fetching CypherHUM dashboard:', error);
+      console.error('Error fetching ECHO dashboard:', error);
       res.status(500).json({ error: 'Failed to fetch dashboard data' });
     }
   });
   
-  // CypherHUM Sessions - Holographic session management
+  // ECHO Sessions - Holographic session management
   app.get("/api/cypherhum/sessions", authenticateJWT, async (req: AuthenticatedRequest, res) => {
     try {
       const userId = req.user?.id;
@@ -13072,7 +13072,7 @@ startxref
       const sessions = await storage.getCypherhumSessions(userId);
       res.json(sessions);
     } catch (error) {
-      console.error('Error fetching CypherHUM sessions:', error);
+      console.error('Error fetching ECHO sessions:', error);
       res.status(500).json({ error: 'Failed to fetch sessions' });
     }
   });
@@ -13093,7 +13093,7 @@ startxref
       const session = await storage.createCypherhumSession(sessionData);
       res.status(201).json(session);
     } catch (error) {
-      console.error('Error creating CypherHUM session:', error);
+      console.error('Error creating ECHO session:', error);
       res.status(400).json({ error: 'Failed to create session' });
     }
   });
@@ -13106,12 +13106,12 @@ startxref
       const session = await storage.updateCypherhumSession(sessionId, updates);
       res.json(session);
     } catch (error) {
-      console.error('Error updating CypherHUM session:', error);
+      console.error('Error updating ECHO session:', error);
       res.status(400).json({ error: 'Failed to update session' });
     }
   });
   
-  // CypherHUM Visualizations - 3D visualization presets and configurations
+  // ECHO Visualizations - 3D visualization presets and configurations
   app.get("/api/cypherhum/visualizations", authenticateJWT, async (req: AuthenticatedRequest, res) => {
     try {
       const userId = req.user?.id;
@@ -13122,7 +13122,7 @@ startxref
       const visualizations = await storage.getCypherhumVisualizations(userId);
       res.json(visualizations);
     } catch (error) {
-      console.error('Error fetching CypherHUM visualizations:', error);
+      console.error('Error fetching ECHO visualizations:', error);
       res.status(500).json({ error: 'Failed to fetch visualizations' });
     }
   });
@@ -13142,12 +13142,12 @@ startxref
       const visualization = await storage.createCypherhumVisualization(visualizationData);
       res.status(201).json(visualization);
     } catch (error) {
-      console.error('Error creating CypherHUM visualization:', error);
+      console.error('Error creating ECHO visualization:', error);
       res.status(400).json({ error: 'Failed to create visualization' });
     }
   });
   
-  // CypherHUM AI Analysis - AI-powered threat analysis and processing
+  // ECHO AI Analysis - AI-powered threat analysis and processing
   app.post("/api/cypherhum/ai-analysis", authenticateJWT, async (req: AuthenticatedRequest, res) => {
     try {
       const userId = req.user?.id;
@@ -13184,25 +13184,25 @@ startxref
           processingTime: Math.floor(Math.random() * 1000) + 100
         },
         timestamp: new Date().toISOString(),
-        processedBy: "CypherHUM-AI-Engine",
+        processedBy: "ECHO-AI-Engine",
         userId
       };
       
       res.json(analysis);
     } catch (error) {
-      console.error('Error processing CypherHUM AI analysis:', error);
+      console.error('Error processing ECHO AI analysis:', error);
       res.status(500).json({ error: 'Failed to process AI analysis' });
     }
   });
   
-  // CypherHUM Interactions - AI command processing and natural language interface
+  // ECHO Interactions - AI command processing and natural language interface
   app.get("/api/cypherhum/interactions", authenticateJWT, async (req: AuthenticatedRequest, res) => {
     try {
       const { sessionId } = req.query;
       const interactions = await storage.getCypherhumInteractions(sessionId as string);
       res.json(interactions);
     } catch (error) {
-      console.error('Error fetching CypherHUM interactions:', error);
+      console.error('Error fetching ECHO interactions:', error);
       res.status(500).json({ error: 'Failed to fetch interactions' });
     }
   });
@@ -13218,7 +13218,7 @@ startxref
         'unknown command';
       
       const aiResponse = {
-        text: `Processing: "${processedInput}". CypherHUM AI is analyzing your request...`,
+        text: `Processing: "${processedInput}". ECHO AI is analyzing your request...`,
         action: interactionData.interactionType === 'voice_command' ? 'voice_response' : 'text_response',
         confidence: 0.85 + Math.random() * 0.15
       };
@@ -13234,12 +13234,12 @@ startxref
       
       res.status(201).json(interaction);
     } catch (error) {
-      console.error('Error creating CypherHUM interaction:', error);
+      console.error('Error creating ECHO interaction:', error);
       res.status(400).json({ error: 'Failed to process interaction' });
     }
   });
   
-  // CypherHUM 3D Data - 3D rendering data generation for holographic displays  
+  // ECHO 3D Data - 3D rendering data generation for holographic displays  
   app.get("/api/cypherhum/3d-data", authenticateJWT, async (req: AuthenticatedRequest, res) => {
     try {
       const { threatId, modelType, complexity } = req.query;
@@ -13282,12 +13282,12 @@ startxref
       
       res.json(threeDData);
     } catch (error) {
-      console.error('Error generating CypherHUM 3D data:', error);
+      console.error('Error generating ECHO 3D data:', error);
       res.status(500).json({ error: 'Failed to generate 3D data' });
     }
   });
   
-  // CypherHUM Analytics - Performance analytics and usage statistics
+  // ECHO Analytics - Performance analytics and usage statistics
   app.get("/api/cypherhum/analytics", authenticateJWT, async (req: AuthenticatedRequest, res) => {
     try {
       const userId = req.user?.id;
@@ -13320,7 +13320,7 @@ startxref
         summary
       });
     } catch (error) {
-      console.error('Error fetching CypherHUM analytics:', error);
+      console.error('Error fetching ECHO analytics:', error);
       res.status(500).json({ error: 'Failed to fetch analytics' });
     }
   });
@@ -13340,19 +13340,19 @@ startxref
       const analytic = await storage.createCypherhumAnalytic(analyticData);
       res.status(201).json(analytic);
     } catch (error) {
-      console.error('Error creating CypherHUM analytic:', error);
+      console.error('Error creating ECHO analytic:', error);
       res.status(400).json({ error: 'Failed to create analytic' });
     }
   });
   
-  // CypherHUM Threat Models - 3D threat model management and visualization
+  // ECHO Threat Models - 3D threat model management and visualization
   app.get("/api/cypherhum/threat-models", authenticateJWT, async (req: AuthenticatedRequest, res) => {
     try {
       const { threatId } = req.query;
       const threatModels = await storage.getCypherhumThreatModels(threatId as string);
       res.json(threatModels);
     } catch (error) {
-      console.error('Error fetching CypherHUM threat models:', error);
+      console.error('Error fetching ECHO threat models:', error);
       res.status(500).json({ error: 'Failed to fetch threat models' });
     }
   });
@@ -13363,7 +13363,7 @@ startxref
       const threatModel = await storage.createCypherhumThreatModel(threatModelData);
       res.status(201).json(threatModel);
     } catch (error) {
-      console.error('Error creating CypherHUM threat model:', error);
+      console.error('Error creating ECHO threat model:', error);
       res.status(400).json({ error: 'Failed to create threat model' });
     }
   });
@@ -13376,7 +13376,7 @@ startxref
       const threatModel = await storage.updateCypherhumThreatModel(modelId, updates);
       res.json(threatModel);
     } catch (error) {
-      console.error('Error updating CypherHUM threat model:', error);
+      console.error('Error updating ECHO threat model:', error);
       res.status(400).json({ error: 'Failed to update threat model' });
     }
   });
@@ -13389,7 +13389,7 @@ startxref
       const { WebSocketServer } = await import('ws');
       const wss = new WebSocketServer({ 
         server: httpServer,
-        path: '/ws/cydef'
+        path: '/ws/pulse'
       });
 
   wss.on('connection', (ws) => {
@@ -13451,7 +13451,7 @@ startxref
     });
 
     ws.on('close', () => {
-      console.log('🔌 CyDEF WebSocket client disconnected');
+      console.log('🔌 PULSE WebSocket client disconnected');
       // Remove event listeners when client disconnects
       getCydefService().then(service => {
         service.removeListener('realtimeEvent', handleRealtimeEvent);
@@ -13461,27 +13461,27 @@ startxref
     });
 
     ws.on('error', (error) => {
-      console.error('❌ CyDEF WebSocket error:', error);
+      console.error('❌ PULSE WebSocket error:', error);
     });
   });
 
-      console.log('🚀 CyDEF WebSocket server initialized at /ws/cydef');
+      console.log('🚀 PULSE WebSocket server initialized at /ws/pulse');
 
-      // ===== CypherHUM WebSocket Support =====
+      // ===== ECHO WebSocket Support =====
 
-      // CypherHUM WebSocket endpoint for real-time 3D holographic updates
+      // ECHO WebSocket endpoint for real-time 3D holographic updates
       wss.on('connection', async (ws, request) => {
         let url: URL;
         try {
           url = new URL(request.url!, `http://${request.headers.host}`);
         } catch (error) {
-          console.error('❌ Invalid CypherHUM WebSocket URL:', request.url, error);
+          console.error('❌ Invalid ECHO WebSocket URL:', request.url, error);
           ws.close(1008, 'Invalid URL format');
           return;
         }
         
-        // Handle CypherHUM WebSocket connections
-        if (url.pathname === '/ws/cypherhum') {
+        // Handle ECHO WebSocket connections
+        if (url.pathname === '/ws/echo') {
           try {
             // Extract and verify JWT token for WebSocket authentication
             let token: string | null = null;
@@ -13498,7 +13498,7 @@ startxref
             }
             
             if (!token) {
-              console.warn('⚠️ CypherHUM WebSocket connection rejected: No authentication token provided');
+              console.warn('⚠️ ECHO WebSocket connection rejected: No authentication token provided');
               ws.close(1008, 'Authentication required');
               return;
             }
@@ -13508,13 +13508,13 @@ startxref
             const payload = AuthService.verifyToken(token);
             
             if (!payload || !payload.userId) {
-              console.warn('⚠️ CypherHUM WebSocket connection rejected: Invalid authentication token');
+              console.warn('⚠️ ECHO WebSocket connection rejected: Invalid authentication token');
               ws.close(1008, 'Invalid authentication token');
               return;
             }
             
             // Log successful authentication with detailed info
-            console.log(`✅ CypherHUM WebSocket authenticated successfully:`);
+            console.log(`✅ ECHO WebSocket authenticated successfully:`);
             console.log(`   📧 User: ${payload.email}`);
             console.log(`   🔑 Role: ${payload.role}`);
             console.log(`   🆔 User ID: ${payload.userId}`);
@@ -13526,13 +13526,13 @@ startxref
             (ws as any).userRole = payload.role;
             (ws as any).connectedAt = new Date().toISOString();
             
-            // Initialize CypherHUM service
+            // Initialize ECHO service
             const service = await initCypherHumService();
             
             // Extract session ID from query parameters
             const sessionId = url.searchParams.get('sessionId');
             if (!sessionId) {
-              console.warn('⚠️ CypherHUM WebSocket connection rejected: No session ID provided');
+              console.warn('⚠️ ECHO WebSocket connection rejected: No session ID provided');
               ws.close(1008, 'Session ID required');
               return;
             }
@@ -13540,7 +13540,7 @@ startxref
             // Verify session ownership
             const session = await service.getSession(sessionId);
             if (!session || (session.userId !== payload.userId && payload.role !== 'admin')) {
-              console.warn('⚠️ CypherHUM WebSocket connection rejected: Invalid session or access denied');
+              console.warn('⚠️ ECHO WebSocket connection rejected: Invalid session or access denied');
               ws.close(1008, 'Invalid session or access denied');
               return;
             }
@@ -13558,7 +13558,7 @@ startxref
               }));
             }
             
-            // Handle incoming messages for CypherHUM interactions
+            // Handle incoming messages for ECHO interactions
             ws.on('message', async (message) => {
               try {
                 const data = JSON.parse(message.toString());
@@ -13600,7 +13600,7 @@ startxref
                     break;
                 }
               } catch (error) {
-                console.error('❌ Error processing CypherHUM WebSocket message:', error);
+                console.error('❌ Error processing ECHO WebSocket message:', error);
                 ws.send(JSON.stringify({
                   type: 'error',
                   message: 'Failed to process message'
@@ -13609,11 +13609,11 @@ startxref
             });
             
             ws.on('close', () => {
-              console.log(`🔌 CypherHUM WebSocket disconnected: ${payload.email}`);
+              console.log(`🔌 ECHO WebSocket disconnected: ${payload.email}`);
             });
             
           } catch (authError) {
-            console.error('❌ CypherHUM WebSocket authentication failed:', authError);
+            console.error('❌ ECHO WebSocket authentication failed:', authError);
             ws.close(1008, 'Authentication failed');
             return;
           }
@@ -13877,7 +13877,7 @@ startxref
       // ACDS WebSocket endpoint for real-time drone swarm coordination
       const acdsWss = new WebSocketServer({ 
         server: httpServer,
-        path: '/ws/acds'
+        path: '/ws/surge'
       });
 
       acdsWss.on('connection', async (ws, request) => {
@@ -13892,7 +13892,7 @@ startxref
         }
         
         // Check if the pathname matches the expected WebSocket endpoint
-        if (url.pathname !== '/ws/acds') {
+        if (url.pathname !== '/ws/surge') {
           console.warn(`⚠️ ACDS WebSocket connection rejected: Invalid path "${url.pathname}"`);
           ws.close(1008, 'Invalid path');
           return;
@@ -14171,18 +14171,18 @@ startxref
         }
 
         } catch (authError) {
-          console.error('❌ ACDS WebSocket authentication failed:', authError);
+          console.error('❌ SURGE WebSocket authentication failed:', authError);
           ws.close(1008, 'Authentication failed');
           return;
         }
 
         // Enhanced error handling
         ws.on('error', (error) => {
-          console.error('❌ ACDS WebSocket error:', error);
+          console.error('❌ SURGE WebSocket error:', error);
         });
       });
 
-      console.log('🚁 ACDS WebSocket server initialized at /ws/acds');
+      console.log('🚁 SURGE WebSocket server initialized at /ws/surge');
 
       // ===== UNIFIED SYSTEM WEBSOCKET SERVER =====
       

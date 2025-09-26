@@ -529,14 +529,14 @@ export default function Dashboard() {
               {/* Four Revolutionary Systems Quick Navigation */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
                 <Button
-                  onClick={() => setLocation('/cydef-dashboard')}
+                  onClick={() => setLocation('/pulse-dashboard')}
                   className="h-24 bg-gradient-to-br from-purple-600/20 to-violet-700/20 border border-purple-500/30 hover:border-purple-400/50 flex flex-col items-center justify-center space-y-2 group transition-all duration-300"
-                  data-testid="nav-cydef-system"
+                  data-testid="nav-pulse-system"
                 >
                   <Brain className="w-8 h-8 text-purple-400 group-hover:text-purple-300 transition-colors" />
                   <div className="text-center">
-                    <div className="text-sm font-bold text-white">CyDEF Genetic AI</div>
-                    <div className="text-xs text-purple-400">Autonomous Defense</div>
+                    <div className="text-sm font-bold text-white">PULSE Genetic AI</div>
+                    <div className="text-xs text-purple-400">Learning Security Engine</div>
                   </div>
                 </Button>
 
@@ -553,26 +553,26 @@ export default function Dashboard() {
                 </Button>
 
                 <Button
-                  onClick={() => setLocation('/cypherhum-interface')}
+                  onClick={() => setLocation('/echo-interface')}
                   className="h-24 bg-gradient-to-br from-green-600/20 to-teal-700/20 border border-green-500/30 hover:border-green-400/50 flex flex-col items-center justify-center space-y-2 group transition-all duration-300"
-                  data-testid="nav-cypherhum-system"
+                  data-testid="nav-echo-system"
                 >
                   <Eye className="w-8 h-8 text-green-400 group-hover:text-green-300 transition-colors" />
                   <div className="text-center">
-                    <div className="text-sm font-bold text-white">CypherHUM 3D</div>
-                    <div className="text-xs text-green-400">Holographic Interface</div>
+                    <div className="text-sm font-bold text-white">ECHO 3D</div>
+                    <div className="text-xs text-green-400">Holographic Operations</div>
                   </div>
                 </Button>
 
                 <Button
-                  onClick={() => setLocation('/acds-dashboard')}
+                  onClick={() => setLocation('/surge-dashboard')}
                   className="h-24 bg-gradient-to-br from-orange-600/20 to-red-700/20 border border-orange-500/30 hover:border-orange-400/50 flex flex-col items-center justify-center space-y-2 group transition-all duration-300"
-                  data-testid="nav-acds-system"
+                  data-testid="nav-surge-system"
                 >
                   <Plane className="w-8 h-8 text-orange-400 group-hover:text-orange-300 transition-colors" />
                   <div className="text-center">
-                    <div className="text-sm font-bold text-white">ACDS Swarm</div>
-                    <div className="text-xs text-orange-400">Drone Defense</div>
+                    <div className="text-sm font-bold text-white">SURGE Swarm</div>
+                    <div className="text-xs text-orange-400">Response Generation</div>
                   </div>
                 </Button>
               </div>

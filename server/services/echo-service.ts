@@ -1,31 +1,31 @@
 /**
- * CypherHUM (Holographic User interface Model) Service
+ * ECHO (Enhanced Cybersecurity Holographic Operations) Service
  * 
  * Revolutionary 3D holographic AI interface service for advanced threat visualization:
  * - AI-powered natural language processing for threat analysis
  * - 3D threat model generation and real-time rendering data
- * - Integration with CyDEF genetic algorithm AI and Live Location systems
+ * - Integration with PULSE genetic algorithm AI and Live Location systems
  * - Holographic session management and performance optimization
  * - Real-time WebSocket-powered 3D threat updates and animations
  */
 
 import { EventEmitter } from 'events';
 import type { DbProvider } from '../db.js';
-import { CydefService } from './cydef-service.js';
+import { PulseService } from './pulse-service.js';
 import { CypherAIService } from './cypher-ai.js';
 import { LiveLocationService } from './live-location-service.js';
 import { GeospatialIntelligenceService } from './geospatial-intelligence.js';
 import type { 
-  CypherhumSession,
-  InsertCypherhumSession,
-  CypherhumVisualization,
-  InsertCypherhumVisualization,
-  CypherhumInteraction,
-  InsertCypherhumInteraction,
-  CypherhumThreatModel,
-  InsertCypherhumThreatModel,
-  CypherhumAnalytics,
-  InsertCypherhumAnalytics,
+  EchoSession,
+  InsertEchoSession,
+  EchoVisualization,
+  InsertEchoVisualization,
+  EchoInteraction,
+  InsertEchoInteraction,
+  EchoThreatModel,
+  InsertEchoThreatModel,
+  EchoAnalytics,
+  InsertEchoAnalytics,
   Threat,
   LiveLocationDevice
 } from '../../shared/schema.js';
@@ -132,12 +132,12 @@ export interface HolographicSessionState {
   };
 }
 
-export class CypherHumService extends EventEmitter {
+export class EchoService extends EventEmitter {
   private activeSessions: Map<string, HolographicSessionState> = new Map();
-  private visualizationPresets: Map<string, CypherhumVisualization> = new Map();
-  private threatModels: Map<string, CypherhumThreatModel> = new Map();
+  private visualizationPresets: Map<string, EchoVisualization> = new Map();
+  private threatModels: Map<string, EchoThreatModel> = new Map();
   private dbProvider?: DbProvider;
-  private cydefService: CydefService;
+  private pulseService: PulseService;
   private cypherAIService: CypherAIService;
   private liveLocationService: LiveLocationService;
   private geospatialService: GeospatialIntelligenceService;
@@ -151,14 +151,14 @@ export class CypherHumService extends EventEmitter {
   
   constructor(
     dbProvider?: DbProvider,
-    cydefService?: CydefService,
+    pulseService?: PulseService,
     cypherAIService?: CypherAIService,
     liveLocationService?: LiveLocationService,
     geospatialService?: GeospatialIntelligenceService
   ) {
     super();
     this.dbProvider = dbProvider;
-    this.cydefService = cydefService || new CydefService({
+    this.pulseService = pulseService || new PulseService({
       organizationId: 'default',
       systemName: 'CypherHUM-AI',
       targetAccuracy: 992,
@@ -769,4 +769,4 @@ export class CypherHumService extends EventEmitter {
   }
 }
 
-export default CypherHumService;
+export default EchoService;

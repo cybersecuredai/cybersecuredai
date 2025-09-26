@@ -1,10 +1,10 @@
 /**
- * ACDS (Autonomous Cyber Defense Swarm) Service
+ * SURGE (Strategic Unified Response & Guardian Engine) Service
  * 
  * Advanced federal cybersecurity drone swarm coordination service:
  * - Autonomous drone fleet management and coordination algorithms
  * - Real-time swarm behavior monitoring and control
- * - Integration with CyDEF genetic algorithms for autonomous threat response
+ * - Integration with PULSE genetic algorithms for autonomous threat response
  * - AI-powered mission planning and optimal deployment strategies
  * - Real-time WebSocket communication for live coordination updates
  * - Advanced threat hunting using distributed drone intelligence
@@ -14,20 +14,20 @@ import { EventEmitter } from 'events';
 import type { DbProvider } from '../db.js';
 import { isDatabaseAvailable } from '../db.js';
 import { eq, and, desc, sql, gte, lte, isNotNull, or } from 'drizzle-orm';
-import { CydefService } from './cydef-service.js';
+import { PulseService } from './pulse-service.js';
 import { LiveLocationService } from './live-location-service.js';
-import { CypherHumService } from './cypherhum-service.js';
+import { EchoService } from './echo-service.js';
 import type { 
-  AcdsDrone,
-  InsertAcdsDrone,
-  AcdsSwarmMission,
-  InsertAcdsSwarmMission,
-  AcdsDeployment,
-  InsertAcdsDeployment,
-  AcdsCoordination,
-  InsertAcdsCoordination,
-  AcdsAnalytics,
-  InsertAcdsAnalytics,
+  SurgeDrone,
+  InsertSurgeDrone,
+  SurgeSwarmMission,
+  InsertSurgeSwarmMission,
+  SurgeDeployment,
+  InsertSurgeDeployment,
+  SurgeCoordination,
+  InsertSurgeCoordination,
+  SurgeAnalytics,
+  InsertSurgeAnalytics,
   Threat,
   User
 } from '../../shared/schema.js';
@@ -56,7 +56,7 @@ export interface SwarmCoordinationDecision {
   decision: any;
   confidence: number;
   executionTime: number;
-  cydefIntegration?: {
+  pulseIntegration?: {
     generation: number;
     fitnessScore: number;
     recommendation: any;
@@ -99,10 +99,10 @@ export interface SwarmMissionPlan {
   objectives: any[];
   riskAssessment: any;
   threatContext?: any;
-  cydefRecommendations?: any;
+  pulseRecommendations?: any;
 }
 
-export interface ACDSAnalytics {
+export interface SURGEAnalytics {
   missionSuccessRate: number;
   averageResponseTime: number;
   swarmEfficiencyScore: number;
@@ -112,15 +112,15 @@ export interface ACDSAnalytics {
   batteryEfficiencyScore: number;
   communicationReliability: number;
   coordinationAlgorithmPerformance: any;
-  cydefIntegrationEffectiveness: number;
+  pulseIntegrationEffectiveness: number;
 }
 
-export interface ACDSConfig {
+export interface SURGEConfig {
   organizationId: string;
   swarmSize: number; // Maximum number of drones in swarm
   autonomyLevel: 'manual' | 'semi_autonomous' | 'autonomous' | 'ai_driven';
   coordinationAlgorithm: 'distributed_consensus' | 'leader_follower' | 'hierarchical' | 'ai_optimized';
-  cydefIntegrationEnabled: boolean;
+  pulseIntegrationEnabled: boolean;
   liveLocationIntegrationEnabled: boolean;
   realTimeCoordinationEnabled: boolean;
   emergencyResponseEnabled: boolean;
@@ -130,22 +130,22 @@ export interface ACDSConfig {
   dbProvider?: DbProvider;
 }
 
-export class ACDSService extends EventEmitter {
-  private drones: Map<string, AcdsDrone> = new Map();
-  private swarmMissions: Map<string, AcdsSwarmMission> = new Map();
-  private activeDeployments: Map<string, AcdsDeployment> = new Map();
-  private coordinationHistory: Map<string, AcdsCoordination> = new Map();
-  private analytics: Map<string, AcdsAnalytics> = new Map();
+export class SurgeService extends EventEmitter {
+  private drones: Map<string, SurgeDrone> = new Map();
+  private swarmMissions: Map<string, SurgeSwarmMission> = new Map();
+  private activeDeployments: Map<string, SurgeDeployment> = new Map();
+  private coordinationHistory: Map<string, SurgeCoordination> = new Map();
+  private analytics: Map<string, SurgeAnalytics> = new Map();
   private isInitialized: boolean = false;
   private initPromise: Promise<void> | null = null;
-  private config: ACDSConfig;
+  private config: SURGEConfig;
   private dbProvider: DbProvider;
   private databaseAvailable: boolean = false;
   
   // Service integrations
-  private cydefService?: CydefService;
+  private pulseService?: PulseService;
   private liveLocationService?: LiveLocationService;
-  private cypherHumService?: CypherHumService;
+  private echoService?: EchoService;
   
   // Real-time coordination
   private coordinationInterval: NodeJS.Timeout | null = null;
@@ -163,7 +163,7 @@ export class ACDSService extends EventEmitter {
   private coordinationMetrics: Map<string, any> = new Map();
   private responseTimeMs: number[] = [];
 
-  constructor(config: ACDSConfig, dbProvider?: DbProvider) {
+  constructor(config: SURGEConfig, dbProvider?: DbProvider) {
     super();
     this.config = config;
     this.dbProvider = dbProvider || config.dbProvider!;
@@ -173,12 +173,12 @@ export class ACDSService extends EventEmitter {
     // Initialize default swarm formations
     this.initializeSwarmFormations();
     
-    console.log('🚁 ACDS Service constructed for organization:', config.organizationId);
+    console.log('🚁 SURGE Service constructed for organization:', config.organizationId);
     console.log('🎯 Swarm configuration:', {
       maxSwarmSize: config.swarmSize,
       autonomyLevel: config.autonomyLevel,
       coordinationAlgorithm: config.coordinationAlgorithm,
-      cydefIntegration: config.cydefIntegrationEnabled
+      pulseIntegration: config.pulseIntegrationEnabled
     });
   }
 
@@ -199,7 +199,7 @@ export class ACDSService extends EventEmitter {
       return;
     }
 
-    console.log('🚀 Initializing ACDS Service...');
+    console.log('🚀 Initializing SURGE Service...');
     
     try {
       // Load existing drones from database
@@ -224,11 +224,11 @@ export class ACDSService extends EventEmitter {
       this.startPerformanceAnalytics();
       
       this.isInitialized = true;
-      console.log('✅ ACDS Service initialized successfully');
+      console.log('✅ SURGE Service initialized successfully');
       this.emit('initialized', { status: 'success', droneCount: this.drones.size });
       
     } catch (error) {
-      console.error('❌ ACDS Service initialization failed:', error);
+      console.error('❌ SURGE Service initialization failed:', error);
       this.emit('initialization_failed', { error: error.message });
       throw error;
     }
@@ -444,7 +444,7 @@ export class ACDSService extends EventEmitter {
       assignedDrones: ['ACDS-ALPHA-001', 'ACDS-BRAVO-002', 'ACDS-CHARLIE-003'],
       coordinationAlgorithm: 'distributed_consensus',
       autonomyLevel: 'autonomous',
-      cydefIntegration: {
+      pulseIntegration: {
         enabled: true,
         threatThreshold: 70,
         autoResponse: true
@@ -484,7 +484,7 @@ export class ACDSService extends EventEmitter {
         threat_detected: 'notify_control_escalate',
         equipment_failure: 'redistribute_swarm'
       },
-      cydefIntegration: mockMission.cydefIntegration!,
+      pulseIntegration: mockMission.pulseIntegration!,
       liveLocationIntegration: true,
       plannedStartTime: new Date(Date.now() - 2 * 60 * 60 * 1000),
       actualStartTime: new Date(Date.now() - 2 * 60 * 60 * 1000),
@@ -514,10 +514,10 @@ export class ACDSService extends EventEmitter {
     console.log('🔗 Initializing service integrations...');
     
     try {
-      // CyDEF integration for genetic algorithm coordination
-      if (this.config.cydefIntegrationEnabled) {
-        // CyDEF service will be injected when available
-        console.log('🧬 CyDEF integration enabled - awaiting service injection');
+      // PULSE integration for genetic algorithm coordination
+      if (this.config.pulseIntegrationEnabled) {
+        // PULSE service will be injected when available
+        console.log('🧬 PULSE integration enabled - awaiting service injection');
       }
       
       // Live Location integration for asset tracking
@@ -539,9 +539,9 @@ export class ACDSService extends EventEmitter {
    * Set up event handlers for service integrations
    */
   private setupIntegrationEventHandlers(): void {
-    // Handle CyDEF threat responses
-    this.on('cydef_threat_detected', async (threatData) => {
-      await this.handleCydefThreatResponse(threatData);
+    // Handle PULSE threat responses
+    this.on('pulse_threat_detected', async (threatData) => {
+      await this.handlePulseThreatResponse(threatData);
     });
     
     // Handle Live Location geofence breaches
@@ -1026,10 +1026,10 @@ export class ACDSService extends EventEmitter {
   }
 
   /**
-   * Handle CyDEF threat response
+   * Handle PULSE threat response
    */
-  private async handleCydefThreatResponse(threatData: any): Promise<void> {
-    console.log('🎯 Handling CyDEF threat response:', threatData);
+  private async handlePulseThreatResponse(threatData: any): Promise<void> {
+    console.log('🎯 Handling PULSE threat response:', threatData);
     
     // Determine appropriate drone response
     const responseLevel = this.assessThreatResponseLevel(threatData);
@@ -1256,7 +1256,7 @@ export class ACDSService extends EventEmitter {
         avgExecutionTime: this.coordinationMetrics.get('last_coordination_time') || 0,
         successRate: 94.3
       },
-      cydefIntegrationEffectiveness: this.config.cydefIntegrationEnabled ? 88.9 : 0
+      pulseIntegrationEffectiveness: this.config.pulseIntegrationEnabled ? 88.9 : 0
     };
     
     return analytics;
@@ -1513,16 +1513,16 @@ export class ACDSService extends EventEmitter {
   // ===== CyDEF Genetic Algorithm Integration =====
 
   /**
-   * Get CyDEF genetic algorithm recommendations for drone deployment decisions
+   * Get PULSE genetic algorithm recommendations for drone deployment decisions
    */
-  async getCydefDeploymentRecommendations(threatData: any, availableDrones: AcdsDrone[]): Promise<any> {
-    if (!this.cydefService) {
-      console.warn('⚠️ CyDEF service not available for deployment recommendations');
+  async getPulseDeploymentRecommendations(threatData: any, availableDrones: SurgeDrone[]): Promise<any> {
+    if (!this.pulseService) {
+      console.warn('⚠️ PULSE service not available for deployment recommendations');
       return null;
     }
 
     try {
-      // Process threat through CyDEF genetic algorithms
+      // Process threat through PULSE genetic algorithms
       const threatResponse = await this.cydefService.processThreat(threatData);
       
       // Calculate optimal drone deployment based on GA recommendations
@@ -1936,9 +1936,9 @@ export class ACDSService extends EventEmitter {
   /**
    * Inject service dependencies
    */
-  setCydefService(cydefService: CydefService): void {
-    this.cydefService = cydefService;
-    console.log('🧬 CyDEF service integration established');
+  setPulseService(pulseService: PulseService): void {
+    this.pulseService = pulseService;
+    console.log('🧬 PULSE service integration established');
   }
 
   setLiveLocationService(liveLocationService: LiveLocationService): void {
@@ -1946,16 +1946,16 @@ export class ACDSService extends EventEmitter {
     console.log('📍 Live Location service integration established');
   }
 
-  setCypherHumService(cypherHumService: CypherHumService): void {
-    this.cypherHumService = cypherHumService;
-    console.log('🔮 CypherHUM service integration established');
+  setEchoService(echoService: EchoService): void {
+    this.echoService = echoService;
+    console.log('🔮 ECHO service integration established');
   }
 
   /**
    * Cleanup and shutdown
    */
   async shutdown(): Promise<void> {
-    console.log('🔄 Shutting down ACDS Service...');
+    console.log('🔄 Shutting down SURGE Service...');
     
     // Clear intervals
     if (this.coordinationInterval) {

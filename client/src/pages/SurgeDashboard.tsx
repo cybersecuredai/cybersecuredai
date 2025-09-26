@@ -1,11 +1,11 @@
 /**
- * ACDS (Autonomous Cyber Defense Swarm) Dashboard
+ * SURGE (Strategic Unified Response Generation Engine) Dashboard
  * 
  * Advanced federal cybersecurity drone swarm coordination interface featuring:
  * - Real-time 3D drone swarm visualization and fleet monitoring
  * - Interactive drone positioning and status monitoring with map integration
  * - Live swarm coordination controls and autonomous mission management
- * - Integration with CyDEF genetic algorithms for threat response
+ * - Integration with PULSE genetic algorithms for threat response
  * - WebSocket-powered real-time coordination updates
  * - Federal-grade mission planning and analytics
  */
@@ -81,8 +81,8 @@ import {
   VolumeX
 } from 'lucide-react';
 
-// Type definitions for ACDS data structures
-interface AcdsDrone {
+// Type definitions for SURGE data structures
+interface SurgeDrone {
   id: string;
   droneId: string;
   droneName: string;
@@ -96,7 +96,7 @@ interface AcdsDrone {
   currentAltitude?: number;
   swarmRole: 'leader' | 'scout' | 'guardian' | 'specialist' | 'coordinator' | 'follower';
   autonomyLevel: 'manual' | 'semi_autonomous' | 'autonomous';
-  cydefIntegration: boolean;
+  pulseIntegration: boolean;
   capabilities: any;
   threatDetectionCapabilities: string[];
   communicationChannels: string[];
@@ -108,7 +108,7 @@ interface AcdsDrone {
   lastStatusUpdate: string;
 }
 
-interface AcdsSwarmMission {
+interface SurgeSwarmMission {
   id: string;
   missionName: string;
   missionType: 'threat_response' | 'perimeter_patrol' | 'network_scan' | 'incident_investigation' | 'proactive_hunt' | 'emergency_response';
@@ -127,7 +127,7 @@ interface AcdsSwarmMission {
   assignedDrones: string[];
   coordinationAlgorithm: string;
   autonomyLevel: string;
-  cydefIntegration: any;
+  pulseIntegration: any;
   plannedStartTime?: string;
   plannedEndTime?: string;
   actualStartTime?: string;
@@ -136,7 +136,7 @@ interface AcdsSwarmMission {
   updatedAt: string;
 }
 
-interface AcdsDeployment {
+interface SurgeDeployment {
   id: string;
   deploymentId: string;
   droneId: string;
@@ -173,7 +173,7 @@ interface DroneFleetStatus {
   swarmCoordination: string;
 }
 
-interface ACDSAnalytics {
+interface SURGEAnalytics {
   missionSuccessRate: number;
   averageResponseTime: number;
   swarmEfficiencyScore: number;
@@ -183,7 +183,7 @@ interface ACDSAnalytics {
   batteryEfficiencyScore: number;
   communicationReliability: number;
   coordinationAlgorithmPerformance: any;
-  cydefIntegrationEffectiveness: number;
+  pulseIntegrationEffectiveness: number;
 }
 
 interface SwarmTelemetry {
@@ -217,7 +217,7 @@ declare global {
   }
 }
 
-export default function ACDSDashboard() {
+export default function SURGEDashboard() {
   const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -241,44 +241,44 @@ export default function ACDSDashboard() {
   const droneMarkers = useRef<Map<string, any>>(new Map());
 
   // Fetch drone fleet data
-  const { data: drones, isLoading: isDronesLoading } = useQuery<AcdsDrone[]>({
-    queryKey: ['/api/acds/drones'],
+  const { data: drones, isLoading: isDronesLoading } = useQuery<SurgeDrone[]>({
+    queryKey: ['/api/surge/drones'],
     refetchInterval: 3000, // Refresh every 3 seconds
   });
 
   // Fetch drone fleet status
   const { data: fleetStatus, isLoading: isFleetLoading } = useQuery<DroneFleetStatus>({
-    queryKey: ['/api/acds/drones/status'],
+    queryKey: ['/api/surge/drones/status'],
     refetchInterval: 2000, // Refresh every 2 seconds
   });
 
   // Fetch active missions
-  const { data: missions, isLoading: isMissionsLoading } = useQuery<AcdsSwarmMission[]>({
-    queryKey: ['/api/acds/swarm-missions'],
+  const { data: missions, isLoading: isMissionsLoading } = useQuery<SurgeSwarmMission[]>({
+    queryKey: ['/api/surge/swarm-missions'],
     refetchInterval: 5000, // Refresh every 5 seconds
   });
 
   // Fetch active deployments
-  const { data: deployments, isLoading: isDeploymentsLoading } = useQuery<AcdsDeployment[]>({
-    queryKey: ['/api/acds/deployments'],
+  const { data: deployments, isLoading: isDeploymentsLoading } = useQuery<SurgeDeployment[]>({
+    queryKey: ['/api/surge/deployments'],
     refetchInterval: 2000, // Refresh every 2 seconds
   });
 
   // Fetch analytics data
-  const { data: analytics } = useQuery<ACDSAnalytics>({
-    queryKey: ['/api/acds/analytics'],
+  const { data: analytics } = useQuery<SURGEAnalytics>({
+    queryKey: ['/api/surge/analytics'],
     refetchInterval: 10000, // Refresh every 10 seconds
   });
 
   // Fetch dashboard data (comprehensive)
   const { data: dashboardData } = useQuery({
-    queryKey: ['/api/acds/dashboard'],
+    queryKey: ['/api/surge/dashboard'],
     refetchInterval: 5000, // Refresh every 5 seconds
   });
 
   // Fetch real-time telemetry
   const { data: telemetryData } = useQuery<SwarmTelemetry>({
-    queryKey: ['/api/acds/telemetry'],
+    queryKey: ['/api/surge/telemetry'],
     refetchInterval: 1000, // Refresh every 1 second for real-time data
   });
 
@@ -291,8 +291,8 @@ export default function ACDSDashboard() {
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/acds/drones'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/acds/deployments'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/surge/drones'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/surge/deployments'] });
       toast({
         title: "Drone Deployed",
         description: "Drone deployment initiated successfully",
@@ -310,13 +310,13 @@ export default function ACDSDashboard() {
   // Mission creation mutation
   const createMissionMutation = useMutation({
     mutationFn: async (missionData: any) => {
-      return apiRequest('/api/acds/swarm-missions', {
+      return apiRequest('/api/surge/swarm-missions', {
         method: 'POST',
         body: JSON.stringify(missionData),
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/acds/swarm-missions'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/surge/swarm-missions'] });
       toast({
         title: "Mission Created",
         description: "Swarm mission created successfully",
@@ -334,14 +334,14 @@ export default function ACDSDashboard() {
   // Emergency recall mutation
   const emergencyRecallMutation = useMutation({
     mutationFn: async ({ reason, droneIds }: { reason: string; droneIds?: string[] }) => {
-      return apiRequest('/api/acds/emergency/recall', {
+      return apiRequest('/api/surge/emergency/recall', {
         method: 'POST',
         body: JSON.stringify({ reason, droneIds }),
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/acds/drones'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/acds/deployments'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/surge/drones'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/surge/deployments'] });
       toast({
         title: "Emergency Recall Initiated",
         description: "All drones are returning to base",
@@ -359,7 +359,7 @@ export default function ACDSDashboard() {
   // Coordination trigger mutation
   const coordinationTriggerMutation = useMutation({
     mutationFn: async ({ coordinationType, parameters }: { coordinationType: string; parameters: any }) => {
-      return apiRequest('/api/acds/coordination/trigger', {
+      return apiRequest('/api/surge/coordination/trigger', {
         method: 'POST',
         body: JSON.stringify({ coordinationType, parameters }),
       });
@@ -383,25 +383,25 @@ export default function ACDSDashboard() {
   useEffect(() => {
     // Skip WebSocket if not authenticated
     if (!user) {
-      console.log('🚁 ACDS WebSocket: No authenticated user found, skipping connection');
+      console.log('🚁 SURGE WebSocket: No authenticated user found, skipping connection');
       return;
     }
 
     // Get authentication token for WebSocket
     const token = localStorage.getItem('auth_token');
     if (!token) {
-      console.warn('🚁 No authentication token found, ACDS WebSocket connection skipped');
+      console.warn('🚁 No authentication token found, SURGE WebSocket connection skipped');
       return;
     }
 
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const wsUrl = `${protocol}//${window.location.host}/ws/acds?token=${encodeURIComponent(token)}`;
+    const wsUrl = `${protocol}//${window.location.host}/ws/surge?token=${encodeURIComponent(token)}`;
     
     try {
       const ws = new WebSocket(wsUrl);
       
       ws.onopen = () => {
-        console.log('🚁 ACDS WebSocket connected');
+        console.log('🚁 SURGE WebSocket connected');
         setIsWebSocketConnected(true);
       };
       
@@ -414,13 +414,13 @@ export default function ACDSDashboard() {
               setSwarmTelemetry(data.payload);
               break;
             case 'drone_status_update':
-              queryClient.invalidateQueries({ queryKey: ['/api/acds/drones'] });
+              queryClient.invalidateQueries({ queryKey: ['/api/surge/drones'] });
               break;
             case 'mission_update':
-              queryClient.invalidateQueries({ queryKey: ['/api/acds/swarm-missions'] });
+              queryClient.invalidateQueries({ queryKey: ['/api/surge/swarm-missions'] });
               break;
             case 'deployment_update':
-              queryClient.invalidateQueries({ queryKey: ['/api/acds/deployments'] });
+              queryClient.invalidateQueries({ queryKey: ['/api/surge/deployments'] });
               break;
             case 'coordination_decision':
               // Handle real-time coordination decisions
@@ -437,7 +437,7 @@ export default function ACDSDashboard() {
               });
               break;
             default:
-              console.log('Unknown ACDS WebSocket message:', data);
+              console.log('Unknown SURGE WebSocket message:', data);
           }
         } catch (error) {
           console.error('Error parsing WebSocket message:', error);
@@ -445,12 +445,12 @@ export default function ACDSDashboard() {
       };
       
       ws.onclose = () => {
-        console.log('🚁 ACDS WebSocket disconnected');
+        console.log('🚁 SURGE WebSocket disconnected');
         setIsWebSocketConnected(false);
       };
       
       ws.onerror = (error) => {
-        console.error('🚁 ACDS WebSocket error:', error);
+        console.error('🚁 SURGE WebSocket error:', error);
         setIsWebSocketConnected(false);
       };
       
@@ -458,7 +458,7 @@ export default function ACDSDashboard() {
         ws.close();
       };
     } catch (error) {
-      console.error('Failed to initialize ACDS WebSocket:', error);
+      console.error('Failed to initialize SURGE WebSocket:', error);
     }
   }, [user, queryClient, toast]);
 
@@ -676,7 +676,7 @@ export default function ACDSDashboard() {
       <div className="flex items-center justify-center h-screen bg-black text-green-400">
         <div className="text-center">
           <Drone className="h-16 w-16 animate-spin mx-auto mb-4" />
-          <p className="text-xl font-mono">Initializing ACDS Command Center...</p>
+          <p className="text-xl font-mono">Initializing SURGE Command Center...</p>
         </div>
       </div>
     );
@@ -690,7 +690,7 @@ export default function ACDSDashboard() {
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-2">
               <Drone className="h-8 w-8" />
-              <h1 className="text-3xl font-bold font-mono">ACDS Command Center</h1>
+              <h1 className="text-3xl font-bold font-mono">SURGE Command Center</h1>
             </div>
             <div className="flex items-center space-x-2">
               <div className={`h-3 w-3 rounded-full ${isWebSocketConnected ? 'bg-green-400' : 'bg-red-400'}`} />
@@ -929,7 +929,7 @@ export default function ACDSDashboard() {
               </Select>
               <Button 
                 variant="outline"
-                onClick={() => queryClient.invalidateQueries({ queryKey: ['/api/acds/drones'] })}
+                onClick={() => queryClient.invalidateQueries({ queryKey: ['/api/surge/drones'] })}
                 data-testid="button-refresh-fleet"
               >
                 <RefreshCw className="h-4 w-4" />
@@ -1058,7 +1058,7 @@ export default function ACDSDashboard() {
                   assignedDrones: [],
                   coordinationAlgorithm: 'ai_optimized',
                   autonomyLevel: 'autonomous',
-                  cydefIntegration: { enabled: true },
+                  pulseIntegration: { enabled: true },
                   realTimeReporting: true,
                 });
               }}
@@ -1292,11 +1292,11 @@ export default function ACDSDashboard() {
               </CardContent>
             </Card>
 
-            <Card className="bg-gray-900 border-gray-700" data-testid="card-cydef-integration">
+            <Card className="bg-gray-900 border-gray-700" data-testid="card-pulse-integration">
               <CardHeader>
                 <CardTitle className="text-green-400 flex items-center">
                   <Shield className="h-5 w-5 mr-2" />
-                  CyDEF Integration
+                  PULSE Integration
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -1339,7 +1339,7 @@ export default function ACDSDashboard() {
                   <div className="p-2 bg-gray-800 rounded">
                     <span className="text-green-400">[{new Date(Date.now() - 30000).toLocaleTimeString()}]</span>
                     <span className="text-yellow-400 ml-2">ROLE_REASSIGNED:</span>
-                    <span className="text-gray-300 ml-2">ACDS-BRAVO-002 promoted to scout leader</span>
+                    <span className="text-gray-300 ml-2">SURGE-BRAVO-002 promoted to scout leader</span>
                   </div>
                   <div className="p-2 bg-gray-800 rounded">
                     <span className="text-green-400">[{new Date(Date.now() - 60000).toLocaleTimeString()}]</span>
@@ -1348,7 +1348,7 @@ export default function ACDSDashboard() {
                   </div>
                   <div className="p-2 bg-gray-800 rounded">
                     <span className="text-green-400">[{new Date(Date.now() - 90000).toLocaleTimeString()}]</span>
-                    <span className="text-purple-400 ml-2">CYDEF_INTEGRATION:</span>
+                    <span className="text-purple-400 ml-2">PULSE_INTEGRATION:</span>
                     <span className="text-gray-300 ml-2">Genetic algorithm fitness improved to 87.3%</span>
                   </div>
                 </div>
@@ -1459,10 +1459,10 @@ export default function ACDSDashboard() {
                   <div className="flex items-center justify-between p-3 bg-gray-800 rounded">
                     <div className="flex items-center space-x-3">
                       <Shield className="h-5 w-5 text-green-400" />
-                      <span className="text-gray-300">CyDEF Integration</span>
+                      <span className="text-gray-300">PULSE Integration</span>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <span className="text-green-400">{analytics?.cydefIntegrationEffectiveness?.toFixed(1) || '0'}%</span>
+                      <span className="text-green-400">{analytics?.pulseIntegrationEffectiveness?.toFixed(1) || '0'}%</span>
                       <CheckCircle className="h-4 w-4 text-green-400" />
                     </div>
                   </div>
@@ -1481,7 +1481,7 @@ export default function ACDSDashboard() {
                   <div className="flex items-center justify-between p-3 bg-gray-800 rounded">
                     <div className="flex items-center space-x-3">
                       <Globe className="h-5 w-5 text-purple-400" />
-                      <span className="text-gray-300">CypherHUM</span>
+                      <span className="text-gray-300">ECHO</span>
                     </div>
                     <div className="flex items-center space-x-2">
                       <span className="text-green-400">Connected</span>
