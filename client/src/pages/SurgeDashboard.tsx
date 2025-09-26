@@ -210,11 +210,7 @@ interface SwarmTelemetry {
   }>;
 }
 
-declare global {
-  interface Window {
-    google: any;
-  }
-}
+// Remove conflicting Google Maps type declaration - use existing one
 
 export default function SURGEDashboard() {
   const { user } = useAuth();
@@ -284,10 +280,7 @@ export default function SURGEDashboard() {
   // Drone deployment mutation
   const deployDroneMutation = useMutation({
     mutationFn: async ({ droneId, deploymentData }: { droneId: string; deploymentData: any }) => {
-      return apiRequest(`/api/surge/drones/${droneId}/deploy`, {
-        method: 'POST',
-        body: JSON.stringify(deploymentData),
-      });
+      return apiRequest(`/api/surge/drones/${droneId}/deploy`, 'POST', deploymentData);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/surge/drones'] });
@@ -309,10 +302,7 @@ export default function SURGEDashboard() {
   // Mission creation mutation
   const createMissionMutation = useMutation({
     mutationFn: async (missionData: any) => {
-      return apiRequest('/api/surge/swarm-missions', {
-        method: 'POST',
-        body: JSON.stringify(missionData),
-      });
+      return apiRequest('/api/surge/swarm-missions', 'POST', missionData);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/surge/swarm-missions'] });
@@ -333,10 +323,7 @@ export default function SURGEDashboard() {
   // Emergency recall mutation
   const emergencyRecallMutation = useMutation({
     mutationFn: async ({ reason, droneIds }: { reason: string; droneIds?: string[] }) => {
-      return apiRequest('/api/surge/emergency/recall', {
-        method: 'POST',
-        body: JSON.stringify({ reason, droneIds }),
-      });
+      return apiRequest('/api/surge/emergency/recall', 'POST', { reason, droneIds });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/surge/drones'] });
@@ -358,10 +345,7 @@ export default function SURGEDashboard() {
   // Coordination trigger mutation
   const coordinationTriggerMutation = useMutation({
     mutationFn: async ({ coordinationType, parameters }: { coordinationType: string; parameters: any }) => {
-      return apiRequest('/api/surge/coordination/trigger', {
-        method: 'POST',
-        body: JSON.stringify({ coordinationType, parameters }),
-      });
+      return apiRequest('/api/surge/coordination/trigger', 'POST', { coordinationType, parameters });
     },
     onSuccess: () => {
       toast({
@@ -635,7 +619,7 @@ export default function SURGEDashboard() {
     if (!drones) return [];
 
     return drones.map(drone => ({
-      id: drone.droneId,
+      threatId: drone.droneId,
       position: [
         parseFloat(drone.currentLatitude || '0'),
         parseFloat(drone.currentLongitude || '0'),
@@ -1542,14 +1526,11 @@ export default function SURGEDashboard() {
               <CardContent className="p-0">
                 <div className="h-[600px] relative">
                   <Holographic3DRenderer
-                    threatsData={get3DVisualizationData()}
-                    is3DActive={is3DViewActive}
-                    holographicIntensity={0.8}
-                    showParticles={true}
-                    showConnections={true}
-                    ambientIntensity={0.3}
-                    onThreatClick={(threatId) => {
-                      const drone = drones?.find(d => d.droneId === threatId);
+                    threats={get3DVisualizationData()}
+                    enableHolographicEffects={true}
+                    enableParticles={true}
+                    onThreatClick={(threat) => {
+                      const drone = drones?.find(d => d.droneId === threat.threatId);
                       if (drone) {
                         setSelectedDrone(drone.droneId);
                         toast({
@@ -1558,7 +1539,7 @@ export default function SURGEDashboard() {
                         });
                       }
                     }}
-                    style={{ width: '100%', height: '100%' }}
+                    className="w-full h-full"
                   />
                   
                   {/* 3D View Controls Overlay */}
