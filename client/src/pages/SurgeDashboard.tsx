@@ -65,7 +65,6 @@ import {
   Satellite,
   MonitorSpeaker,
   Crosshair,
-  FlightTakeoff,
   Plane,
   RefreshCw,
   Download,
@@ -869,7 +868,7 @@ export default function SURGEDashboard() {
             <Card className="bg-gray-900 border-gray-700" data-testid="card-active-deployments">
               <CardHeader>
                 <CardTitle className="text-green-400 flex items-center">
-                  <FlightTakeoff className="h-5 w-5 mr-2" />
+                  <Plane className="h-5 w-5 mr-2" />
                   Active Deployments
                 </CardTitle>
               </CardHeader>
@@ -1024,7 +1023,7 @@ export default function SURGEDashboard() {
                       onClick={() => handleDeployDrone(drone.droneId, mapCenter.lat, mapCenter.lng)}
                       data-testid={`button-deploy-${drone.droneId}`}
                     >
-                      <FlightTakeoff className="h-4 w-4 mr-2" />
+                      <Plane className="h-4 w-4 mr-2" />
                       Deploy
                     </Button>
                   </div>
