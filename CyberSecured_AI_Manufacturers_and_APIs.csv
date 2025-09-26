@@ -1,0 +1,57 @@
+Category,Company Name,Product/Service Affiliated,Potential Annual Cost,Company URL,Phone Number,Contact Email,Notes
+Hardware Manufacturers,Thales,Hardware Security Modules (HSM),"$15,000-50,000",https://www.thales.com,+1-888-744-4976,contact@thales.com,Luna HSM appliances for FIPS 140-2 compliance
+Hardware Manufacturers,Yubico,Hardware Security Modules,"$500-2,000",https://www.yubico.com,+1-650-285-0088,sales@yubico.com,YubiHSM 2 devices for key management
+Hardware Manufacturers,Utimaco,Hardware Security Modules,"$20,000-75,000",https://www.utimaco.com,+49-6201-9003-0,info@utimaco.com,CryptoServer HSM solutions
+Hardware Manufacturers,DJI Enterprise,ACDS Drone Hardware,"$5,000-25,000",https://enterprise.dji.com,+1-818-235-0789,enterprise@dji.com,Custom drone solutions for autonomous swarms
+Hardware Manufacturers,Autel Robotics,ACDS Drone Hardware,"$3,000-20,000",https://www.autel.com,+1-425-274-0294,info@autel.com,Enterprise drone systems
+Hardware Manufacturers,Skydio,ACDS Drone Hardware,"$8,000-35,000",https://www.skydio.com,+1-650-815-2830,enterprise@skydio.com,AI-powered autonomous drones
+Hardware Manufacturers,Parrot,ACDS Drone Hardware,"$2,000-15,000",https://www.parrot.com,+33-1-48-03-60-60,contact@parrot.com,Professional drone platforms
+Hardware Manufacturers,HID Global,Biometric Authentication Systems,"$2,000-15,000",https://www.hidglobal.com,+1-949-732-2000,info@hidglobal.com,Access control and biometric hardware
+Hardware Manufacturers,NEC Corporation,Advanced Biometric Systems,"$10,000-75,000",https://www.nec.com,+1-202-457-4700,contact@nec.com,Facial recognition and biometric solutions
+Hardware Manufacturers,Suprema,Biometric Authentication,"$1,500-10,000",https://www.supremainc.com,+82-31-783-4502,sales@suprema.co.kr,Fingerprint and facial recognition
+Hardware Manufacturers,BioKey International,Biometric Authentication,"$3,000-20,000",https://www.biokey.com,+1-952-924-8269,info@biokey.com,Enterprise biometric solutions
+Hardware Manufacturers,Zebra Technologies,Live Location Tracking Hardware,"$1,000-10,000",https://www.zebra.com,+1-847-634-6700,contact@zebra.com,RFID and real-time location systems
+Hardware Manufacturers,Impinj,RFID/Location Hardware,"$500-5,000",https://www.impinj.com,+1-206-266-5000,info@impinj.com,RAIN RFID solutions for asset tracking
+Hardware Manufacturers,Ubisense,Real-Time Location Systems,"$5,000-30,000",https://www.ubisense.com,+44-1223-535170,info@ubisense.com,Precise location tracking systems
+Hardware Manufacturers,AiRISTA Flow,Location Intelligence,"$2,000-15,000",https://airistaflow.com,+1-919-433-5990,info@airistaflow.com,Healthcare and enterprise tracking
+Hardware Manufacturers,Looking Glass Factory,CypherHUM Holographic Displays,"$25,000-100,000",https://lookingglassfactory.com,+1-718-613-2786,hello@lookingglassfactory.com,Holographic display technology
+Hardware Manufacturers,RealView Imaging,5D Holographic Systems,"$50,000-200,000",https://www.realviewimaging.com,+972-9-974-8832,info@realviewimaging.com,Medical holographic displays
+Hardware Manufacturers,Holoxica,Holographic Display Systems,"$30,000-150,000",https://www.holoxica.com,+44-131-526-4444,info@holoxica.com,3D holographic visualization
+Hardware Manufacturers,Palo Alto Networks,Network Security Appliances,"$10,000-100,000",https://www.paloaltonetworks.com,+1-408-753-4000,info@paloaltonetworks.com,Next-generation firewalls
+Hardware Manufacturers,Cisco Systems,Network Security Hardware,"$5,000-75,000",https://www.cisco.com,+1-800-553-6387,info@cisco.com,Firepower NGFW and IPS systems
+Hardware Manufacturers,Fortinet,Security Appliances,"$3,000-50,000",https://www.fortinet.com,+1-408-235-7700,sales@fortinet.com,FortiGate security appliances
+Hardware Manufacturers,F5 Networks,Application Security,"$8,000-60,000",https://www.f5.com,+1-206-272-5555,info@f5.com,BIG-IP ASM and WAF solutions
+Hardware Manufacturers,Check Point,Security Gateways,"$5,000-80,000",https://www.checkpoint.com,+1-650-628-2000,info@checkpoint.com,Next generation security gateways
+API/Software Companies,Mandiant (Google Cloud),Threat Intelligence API,"$50,000-200,000",https://www.mandiant.com,+1-703-263-4459,sales@mandiant.com,Advanced threat intelligence and incident response
+API/Software Companies,IBM Security,X-Force Threat Intelligence,"$25,000-100,000",https://www.ibm.com/security,+1-800-426-4968,security@ibm.com,X-Force Exchange threat intelligence API
+API/Software Companies,ThreatConnect,Platform API,"$30,000-150,000",https://threatconnect.com,+1-703-997-3300,sales@threatconnect.com,Threat intelligence platform and orchestration
+API/Software Companies,AT&T Cybersecurity,AlienVault OTX API,"$10,000-50,000",https://cybersecurity.att.com,+1-866-787-4968,cybersecurity@att.com,Open threat exchange and SIEM
+API/Software Companies,Anomali,TAXII/STIX Threat Feeds,"$15,000-75,000",https://www.anomali.com,+1-650-241-2296,info@anomali.com,Threat intelligence platform and feeds
+API/Software Companies,Recorded Future,Threat Intelligence API,"$40,000-180,000",https://www.recordedfuture.com,+1-617-453-6900,info@recordedfuture.com,Real-time threat intelligence
+API/Software Companies,CrowdStrike,Falcon Intelligence API,"$35,000-150,000",https://www.crowdstrike.com,+1-888-512-8906,sales@crowdstrike.com,Threat intelligence and endpoint protection
+API/Software Companies,FireEye,Threat Intelligence API,"$45,000-200,000",https://www.fireeye.com,+1-877-347-3393,info@fireeye.com,Advanced threat detection and intelligence
+API/Software Companies,Amazon Web Services,Machine Learning APIs,"$5,000-25,000",https://aws.amazon.com,+1-206-266-4064,aws-sales@amazon.com,SageMaker and AI/ML services
+API/Software Companies,Google Cloud,AI/ML Platform APIs,"$8,000-40,000",https://cloud.google.com,+1-877-453-1350,cloud-sales@google.com,Vertex AI and machine learning APIs
+API/Software Companies,Microsoft Azure,Cognitive Services APIs,"$6,000-35,000",https://azure.microsoft.com,+1-800-642-7676,azuresales@microsoft.com,AI and machine learning services
+API/Software Companies,OpenAI,GPT and AI APIs,"$2,000-20,000",https://openai.com,N/A,support@openai.com,Large language models and AI APIs
+API/Software Companies,CIRCL,Threat Intelligence Tools,"$0-5,000",https://www.circl.lu,+352-247-88444,info@circl.lu,Open source threat intelligence tools
+API/Software Companies,MISP Project,Threat Sharing Platform,"$0-10,000",https://www.misp-project.org,N/A,info@misp-project.org,Open source threat intelligence sharing
+API/Software Companies,VirusTotal (Google),Malware Analysis API,"$5,000-25,000",https://www.virustotal.com,Via Google Cloud,enterprise@virustotal.com,File and URL scanning API
+API/Software Companies,SendGrid (Twilio),Email Delivery API,"$1,000-5,000",https://sendgrid.com,+1-877-992-1646,sales@sendgrid.com,Transactional email and notifications
+API/Software Companies,Twilio,Communications API,"$2,000-10,000",https://www.twilio.com,+1-844-814-4627,sales@twilio.com,SMS voice and communication APIs
+API/Software Companies,Amazon SES,Email Service API,"$500-3,000",https://aws.amazon.com/ses,+1-206-266-4064,aws-sales@amazon.com,Simple email service for notifications
+API/Software Companies,Okta,Identity Management API,"$15,000-75,000",https://www.okta.com,+1-888-722-7871,sales@okta.com,Enterprise identity and access management
+API/Software Companies,Auth0,Authentication API,"$5,000-30,000",https://auth0.com,+1-888-383-5133,sales@auth0.com,Identity platform and authentication APIs
+API/Software Companies,Microsoft Azure AD,Identity Services API,"$8,000-50,000",https://azure.microsoft.com,+1-800-642-7676,azuresales@microsoft.com,Azure Active Directory services
+API/Software Companies,OneLogin,SSO and Identity API,"$10,000-60,000",https://www.onelogin.com,+1-800-584-9771,sales@onelogin.com,Single sign-on and identity management
+API/Software Companies,JumpCloud,Directory Services API,"$3,000-25,000",https://jumpcloud.com,+1-855-426-6287,sales@jumpcloud.com,Cloud directory and identity management
+API/Software Companies,Duo Security (Cisco),Multi-Factor Authentication API,"$5,000-40,000",https://duo.com,+1-734-222-3322,sales@duo.com,Two-factor authentication and security
+API/Software Companies,RSA Security,Authentication APIs,"$12,000-80,000",https://www.rsa.com,+1-781-515-5000,info@rsa.com,SecurID and authentication solutions
+API/Software Companies,CyberArk,Privileged Access API,"$20,000-120,000",https://www.cyberark.com,+1-617-558-2678,info@cyberark.com,Privileged access management APIs
+API/Software Companies,BeyondTrust,Privileged Access API,"$15,000-90,000",https://www.beyondtrust.com,+1-800-234-9072,info@beyondtrust.com,Privileged access and endpoint security
+API/Software Companies,Rapid7,Security Analytics API,"$10,000-60,000",https://www.rapid7.com,+1-617-247-1717,info@rapid7.com,InsightIDR and security analytics
+API/Software Companies,Splunk,SIEM and Analytics API,"$25,000-150,000",https://www.splunk.com,+1-415-848-8400,sales@splunk.com,Security information and event management
+API/Software Companies,LogRhythm,SIEM Platform API,"$20,000-100,000",https://logrhythm.com,+1-303-449-8119,info@logrhythm.com,Security analytics and SIEM
+API/Software Companies,Sumo Logic,Security Analytics API,"$8,000-50,000",https://www.sumologic.com,+1-650-810-8700,info@sumologic.com,Cloud-native security analytics
+API/Software Companies,Datadog,Security Monitoring API,"$5,000-30,000",https://www.datadoghq.com,+1-866-329-4466,sales@datadoghq.com,Infrastructure and security monitoring
+API/Software Companies,New Relic,Application Security API,"$3,000-20,000",https://newrelic.com,+1-877-696-7942,sales@newrelic.com,Application performance and security monitoring
