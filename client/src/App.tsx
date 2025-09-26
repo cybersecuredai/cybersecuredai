@@ -130,6 +130,11 @@ const IdentityAccessManagement = lazy(() => import("@/pages/platform/IdentityAcc
 const SystemAdministration = lazy(() => import("@/pages/platform/SystemAdministration"));
 const HardwareSecurityModules = lazy(() => import("@/pages/platform/HardwareSecurityModules"));
 const BiometricAuthentication = lazy(() => import("@/pages/platform/BiometricAuthentication"));
+const APEXGeneticAI = lazy(() => import("@/pages/platform/APEXGeneticAI"));
+const ECHOHolographic = lazy(() => import("@/pages/platform/ECHOHolographic"));
+const PULSELocationIntelligence = lazy(() => import("@/pages/platform/PULSELocationIntelligence"));
+const SURGEAutonomousDefense = lazy(() => import("@/pages/platform/SURGEAutonomousDefense"));
+const FLOWOperationsAutomation = lazy(() => import("@/pages/platform/FLOWOperationsAutomation"));
 
 // Catalog Management System - Internal pricing and product management
 const Catalog = lazy(() => import("@/pages/Catalog"));
@@ -302,6 +307,11 @@ function Router() {
       
       {/* Platform Pages */}
       <Route path="/platform" component={Platform} />
+      <Route path="/platform/apex-genetic-ai" component={APEXGeneticAI} />
+      <Route path="/platform/echo-holographic" component={ECHOHolographic} />
+      <Route path="/platform/pulse-predictive" component={PULSELocationIntelligence} />
+      <Route path="/platform/surge-unified-response" component={SURGEAutonomousDefense} />
+      <Route path="/platform/flow-federated-learning" component={FLOWOperationsAutomation} />
       <Route path="/platform/automated-incident-response" component={AutomatedIncidentResponse} />
       <Route path="/platform/threat-detection" component={PlatformThreatDetection} />
       <Route path="/platform/predictive-risk-analysis" component={PredictiveRiskAnalysis} />
