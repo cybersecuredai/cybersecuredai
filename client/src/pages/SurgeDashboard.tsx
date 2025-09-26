@@ -66,7 +66,7 @@ import {
   MonitorSpeaker,
   Crosshair,
   FlightTakeoff,
-  FlightLand,
+  Plane,
   RefreshCw,
   Download,
   Upload,
@@ -734,7 +734,7 @@ export default function SURGEDashboard() {
                   onClick={() => handleEmergencyRecall('manual_emergency')}
                   data-testid="button-emergency-recall"
                 >
-                  <FlightLand className="h-4 w-4 mr-2" />
+                  <Plane className="h-4 w-4 mr-2" />
                   RECALL ALL DRONES
                 </Button>
                 <Button
