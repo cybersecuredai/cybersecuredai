@@ -61,14 +61,14 @@ const ThreatIntelligenceDashboard = lazy(() => import("@/pages/ThreatIntelligenc
 const MISPLiveDashboard = lazy(() => import("@/pages/MISPLiveDashboard"));
 const MISPBenefits = lazy(() => import("@/pages/MISPBenefits"));
 const VulnerabilityTrendDashboard = lazy(() => import("@/pages/VulnerabilityTrendDashboard"));
-const CydefDashboard = lazy(() => import("@/pages/CydefDashboard"));
+const PulseDashboard = lazy(() => import("@/pages/PulseDashboard"));
 const LiveLocationDashboard = lazy(() => import("@/pages/LiveLocationDashboard"));
-// Advanced ACDS (Autonomous Cyber Defense Swarm) Dashboard - lazy loaded due to heavy 3D/map components
-const ACDSDashboard = lazy(() => import("@/pages/ACDSDashboard"));
+// Advanced SURGE (Strategic Unified Response Generation Engine) Dashboard - lazy loaded due to heavy 3D/map components
+const SURGEDashboard = lazy(() => import("@/pages/SurgeDashboard"));
 // Heavy 3D visualization component - lazy loaded to reduce initial bundle
 const ThreatMap5D = lazy(() => import("@/pages/ThreatMap5D"));
-// Revolutionary CypherHUM 5D Holographic AI Interface with Live Avatar - lazy loaded due to heavy dependencies
-const CypherHumInterface = lazy(() => import("@/pages/CypherHumInterface"));
+// Revolutionary ECHO 5D Holographic AI Interface with Live Avatar - lazy loaded due to heavy dependencies
+const EchoInterface = lazy(() => import("@/pages/EchoInterface"));
 // Public Health Dashboard - comprehensive disease surveillance and outbreak management
 const PublicHealthDashboard = lazy(() => import("@/pages/PublicHealthDashboard"));
 
@@ -194,10 +194,10 @@ function Router() {
                           location.startsWith('/threat-') ||
                           location.startsWith('/ai-config') ||
                           location.startsWith('/support') ||
-                          location.startsWith('/cydef-dashboard') ||
+                          location.startsWith('/pulse-dashboard') ||
                           location.startsWith('/live-location-dashboard') ||
-                          location.startsWith('/acds-dashboard') ||
-                          location.startsWith('/cypherhum-interface') ||
+                          location.startsWith('/surge-dashboard') ||
+                          location.startsWith('/echo-interface') ||
                           location.startsWith('/public-health-dashboard');
 
     // Show onboarding if user exists, is on a platform page, and lacks proper auth setup
@@ -345,9 +345,9 @@ function Router() {
           <VulnerabilityTrendDashboard />
         </Layout>
       </Route>
-      <Route path="/cydef-dashboard">
+      <Route path="/pulse-dashboard">
         <Layout>
-          <CydefDashboard />
+          <PulseDashboard />
         </Layout>
       </Route>
       
@@ -357,11 +357,11 @@ function Router() {
         </Layout>
       </Route>
       
-      {/* ACDS (Autonomous Cyber Defense Swarm) Advanced Dashboard */}
-      <Route path="/acds-dashboard">
+      {/* SURGE (Strategic Unified Response Generation Engine) Advanced Dashboard */}
+      <Route path="/surge-dashboard">
         <Layout>
           <LazyErrorBoundary>
-            <ACDSDashboard />
+            <SURGEDashboard />
           </LazyErrorBoundary>
         </Layout>
       </Route>
@@ -372,11 +372,11 @@ function Router() {
         </Layout>
       </Route>
       
-      {/* CypherHUM Revolutionary 3D Holographic AI Interface */}
-      <Route path="/cypherhum-interface">
+      {/* ECHO Revolutionary 3D Holographic AI Interface */}
+      <Route path="/echo-interface">
         <Layout>
           <LazyErrorBoundary>
-            <CypherHumInterface />
+            <EchoInterface />
           </LazyErrorBoundary>
         </Layout>
       </Route>

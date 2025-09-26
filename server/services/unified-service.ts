@@ -1,11 +1,11 @@
 /**
  * Unified Service Layer
  * 
- * Aggregates data from all four CyberSecured AI systems:
- * - CyDEF (Autonomous Cyber Defense) 
- * - Live Location Tracking
- * - CypherHUM (Holographic User Interface Model)
- * - ACDS (Autonomous Cyber Defense Swarm)
+ * Aggregates data from all four POD Intelligence systems:
+ * - PULSE (Location Intelligence)
+ * - Live Location Tracking  
+ * - ECHO (Holographic Interface)
+ * - SURGE (Autonomous Defense)
  * 
  * Provides unified APIs, cross-system correlation, and executive reporting.
  */
@@ -29,10 +29,10 @@ import {
 } from '../../shared/schema.js';
 
 // Import service types
-import type { CydefService, CydefSystemStatus } from './cydef-service.js';
+import type { PulseService, PulseSystemStatus } from './pulse-service.js';
 import type { LiveLocationService, LiveLocationStats } from './live-location-service.js';
-import type { CypherHumService, HolographicSessionState } from './cypherhum-service.js';
-import type { ACDSService, DroneFleetStatus } from './acds-service.js';
+import type { EchoService, HolographicSessionState } from './echo-service.js';
+import type { SurgeService, DroneFleetStatus } from './surge-service.js';
 
 export interface UnifiedServiceConfig {
   organizationId: string;
@@ -45,10 +45,10 @@ export interface UnifiedServiceConfig {
 }
 
 export interface SystemIntegrationStatus {
-  cydefIntegrated: boolean;
+  pulseIntegrated: boolean;
   liveLocationIntegrated: boolean;
-  cypherHUMIntegrated: boolean;
-  acdsIntegrated: boolean;
+  echoIntegrated: boolean;
+  surgeIntegrated: boolean;
   lastIntegrationCheck: Date;
   integrationErrors: string[];
 }
@@ -61,10 +61,10 @@ export interface ThreatCorrelationResult {
   riskLevel: 'low' | 'medium' | 'high' | 'critical';
   affectedSystems: string[];
   correlationData: {
-    cydefAnalysis?: any;
+    pulseAnalysis?: any;
     locationData?: any;
-    cypherHumVisualization?: any;
-    acdsResponse?: any;
+    echoVisualization?: any;
+    surgeResponse?: any;
   };
   automaticActions: string[];
   recommendations: string[];
@@ -79,10 +79,10 @@ export class UnifiedService extends EventEmitter {
   private initPromise: Promise<void> | null = null;
 
   // Service integrations (lazy loaded)
-  private cydefService?: CydefService;
+  private pulseService?: PulseService;
   private liveLocationService?: LiveLocationService;
-  private cypherHumService?: CypherHumService;
-  private acdsService?: ACDSService;
+  private echoService?: EchoService;
+  private surgeService?: SurgeService;
 
   // Unified alert management
   private alerts: Map<string, UnifiedAlert> = new Map();
@@ -99,10 +99,10 @@ export class UnifiedService extends EventEmitter {
   
   // Integration status
   private integrationStatus: SystemIntegrationStatus = {
-    cydefIntegrated: false,
+    pulseIntegrated: false,
     liveLocationIntegrated: false,
-    cypherHUMIntegrated: false,
-    acdsIntegrated: false,
+    echoIntegrated: false,
+    surgeIntegrated: false,
     lastIntegrationCheck: new Date(),
     integrationErrors: [],
   };
@@ -175,11 +175,11 @@ export class UnifiedService extends EventEmitter {
     const errors: string[] = [];
     
     try {
-      // CyDEF Service Integration
-      const { CydefService } = await import('./cydef-service.js');
-      this.cydefService = new CydefService({
+      // PULSE Service Integration
+      const { PulseService } = await import('./pulse-service.js');
+      this.pulseService = new PulseService({
         organizationId: this.config.organizationId,
-        systemName: 'Unified-CyDEF',
+        systemName: 'Unified-PULSE',
         targetAccuracy: 992,
         autonomousMode: true,
         threatDetectionEngine: 'hybrid',
@@ -187,13 +187,13 @@ export class UnifiedService extends EventEmitter {
         dbProvider: this.dbProvider
       });
       
-      await this.cydefService.initialize();
-      this.integrationStatus.cydefIntegrated = true;
+      await this.pulseService.initialize();
+      this.integrationStatus.pulseIntegrated = true;
       
       // Set up event forwarding
-      this.cydefService.on('threatDetected', (threat) => {
+      this.pulseService.on('threatDetected', (threat) => {
         this.emit('systemAlert', {
-          sourceSystem: 'cydef',
+          sourceSystem: 'pulse',
           sourceId: threat.id,
           alertType: 'security_threat',
           severity: threat.severity,
@@ -201,11 +201,11 @@ export class UnifiedService extends EventEmitter {
         });
       });
       
-      console.log('✅ CyDEF Service integrated');
+      console.log('✅ PULSE Service integrated');
       
     } catch (error) {
-      errors.push(`CyDEF integration failed: ${error}`);
-      console.warn('⚠️ CyDEF Service integration failed:', error);
+      errors.push(`PULSE integration failed: ${error}`);
+      console.warn('⚠️ PULSE Service integration failed:', error);
     }
 
     try {
@@ -244,23 +244,23 @@ export class UnifiedService extends EventEmitter {
     }
 
     try {
-      // CypherHUM Service Integration
-      const { CypherHumService } = await import('./cypherhum-service.js');
-      this.cypherHumService = new CypherHumService(
+      // ECHO Service Integration
+      const { EchoService } = await import('./echo-service.js');
+      this.echoService = new EchoService(
         this.dbProvider,
-        this.cydefService,
+        this.pulseService,
         undefined, // cypherAI will be auto-created
         this.liveLocationService,
         undefined // geospatial will be auto-created
       );
       
-      await this.cypherHumService.initialize();
-      this.integrationStatus.cypherHUMIntegrated = true;
+      await this.echoService.initialize();
+      this.integrationStatus.echoIntegrated = true;
       
       // Set up event forwarding
-      this.cypherHumService.on('aiThreatAnalysis', (analysis) => {
+      this.echoService.on('aiThreatAnalysis', (analysis) => {
         this.emit('systemAlert', {
-          sourceSystem: 'cypherHUM',
+          sourceSystem: 'echo',
           sourceId: analysis.threatId,
           alertType: 'ai_correlation',
           severity: analysis.aiResponse.confidence > 80 ? 'high' : 'medium',
@@ -268,22 +268,22 @@ export class UnifiedService extends EventEmitter {
         });
       });
       
-      console.log('✅ CypherHUM Service integrated');
+      console.log('✅ ECHO Service integrated');
       
     } catch (error) {
-      errors.push(`CypherHUM integration failed: ${error}`);
-      console.warn('⚠️ CypherHUM Service integration failed:', error);
+      errors.push(`ECHO integration failed: ${error}`);
+      console.warn('⚠️ ECHO Service integration failed:', error);
     }
 
     try {
-      // ACDS Service Integration
-      const { ACDSService } = await import('./acds-service.js');
-      this.acdsService = new ACDSService({
+      // SURGE Service Integration
+      const { SurgeService } = await import('./surge-service.js');
+      this.surgeService = new SurgeService({
         organizationId: this.config.organizationId,
         swarmSize: 10,
         autonomyLevel: 'ai_driven',
         coordinationAlgorithm: 'ai_optimized',
-        cydefIntegrationEnabled: true,
+        pulseIntegrationEnabled: true,
         liveLocationIntegrationEnabled: true,
         realTimeCoordinationEnabled: true,
         emergencyResponseEnabled: true,
@@ -293,13 +293,13 @@ export class UnifiedService extends EventEmitter {
         dbProvider: this.dbProvider
       }, this.dbProvider);
       
-      await this.acdsService.initialize();
-      this.integrationStatus.acdsIntegrated = true;
+      await this.surgeService.initialize();
+      this.integrationStatus.surgeIntegrated = true;
       
       // Set up event forwarding
-      this.acdsService.on('missionCritical', (mission) => {
+      this.surgeService.on('missionCritical', (mission) => {
         this.emit('systemAlert', {
-          sourceSystem: 'acds',
+          sourceSystem: 'surge',
           sourceId: mission.missionId,
           alertType: 'mission_critical',
           severity: mission.priority === 'emergency' ? 'emergency' : 'critical',
@@ -307,11 +307,11 @@ export class UnifiedService extends EventEmitter {
         });
       });
       
-      console.log('✅ ACDS Service integrated');
+      console.log('✅ SURGE Service integrated');
       
     } catch (error) {
-      errors.push(`ACDS integration failed: ${error}`);
-      console.warn('⚠️ ACDS Service integration failed:', error);
+      errors.push(`SURGE integration failed: ${error}`);
+      console.warn('⚠️ SURGE Service integration failed:', error);
     }
 
     // Update integration status
@@ -352,30 +352,30 @@ export class UnifiedService extends EventEmitter {
     
     try {
       // Get data from all systems
-      const [cydefThreats, locationAlerts, cypherHumSessions, acdsDeployments] = await Promise.allSettled([
-        this.cydefService?.getActiveThreats() || Promise.resolve([]),
+      const [pulseThreats, locationAlerts, echoSessions, surgeDeployments] = await Promise.allSettled([
+        this.pulseService?.getActiveThreats() || Promise.resolve([]),
         this.liveLocationService?.getActiveAlerts() || Promise.resolve([]),
-        this.cypherHumService?.getActiveSessions() || Promise.resolve([]),
-        this.acdsService?.getActiveDeployments() || Promise.resolve([])
+        this.echoService?.getActiveSessions() || Promise.resolve([]),
+        this.surgeService?.getActiveDeployments() || Promise.resolve([])
       ]);
 
       // Spatial correlation analysis
       const spatialCorrelations = await this.analyzeSpatialCorrelations(
-        cydefThreats.status === 'fulfilled' ? cydefThreats.value : [],
+        pulseThreats.status === 'fulfilled' ? pulseThreats.value : [],
         locationAlerts.status === 'fulfilled' ? locationAlerts.value : []
       );
       correlations.push(...spatialCorrelations);
 
       // Temporal correlation analysis  
       const temporalCorrelations = await this.analyzeTemporalCorrelations(
-        cydefThreats.status === 'fulfilled' ? cydefThreats.value : [],
-        acdsDeployments.status === 'fulfilled' ? acdsDeployments.value : []
+        pulseThreats.status === 'fulfilled' ? pulseThreats.value : [],
+        surgeDeployments.status === 'fulfilled' ? surgeDeployments.value : []
       );
       correlations.push(...temporalCorrelations);
 
       // AI pattern correlation
       const aiCorrelations = await this.analyzeAIPatternCorrelations(
-        cypherHumSessions.status === 'fulfilled' ? cypherHumSessions.value : []
+        echoSessions.status === 'fulfilled' ? echoSessions.value : []
       );
       correlations.push(...aiCorrelations);
 
@@ -420,9 +420,9 @@ export class UnifiedService extends EventEmitter {
               correlationType: 'spatial',
               confidenceScore: Math.max(0, 100 - (distance * 50)),
               riskLevel: distance < 0.1 ? 'critical' : distance < 0.5 ? 'high' : 'medium',
-              affectedSystems: ['cydef', 'liveLocation'],
+              affectedSystems: ['pulse', 'liveLocation'],
               correlationData: {
-                cydefAnalysis: threat,
+                pulseAnalysis: threat,
                 locationData: event,
               },
               automaticActions: ['increase_monitoring', 'alert_security_team'],
@@ -457,10 +457,10 @@ export class UnifiedService extends EventEmitter {
             correlationType: 'temporal',
             confidenceScore: Math.max(0, 100 - (timeDiff / TIME_WINDOW_MS * 100)),
             riskLevel: timeDiff < 60000 ? 'critical' : timeDiff < 180000 ? 'high' : 'medium',
-            affectedSystems: ['cydef', 'acds'],
+            affectedSystems: ['pulse', 'surge'],
             correlationData: {
-              cydefAnalysis: threat,
-              acdsResponse: deployment,
+              pulseAnalysis: threat,
+              surgeResponse: deployment,
             },
             automaticActions: ['coordinate_response', 'update_threat_model'],
             recommendations: [`Investigate temporal correlation within ${Math.round(timeDiff/1000)} seconds`],
@@ -474,7 +474,7 @@ export class UnifiedService extends EventEmitter {
   }
 
   /**
-   * Analyze AI pattern correlations from CypherHUM sessions
+   * Analyze AI pattern correlations from ECHO sessions
    */
   private async analyzeAIPatternCorrelations(sessions: any[]): Promise<ThreatCorrelationResult[]> {
     const correlations: ThreatCorrelationResult[] = [];
@@ -494,9 +494,9 @@ export class UnifiedService extends EventEmitter {
               (avg: number, i: any) => avg + i.aiResponse.confidence, 0
             ) / highConfidenceInteractions.length),
             riskLevel: 'high',
-            affectedSystems: ['cypherHUM', 'cydef'],
+            affectedSystems: ['echo', 'pulse'],
             correlationData: {
-              cypherHumVisualization: session,
+              echoVisualization: session,
             },
             automaticActions: ['enhance_ai_analysis', 'update_visual_models'],
             recommendations: [`AI pattern detected across ${highConfidenceInteractions.length} interactions`],
@@ -568,20 +568,20 @@ export class UnifiedService extends EventEmitter {
       }
     };
 
-    if (this.cydefService) {
-      metrics.cydef = await this.cydefService.getPerformanceMetrics?.() || {};
+    if (this.pulseService) {
+      metrics.pulse = await this.pulseService.getPerformanceMetrics?.() || {};
     }
     
     if (this.liveLocationService) {
       metrics.liveLocation = await this.liveLocationService.getStats?.() || {};
     }
     
-    if (this.cypherHumService) {
-      metrics.cypherHUM = await this.cypherHumService.getSessionMetrics?.() || {};
+    if (this.echoService) {
+      metrics.echo = await this.echoService.getSessionMetrics?.() || {};
     }
     
-    if (this.acdsService) {
-      metrics.acds = await this.acdsService.getFleetStatus?.() || {};
+    if (this.surgeService) {
+      metrics.surge = await this.surgeService.getFleetStatus?.() || {};
     }
 
     this.performanceMetrics.set('latest', metrics);
@@ -594,10 +594,10 @@ export class UnifiedService extends EventEmitter {
     await this.initialize();
 
     // Get individual system statuses
-    const cydefStatus = await this.cydefService?.getSystemStatus?.() || null;
+    const pulseStatus = await this.pulseService?.getSystemStatus?.() || null;
     const liveLocationStats = await this.liveLocationService?.getStats?.() || null;
-    const cypherHumMetrics = await this.cypherHumService?.getSessionMetrics?.() || null;
-    const acdsFleetStatus = await this.acdsService?.getFleetStatus?.() || null;
+    const echoMetrics = await this.echoService?.getSessionMetrics?.() || null;
+    const surgeFleetStatus = await this.surgeService?.getFleetStatus?.() || null;
 
     const unifiedStatus: UnifiedSystemStatus = {
       systemId: `unified-${this.config.organizationId}`,
@@ -605,13 +605,13 @@ export class UnifiedService extends EventEmitter {
       status: this.calculateOverallStatus(),
       lastUpdate: new Date().toISOString(),
       subsystems: {
-        cydef: {
-          status: cydefStatus ? 'operational' : 'offline',
-          activeThreats: cydefStatus?.totalThreatsProcessed || 0,
-          geneticGeneration: cydefStatus?.currentGeneration || 0,
-          fitnessScore: cydefStatus?.bestFitnessScore || 0,
-          autonomousMode: cydefStatus?.autonomousMode || false,
-          lastEvolution: cydefStatus?.lastEvolutionCycle?.toISOString(),
+        pulse: {
+          status: pulseStatus ? 'operational' : 'offline',
+          activeThreats: pulseStatus?.totalThreatsProcessed || 0,
+          geneticGeneration: pulseStatus?.currentGeneration || 0,
+          fitnessScore: pulseStatus?.bestFitnessScore || 0,
+          autonomousMode: pulseStatus?.autonomousMode || false,
+          lastEvolution: pulseStatus?.lastEvolutionCycle?.toISOString(),
         },
         liveLocation: {
           status: liveLocationStats ? 'operational' : 'offline',
@@ -621,21 +621,21 @@ export class UnifiedService extends EventEmitter {
           geofenceBreaches: 0,
           lastLocationUpdate: new Date().toISOString(),
         },
-        cypherHUM: {
-          status: cypherHumMetrics ? 'operational' : 'offline',
-          activeSessions: cypherHumMetrics?.activeSessions || 0,
-          threatsVisualized: cypherHumMetrics?.threatsProcessed || 0,
-          aiInteractions: cypherHumMetrics?.aiInteractions || 0,
+        echo: {
+          status: echoMetrics ? 'operational' : 'offline',
+          activeSessions: echoMetrics?.activeSessions || 0,
+          threatsVisualized: echoMetrics?.threatsProcessed || 0,
+          aiInteractions: echoMetrics?.aiInteractions || 0,
           holographicQuality: 'high',
-          averageFPS: cypherHumMetrics?.averageFPS || 60,
+          averageFPS: echoMetrics?.averageFPS || 60,
         },
-        acds: {
-          status: acdsFleetStatus ? 'operational' : 'offline',
-          totalDrones: acdsFleetStatus?.totalDrones || 0,
-          activeDrones: acdsFleetStatus?.activeDrones || 0,
-          activeMissions: acdsFleetStatus?.activeDeployments || 0,
-          swarmCoordination: acdsFleetStatus?.swarmCoordination || 'autonomous',
-          averageBatteryLevel: acdsFleetStatus?.averageBatteryLevel || 0,
+        surge: {
+          status: surgeFleetStatus ? 'operational' : 'offline',
+          totalDrones: surgeFleetStatus?.totalDrones || 0,
+          activeDrones: surgeFleetStatus?.activeDrones || 0,
+          activeMissions: surgeFleetStatus?.activeDeployments || 0,
+          swarmCoordination: surgeFleetStatus?.swarmCoordination || 'autonomous',
+          averageBatteryLevel: surgeFleetStatus?.averageBatteryLevel || 0,
         },
       },
       overallHealth: this.calculateOverallHealth(),
@@ -694,10 +694,10 @@ export class UnifiedService extends EventEmitter {
         end: new Date().toISOString(),
       },
       correlationAnalysis: {
-        cydefLiveLocationCorrelation: this.calculateCorrelationStrength('spatial'),
-        cydefACDSCorrelation: this.calculateCorrelationStrength('temporal'),
-        liveLocationACDSCorrelation: 0.65,
-        cypherHUMEffectiveness: this.calculateCorrelationStrength('ai_pattern'),
+        pulseLiveLocationCorrelation: this.calculateCorrelationStrength('spatial'),
+        pulseSURGECorrelation: this.calculateCorrelationStrength('temporal'),
+        liveLocationSURGECorrelation: 0.65,
+        echoEffectiveness: this.calculateCorrelationStrength('ai_pattern'),
         overallSystemSynergy: filteredCorrelations.length > 0 ? 0.85 : 0.50,
       },
       threatResponseMetrics: {
@@ -760,9 +760,9 @@ export class UnifiedService extends EventEmitter {
                                systemStatus.overallHealth > 80 ? 'good' : 
                                systemStatus.overallHealth > 70 ? 'fair' : 
                                systemStatus.overallHealth > 50 ? 'poor' : 'critical',
-        threatLandscapeStatus: systemStatus.subsystems.cydef.activeThreats > 50 ? 'critical' :
-                              systemStatus.subsystems.cydef.activeThreats > 20 ? 'high' :
-                              systemStatus.subsystems.cydef.activeThreats > 5 ? 'elevated' : 'calm',
+        threatLandscapeStatus: systemStatus.subsystems.pulse.activeThreats > 50 ? 'critical' :
+                              systemStatus.subsystems.pulse.activeThreats > 20 ? 'high' :
+                              systemStatus.subsystems.pulse.activeThreats > 5 ? 'elevated' : 'calm',
         systemPerformanceRating: systemStatus.overallHealth,
         complianceStatus: crossSystemMetrics.operationalMetrics.complianceScore > 95 ? 'compliant' :
                          crossSystemMetrics.operationalMetrics.complianceScore > 85 ? 'minor_issues' :
@@ -781,9 +781,9 @@ export class UnifiedService extends EventEmitter {
       },
       trendAnalysis: {
         threatTrends: [
-          { period: '24h', threatCount: systemStatus.subsystems.cydef.activeThreats, severity: 'medium', category: 'malware' },
-          { period: '7d', threatCount: systemStatus.subsystems.cydef.activeThreats * 6, severity: 'medium', category: 'phishing' },
-          { period: '30d', threatCount: systemStatus.subsystems.cydef.activeThreats * 25, severity: 'low', category: 'anomaly' },
+          { period: '24h', threatCount: systemStatus.subsystems.pulse.activeThreats, severity: 'medium', category: 'malware' },
+          { period: '7d', threatCount: systemStatus.subsystems.pulse.activeThreats * 6, severity: 'medium', category: 'phishing' },
+          { period: '30d', threatCount: systemStatus.subsystems.pulse.activeThreats * 25, severity: 'low', category: 'anomaly' },
         ],
         performanceTrends: [
           { period: '24h', metric: 'response_time', value: crossSystemMetrics.threatResponseMetrics.averageResponseTime, trend: 'improving' },
@@ -802,8 +802,8 @@ export class UnifiedService extends EventEmitter {
         ],
         recommendations: [
           'Increase genetic algorithm evolution frequency',
-          'Deploy additional ACDS drones for coverage',
-          'Enhance CypherHUM visualization accuracy',
+          'Deploy additional SURGE drones for coverage',
+          'Enhance ECHO visualization accuracy',
           'Implement predictive threat modeling'
         ],
       },
@@ -887,10 +887,10 @@ export class UnifiedService extends EventEmitter {
       },
       totalAlerts: filteredAlerts.length,
       alertsBySystem: {
-        cydef: filteredAlerts.filter(a => a.sourceSystem === 'cydef').length,
+        pulse: filteredAlerts.filter(a => a.sourceSystem === 'pulse').length,
         liveLocation: filteredAlerts.filter(a => a.sourceSystem === 'liveLocation').length,
-        cypherHUM: filteredAlerts.filter(a => a.sourceSystem === 'cypherHUM').length,
-        acds: filteredAlerts.filter(a => a.sourceSystem === 'acds').length,
+        echo: filteredAlerts.filter(a => a.sourceSystem === 'echo').length,
+        surge: filteredAlerts.filter(a => a.sourceSystem === 'surge').length,
         unified: filteredAlerts.filter(a => a.sourceSystem === 'unified').length,
       },
       alertsBySeverity: {
@@ -1191,20 +1191,20 @@ export class UnifiedService extends EventEmitter {
     }
     
     // Shutdown integrated services
-    if (this.cydefService) {
-      await this.cydefService.shutdown?.();
+    if (this.pulseService) {
+      await this.pulseService.shutdown?.();
     }
     
     if (this.liveLocationService) {
       await this.liveLocationService.shutdown?.();
     }
     
-    if (this.cypherHumService) {
-      await this.cypherHumService.shutdown?.();
+    if (this.echoService) {
+      await this.echoService.shutdown?.();
     }
     
-    if (this.acdsService) {
-      await this.acdsService.shutdown?.();
+    if (this.surgeService) {
+      await this.surgeService.shutdown?.();
     }
     
     this.isInitialized = false;

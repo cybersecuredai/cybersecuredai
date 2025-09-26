@@ -61,26 +61,26 @@ import {
   type Subscriber,
   type InsertSubscriber,
   type UpsertUser,
-  type CypherhumSession,
-  type InsertCypherhumSession,
-  type CypherhumVisualization,
-  type InsertCypherhumVisualization,
-  type CypherhumInteraction,
-  type InsertCypherhumInteraction,
-  type CypherhumThreatModel,
-  type InsertCypherhumThreatModel,
-  type CypherhumAnalytics,
-  type InsertCypherhumAnalytics,
-  type AcdsDrone,
-  type InsertAcdsDrone,
-  type AcdsSwarmMission,
-  type InsertAcdsSwarmMission,
-  type AcdsDeployment,
-  type InsertAcdsDeployment,
-  type AcdsCoordination,
-  type InsertAcdsCoordination,
-  type AcdsAnalytics,
-  type InsertAcdsAnalytics,
+  type EchoSession,
+  type InsertEchoSession,
+  type EchoVisualization,
+  type InsertEchoVisualization,
+  type EchoInteraction,
+  type InsertEchoInteraction,
+  type EchoThreatModel,
+  type InsertEchoThreatModel,
+  type EchoAnalytics,
+  type InsertEchoAnalytics,
+  type SurgeDrone,
+  type InsertSurgeDrone,
+  type SurgeSwarmMission,
+  type InsertSurgeSwarmMission,
+  type SurgeDeployment,
+  type InsertSurgeDeployment,
+  type SurgeCoordination,
+  type InsertSurgeCoordination,
+  type SurgeAnalytics,
+  type InsertSurgeAnalytics,
   // Public Health imports
   type PublicHealthIncident,
   type InsertPublicHealthIncident,
@@ -232,89 +232,89 @@ export interface IStorage {
   createConfirmationCode(data: any): Promise<any>;
   verifyConfirmationCode(email: string, code: string): Promise<any | undefined>;
 
-  // ===== CypherHUM Operations =====
+  // ===== ECHO Operations =====
   
-  // CypherHUM Session operations
-  getCypherhumSessions(userId?: string): Promise<CypherhumSession[]>;
-  getCypherhumSession(sessionId: string): Promise<CypherhumSession | undefined>;
-  createCypherhumSession(session: InsertCypherhumSession): Promise<CypherhumSession>;
-  updateCypherhumSession(sessionId: string, updates: Partial<CypherhumSession>): Promise<CypherhumSession>;
-  deleteCypherhumSession(sessionId: string): Promise<void>;
+  // ECHO Session operations
+  getEchoSessions(userId?: string): Promise<EchoSession[]>;
+  getEchoSession(sessionId: string): Promise<EchoSession | undefined>;
+  createEchoSession(session: InsertEchoSession): Promise<EchoSession>;
+  updateEchoSession(sessionId: string, updates: Partial<EchoSession>): Promise<EchoSession>;
+  deleteEchoSession(sessionId: string): Promise<void>;
   
-  // CypherHUM Visualization operations  
-  getCypherhumVisualizations(userId?: string): Promise<CypherhumVisualization[]>;
-  getCypherhumVisualization(visualizationId: string): Promise<CypherhumVisualization | undefined>;
-  createCypherhumVisualization(visualization: InsertCypherhumVisualization): Promise<CypherhumVisualization>;
-  updateCypherhumVisualization(visualizationId: string, updates: Partial<CypherhumVisualization>): Promise<CypherhumVisualization>;
-  deleteCypherhumVisualization(visualizationId: string): Promise<void>;
+  // ECHO Visualization operations  
+  getEchoVisualizations(userId?: string): Promise<EchoVisualization[]>;
+  getEchoVisualization(visualizationId: string): Promise<EchoVisualization | undefined>;
+  createEchoVisualization(visualization: InsertEchoVisualization): Promise<EchoVisualization>;
+  updateEchoVisualization(visualizationId: string, updates: Partial<EchoVisualization>): Promise<EchoVisualization>;
+  deleteEchoVisualization(visualizationId: string): Promise<void>;
   
-  // CypherHUM Interaction operations
-  getCypherhumInteractions(sessionId?: string): Promise<CypherhumInteraction[]>;
-  getCypherhumInteraction(interactionId: string): Promise<CypherhumInteraction | undefined>;
-  createCypherhumInteraction(interaction: InsertCypherhumInteraction): Promise<CypherhumInteraction>;
-  updateCypherhumInteraction(interactionId: string, updates: Partial<CypherhumInteraction>): Promise<CypherhumInteraction>;
-  deleteCypherhumInteraction(interactionId: string): Promise<void>;
+  // ECHO Interaction operations
+  getEchoInteractions(sessionId?: string): Promise<EchoInteraction[]>;
+  getEchoInteraction(interactionId: string): Promise<EchoInteraction | undefined>;
+  createEchoInteraction(interaction: InsertEchoInteraction): Promise<EchoInteraction>;
+  updateEchoInteraction(interactionId: string, updates: Partial<EchoInteraction>): Promise<EchoInteraction>;
+  deleteEchoInteraction(interactionId: string): Promise<void>;
   
-  // CypherHUM Threat Model operations
-  getCypherhumThreatModels(threatId?: string): Promise<CypherhumThreatModel[]>;
-  getCypherhumThreatModel(modelId: string): Promise<CypherhumThreatModel | undefined>;
-  createCypherhumThreatModel(threatModel: InsertCypherhumThreatModel): Promise<CypherhumThreatModel>;
-  updateCypherhumThreatModel(modelId: string, updates: Partial<CypherhumThreatModel>): Promise<CypherhumThreatModel>;
-  deleteCypherhumThreatModel(modelId: string): Promise<void>;
+  // ECHO Threat Model operations
+  getEchoThreatModels(threatId?: string): Promise<EchoThreatModel[]>;
+  getEchoThreatModel(modelId: string): Promise<EchoThreatModel | undefined>;
+  createEchoThreatModel(threatModel: InsertEchoThreatModel): Promise<EchoThreatModel>;
+  updateEchoThreatModel(modelId: string, updates: Partial<EchoThreatModel>): Promise<EchoThreatModel>;
+  deleteEchoThreatModel(modelId: string): Promise<void>;
   
-  // CypherHUM Analytics operations
-  getCypherhumAnalytics(sessionId?: string, userId?: string): Promise<CypherhumAnalytics[]>;
-  getCypherhumAnalytic(analyticId: string): Promise<CypherhumAnalytics | undefined>;
-  createCypherhumAnalytic(analytic: InsertCypherhumAnalytics): Promise<CypherhumAnalytics>;
-  updateCypherhumAnalytic(analyticId: string, updates: Partial<CypherhumAnalytics>): Promise<CypherhumAnalytics>;
-  deleteCypherhumAnalytic(analyticId: string): Promise<void>;
+  // ECHO Analytics operations
+  getEchoAnalytics(sessionId?: string, userId?: string): Promise<EchoAnalytics[]>;
+  getEchoAnalytic(analyticId: string): Promise<EchoAnalytics | undefined>;
+  createEchoAnalytic(analytic: InsertEchoAnalytics): Promise<EchoAnalytics>;
+  updateEchoAnalytic(analyticId: string, updates: Partial<EchoAnalytics>): Promise<EchoAnalytics>;
+  deleteEchoAnalytic(analyticId: string): Promise<void>;
 
-  // ===== ACDS (Autonomous Cyber Defense Swarm) Operations =====
+  // ===== SURGE (Strategic Unified Response & Guardian Engine) Operations =====
   
-  // ACDS Drone operations
-  getAcdsDrones(organizationId?: string): Promise<AcdsDrone[]>;
-  getAcdsDrone(droneId: string): Promise<AcdsDrone | undefined>;
-  createAcdsDrone(drone: InsertAcdsDrone): Promise<AcdsDrone>;
-  updateAcdsDrone(droneId: string, updates: Partial<AcdsDrone>): Promise<AcdsDrone>;
-  deleteAcdsDrone(droneId: string): Promise<void>;
-  getAcdsDronesByStatus(status: string, organizationId?: string): Promise<AcdsDrone[]>;
-  getAcdsDronesBySwarmRole(role: string, organizationId?: string): Promise<AcdsDrone[]>;
+  // SURGE Drone operations
+  getSurgeDrones(organizationId?: string): Promise<SurgeDrone[]>;
+  getSurgeDrone(droneId: string): Promise<SurgeDrone | undefined>;
+  createSurgeDrone(drone: InsertSurgeDrone): Promise<SurgeDrone>;
+  updateSurgeDrone(droneId: string, updates: Partial<SurgeDrone>): Promise<SurgeDrone>;
+  deleteSurgeDrone(droneId: string): Promise<void>;
+  getSurgeDronesByStatus(status: string, organizationId?: string): Promise<SurgeDrone[]>;
+  getSurgeDronesBySwarmRole(role: string, organizationId?: string): Promise<SurgeDrone[]>;
   
-  // ACDS Swarm Mission operations
-  getAcdsSwarmMissions(organizationId?: string, status?: string): Promise<AcdsSwarmMission[]>;
-  getAcdsSwarmMission(missionId: string): Promise<AcdsSwarmMission | undefined>;
-  createAcdsSwarmMission(mission: InsertAcdsSwarmMission): Promise<AcdsSwarmMission>;
-  updateAcdsSwarmMission(missionId: string, updates: Partial<AcdsSwarmMission>): Promise<AcdsSwarmMission>;
-  deleteAcdsSwarmMission(missionId: string): Promise<void>;
-  getActiveAcdsSwarmMissions(organizationId?: string): Promise<AcdsSwarmMission[]>;
+  // SURGE Swarm Mission operations
+  getSurgeSwarmMissions(organizationId?: string, status?: string): Promise<SurgeSwarmMission[]>;
+  getSurgeSwarmMission(missionId: string): Promise<SurgeSwarmMission | undefined>;
+  createSurgeSwarmMission(mission: InsertSurgeSwarmMission): Promise<SurgeSwarmMission>;
+  updateSurgeSwarmMission(missionId: string, updates: Partial<SurgeSwarmMission>): Promise<SurgeSwarmMission>;
+  deleteSurgeSwarmMission(missionId: string): Promise<void>;
+  getActiveSurgeSwarmMissions(organizationId?: string): Promise<SurgeSwarmMission[]>;
   
-  // ACDS Deployment operations
-  getAcdsDeployments(organizationId?: string, status?: string): Promise<AcdsDeployment[]>;
-  getAcdsDeployment(deploymentId: string): Promise<AcdsDeployment | undefined>;
-  createAcdsDeployment(deployment: InsertAcdsDeployment): Promise<AcdsDeployment>;
-  updateAcdsDeployment(deploymentId: string, updates: Partial<AcdsDeployment>): Promise<AcdsDeployment>;
-  deleteAcdsDeployment(deploymentId: string): Promise<void>;
-  getAcdsDeploymentsByDrone(droneId: string): Promise<AcdsDeployment[]>;
-  getAcdsDeploymentsByMission(missionId: string): Promise<AcdsDeployment[]>;
-  getActiveAcdsDeployments(organizationId?: string): Promise<AcdsDeployment[]>;
+  // SURGE Deployment operations
+  getSurgeDeployments(organizationId?: string, status?: string): Promise<SurgeDeployment[]>;
+  getSurgeDeployment(deploymentId: string): Promise<SurgeDeployment | undefined>;
+  createSurgeDeployment(deployment: InsertSurgeDeployment): Promise<SurgeDeployment>;
+  updateSurgeDeployment(deploymentId: string, updates: Partial<SurgeDeployment>): Promise<SurgeDeployment>;
+  deleteSurgeDeployment(deploymentId: string): Promise<void>;
+  getSurgeDeploymentsByDrone(droneId: string): Promise<SurgeDeployment[]>;
+  getSurgeDeploymentsByMission(missionId: string): Promise<SurgeDeployment[]>;
+  getActiveSurgeDeployments(organizationId?: string): Promise<SurgeDeployment[]>;
   
-  // ACDS Coordination operations
-  getAcdsCoordinations(organizationId?: string): Promise<AcdsCoordination[]>;
-  getAcdsCoordination(coordinationId: string): Promise<AcdsCoordination | undefined>;
-  createAcdsCoordination(coordination: InsertAcdsCoordination): Promise<AcdsCoordination>;
-  updateAcdsCoordination(coordinationId: string, updates: Partial<AcdsCoordination>): Promise<AcdsCoordination>;
-  deleteAcdsCoordination(coordinationId: string): Promise<void>;
-  getAcdsCoordinationsByEvent(eventType: string, organizationId?: string): Promise<AcdsCoordination[]>;
-  getAcdsCoordinationsBySwarm(swarmId: string): Promise<AcdsCoordination[]>;
+  // SURGE Coordination operations
+  getSurgeCoordinations(organizationId?: string): Promise<SurgeCoordination[]>;
+  getSurgeCoordination(coordinationId: string): Promise<SurgeCoordination | undefined>;
+  createSurgeCoordination(coordination: InsertSurgeCoordination): Promise<SurgeCoordination>;
+  updateSurgeCoordination(coordinationId: string, updates: Partial<SurgeCoordination>): Promise<SurgeCoordination>;
+  deleteSurgeCoordination(coordinationId: string): Promise<void>;
+  getSurgeCoordinationsByEvent(eventType: string, organizationId?: string): Promise<SurgeCoordination[]>;
+  getSurgeCoordinationsBySwarm(swarmId: string): Promise<SurgeCoordination[]>;
   
-  // ACDS Analytics operations
-  getAcdsAnalytics(organizationId?: string, analyticsType?: string): Promise<AcdsAnalytics[]>;
-  getAcdsAnalytic(analyticId: string): Promise<AcdsAnalytics | undefined>;
-  createAcdsAnalytic(analytic: InsertAcdsAnalytics): Promise<AcdsAnalytics>;
-  updateAcdsAnalytic(analyticId: string, updates: Partial<AcdsAnalytics>): Promise<AcdsAnalytics>;
-  deleteAcdsAnalytic(analyticId: string): Promise<void>;
-  getAcdsAnalyticsByCategory(category: string, organizationId?: string): Promise<AcdsAnalytics[]>;
-  getAcdsAnalyticsByDateRange(startDate: Date, endDate: Date, organizationId?: string): Promise<AcdsAnalytics[]>;
+  // SURGE Analytics operations
+  getSurgeAnalytics(organizationId?: string, analyticsType?: string): Promise<SurgeAnalytics[]>;
+  getSurgeAnalytic(analyticId: string): Promise<SurgeAnalytics | undefined>;
+  createSurgeAnalytic(analytic: InsertSurgeAnalytics): Promise<SurgeAnalytics>;
+  updateSurgeAnalytic(analyticId: string, updates: Partial<SurgeAnalytics>): Promise<SurgeAnalytics>;
+  deleteSurgeAnalytic(analyticId: string): Promise<void>;
+  getSurgeAnalyticsByCategory(category: string, organizationId?: string): Promise<SurgeAnalytics[]>;
+  getSurgeAnalyticsByDateRange(startDate: Date, endDate: Date, organizationId?: string): Promise<SurgeAnalytics[]>;
 
   // ===== PUBLIC HEALTH OPERATIONS =====
   
@@ -681,19 +681,19 @@ export class MemStorage implements IStorage {
   private cypherSettings = { enabled: true, dailyReports: true, issueAlerts: true };
   private cypherReports: Map<string, any> = new Map();
   
-  // CypherHUM Storage Maps
+  // ECHO Storage Maps
   private cypherhumSessions: Map<string, CypherhumSession> = new Map();
   private cypherhumVisualizations: Map<string, CypherhumVisualization> = new Map();
   private cypherhumInteractions: Map<string, CypherhumInteraction> = new Map();
   private cypherhumThreatModels: Map<string, CypherhumThreatModel> = new Map();
   private cypherhumAnalytics: Map<string, CypherhumAnalytics> = new Map();
 
-  // ACDS Storage Maps
-  private acdsDrones: Map<string, AcdsDrone> = new Map();
-  private acdsSwarmMissions: Map<string, AcdsSwarmMission> = new Map();
-  private acdsDeployments: Map<string, AcdsDeployment> = new Map();
-  private acdsCoordinations: Map<string, AcdsCoordination> = new Map();
-  private acdsAnalytics: Map<string, AcdsAnalytics> = new Map();
+  // SURGE Storage Maps
+  private surgeDrones: Map<string, SurgeDrone> = new Map();
+  private surgeSwarmMissions: Map<string, SurgeSwarmMission> = new Map();
+  private surgeDeployments: Map<string, SurgeDeployment> = new Map();
+  private surgeCoordinations: Map<string, SurgeCoordination> = new Map();
+  private surgeAnalytics: Map<string, SurgeAnalytics> = new Map();
 
   // HIPAA Storage Maps
   private hipaaWorkstationSecurity: Map<string, HipaaWorkstationSecurity> = new Map();
@@ -1708,9 +1708,9 @@ export class MemStorage implements IStorage {
     return undefined;
   }
 
-  // ===== CypherHUM Storage Implementations =====
+  // ===== ECHO Storage Implementations =====
   
-  // CypherHUM Session operations
+  // ECHO Session operations
   async getCypherhumSessions(userId?: string): Promise<CypherhumSession[]> {
     const sessions = Array.from(this.cypherhumSessions.values());
     return userId ? sessions.filter(s => s.userId === userId) : sessions;
@@ -1743,7 +1743,7 @@ export class MemStorage implements IStorage {
 
   async updateCypherhumSession(sessionId: string, updates: Partial<CypherhumSession>): Promise<CypherhumSession> {
     const session = this.cypherhumSessions.get(sessionId);
-    if (!session) throw new Error("CypherHUM session not found");
+    if (!session) throw new Error("ECHO session not found");
     
     const updatedSession = { ...session, ...updates, updatedAt: new Date() };
     this.cypherhumSessions.set(sessionId, updatedSession);
@@ -1754,7 +1754,7 @@ export class MemStorage implements IStorage {
     this.cypherhumSessions.delete(sessionId);
   }
 
-  // CypherHUM Visualization operations  
+  // ECHO Visualization operations  
   async getCypherhumVisualizations(userId?: string): Promise<CypherhumVisualization[]> {
     const visualizations = Array.from(this.cypherhumVisualizations.values());
     if (userId) {
@@ -1785,7 +1785,7 @@ export class MemStorage implements IStorage {
 
   async updateCypherhumVisualization(visualizationId: string, updates: Partial<CypherhumVisualization>): Promise<CypherhumVisualization> {
     const visualization = this.cypherhumVisualizations.get(visualizationId);
-    if (!visualization) throw new Error("CypherHUM visualization not found");
+    if (!visualization) throw new Error("ECHO visualization not found");
     
     const updatedVisualization = { ...visualization, ...updates, updatedAt: new Date() };
     this.cypherhumVisualizations.set(visualizationId, updatedVisualization);
@@ -1796,7 +1796,7 @@ export class MemStorage implements IStorage {
     this.cypherhumVisualizations.delete(visualizationId);
   }
 
-  // CypherHUM Interaction operations
+  // ECHO Interaction operations
   async getCypherhumInteractions(sessionId?: string): Promise<CypherhumInteraction[]> {
     const interactions = Array.from(this.cypherhumInteractions.values());
     return sessionId ? interactions.filter(i => i.sessionId === sessionId) : interactions;
@@ -1826,7 +1826,7 @@ export class MemStorage implements IStorage {
 
   async updateCypherhumInteraction(interactionId: string, updates: Partial<CypherhumInteraction>): Promise<CypherhumInteraction> {
     const interaction = this.cypherhumInteractions.get(interactionId);
-    if (!interaction) throw new Error("CypherHUM interaction not found");
+    if (!interaction) throw new Error("ECHO interaction not found");
     
     const updatedInteraction = { ...interaction, ...updates };
     this.cypherhumInteractions.set(interactionId, updatedInteraction);
@@ -1837,7 +1837,7 @@ export class MemStorage implements IStorage {
     this.cypherhumInteractions.delete(interactionId);
   }
 
-  // CypherHUM Threat Model operations
+  // ECHO Threat Model operations
   async getCypherhumThreatModels(threatId?: string): Promise<CypherhumThreatModel[]> {
     const models = Array.from(this.cypherhumThreatModels.values());
     return threatId ? models.filter(m => m.threatId === threatId) : models;
@@ -1871,7 +1871,7 @@ export class MemStorage implements IStorage {
 
   async updateCypherhumThreatModel(modelId: string, updates: Partial<CypherhumThreatModel>): Promise<CypherhumThreatModel> {
     const model = this.cypherhumThreatModels.get(modelId);
-    if (!model) throw new Error("CypherHUM threat model not found");
+    if (!model) throw new Error("ECHO threat model not found");
     
     const updatedModel = { ...model, ...updates, updatedAt: new Date() };
     this.cypherhumThreatModels.set(modelId, updatedModel);
@@ -1882,7 +1882,7 @@ export class MemStorage implements IStorage {
     this.cypherhumThreatModels.delete(modelId);
   }
 
-  // CypherHUM Analytics operations
+  // ECHO Analytics operations
   async getCypherhumAnalytics(sessionId?: string, userId?: string): Promise<CypherhumAnalytics[]> {
     const analytics = Array.from(this.cypherhumAnalytics.values());
     let filtered = analytics;
@@ -1918,7 +1918,7 @@ export class MemStorage implements IStorage {
 
   async updateCypherhumAnalytic(analyticId: string, updates: Partial<CypherhumAnalytics>): Promise<CypherhumAnalytics> {
     const analytic = this.cypherhumAnalytics.get(analyticId);
-    if (!analytic) throw new Error("CypherHUM analytic not found");
+    if (!analytic) throw new Error("ECHO analytic not found");
     
     const updatedAnalytic = { ...analytic, ...updates };
     this.cypherhumAnalytics.set(analyticId, updatedAnalytic);
@@ -1929,16 +1929,16 @@ export class MemStorage implements IStorage {
     this.cypherhumAnalytics.delete(analyticId);
   }
 
-  // ===== ACDS (Autonomous Cyber Defense Swarm) Operations =====
+  // ===== SURGE (Strategic Unified Response & Guardian Engine) Operations =====
   
-  // ACDS Drone operations
+  // SURGE Drone operations
   async getAcdsDrones(organizationId?: string): Promise<AcdsDrone[]> {
-    const drones = Array.from(this.acdsDrones.values());
+    const drones = Array.from(this.surgeDrones.values());
     return organizationId ? drones.filter(d => d.organizationId === organizationId) : drones;
   }
 
   async getAcdsDrone(droneId: string): Promise<AcdsDrone | undefined> {
-    return Array.from(this.acdsDrones.values()).find(d => d.droneId === droneId);
+    return Array.from(this.surgeDrones.values()).find(d => d.droneId === droneId);
   }
 
   async createAcdsDrone(insertDrone: InsertAcdsDrone): Promise<AcdsDrone> {
@@ -1957,23 +1957,23 @@ export class MemStorage implements IStorage {
       createdAt: new Date(),
       updatedAt: new Date()
     };
-    this.acdsDrones.set(id, drone);
+    this.surgeDrones.set(id, drone);
     return drone;
   }
 
   async updateAcdsDrone(droneId: string, updates: Partial<AcdsDrone>): Promise<AcdsDrone> {
-    const drone = Array.from(this.acdsDrones.values()).find(d => d.droneId === droneId);
-    if (!drone) throw new Error("ACDS drone not found");
+    const drone = Array.from(this.surgeDrones.values()).find(d => d.droneId === droneId);
+    if (!drone) throw new Error("SURGE drone not found");
     
     const updatedDrone = { ...drone, ...updates, updatedAt: new Date() };
-    this.acdsDrones.set(drone.id, updatedDrone);
+    this.surgeDrones.set(drone.id, updatedDrone);
     return updatedDrone;
   }
 
   async deleteAcdsDrone(droneId: string): Promise<void> {
-    const drone = Array.from(this.acdsDrones.values()).find(d => d.droneId === droneId);
+    const drone = Array.from(this.surgeDrones.values()).find(d => d.droneId === droneId);
     if (drone) {
-      this.acdsDrones.delete(drone.id);
+      this.surgeDrones.delete(drone.id);
     }
   }
 
@@ -1987,15 +1987,15 @@ export class MemStorage implements IStorage {
     return drones.filter(d => d.swarmRole === role);
   }
   
-  // ACDS Swarm Mission operations
+  // SURGE Swarm Mission operations
   async getAcdsSwarmMissions(organizationId?: string, status?: string): Promise<AcdsSwarmMission[]> {
-    const missions = Array.from(this.acdsSwarmMissions.values());
+    const missions = Array.from(this.surgeSwarmMissions.values());
     let filtered = organizationId ? missions.filter(m => m.organizationId === organizationId) : missions;
     return status ? filtered.filter(m => m.status === status) : filtered;
   }
 
   async getAcdsSwarmMission(missionId: string): Promise<AcdsSwarmMission | undefined> {
-    return this.acdsSwarmMissions.get(missionId);
+    return this.surgeSwarmMissions.get(missionId);
   }
 
   async createAcdsSwarmMission(insertMission: InsertAcdsSwarmMission): Promise<AcdsSwarmMission> {
@@ -2011,7 +2011,7 @@ export class MemStorage implements IStorage {
       airspaceRestrictions: insertMission.airspaceRestrictions ?? [],
       dataCollectionRequirements: insertMission.dataCollectionRequirements ?? [],
       emergencyProcedures: insertMission.emergencyProcedures ?? {},
-      cydefIntegration: insertMission.cydefIntegration ?? {},
+      pulseIntegration: insertMission.pulseIntegration ?? {},
       plannedStartTime: insertMission.plannedStartTime ?? null,
       actualStartTime: insertMission.actualStartTime ?? null,
       plannedEndTime: insertMission.plannedEndTime ?? null,
@@ -2023,36 +2023,36 @@ export class MemStorage implements IStorage {
       createdAt: new Date(),
       updatedAt: new Date()
     };
-    this.acdsSwarmMissions.set(id, mission);
+    this.surgeSwarmMissions.set(id, mission);
     return mission;
   }
 
   async updateAcdsSwarmMission(missionId: string, updates: Partial<AcdsSwarmMission>): Promise<AcdsSwarmMission> {
-    const mission = this.acdsSwarmMissions.get(missionId);
-    if (!mission) throw new Error("ACDS swarm mission not found");
+    const mission = this.surgeSwarmMissions.get(missionId);
+    if (!mission) throw new Error("SURGE swarm mission not found");
     
     const updatedMission = { ...mission, ...updates, updatedAt: new Date() };
-    this.acdsSwarmMissions.set(missionId, updatedMission);
+    this.surgeSwarmMissions.set(missionId, updatedMission);
     return updatedMission;
   }
 
   async deleteAcdsSwarmMission(missionId: string): Promise<void> {
-    this.acdsSwarmMissions.delete(missionId);
+    this.surgeSwarmMissions.delete(missionId);
   }
 
   async getActiveAcdsSwarmMissions(organizationId?: string): Promise<AcdsSwarmMission[]> {
     return this.getAcdsSwarmMissions(organizationId, 'active');
   }
   
-  // ACDS Deployment operations
+  // SURGE Deployment operations
   async getAcdsDeployments(organizationId?: string, status?: string): Promise<AcdsDeployment[]> {
-    const deployments = Array.from(this.acdsDeployments.values());
+    const deployments = Array.from(this.surgeDeployments.values());
     let filtered = organizationId ? deployments.filter(d => d.organizationId === organizationId) : deployments;
     return status ? filtered.filter(d => d.deploymentStatus === status) : filtered;
   }
 
   async getAcdsDeployment(deploymentId: string): Promise<AcdsDeployment | undefined> {
-    return Array.from(this.acdsDeployments.values()).find(d => d.deploymentId === deploymentId);
+    return Array.from(this.surgeDeployments.values()).find(d => d.deploymentId === deploymentId);
   }
 
   async createAcdsDeployment(insertDeployment: InsertAcdsDeployment): Promise<AcdsDeployment> {
@@ -2075,7 +2075,7 @@ export class MemStorage implements IStorage {
       communicationLog: insertDeployment.communicationLog ?? [],
       coordinationCommands: insertDeployment.coordinationCommands ?? [],
       autonomousDecisions: insertDeployment.autonomousDecisions ?? [],
-      cydefResponses: insertDeployment.cydefResponses ?? [],
+      pulseResponses: insertDeployment.pulseResponses ?? [],
       environmentalFactors: insertDeployment.environmentalFactors ?? {},
       riskLevelCurrent: insertDeployment.riskLevelCurrent ?? 'low',
       emergencyProceduresActive: insertDeployment.emergencyProceduresActive ?? false,
@@ -2091,33 +2091,33 @@ export class MemStorage implements IStorage {
       createdAt: new Date(),
       updatedAt: new Date()
     };
-    this.acdsDeployments.set(id, deployment);
+    this.surgeDeployments.set(id, deployment);
     return deployment;
   }
 
   async updateAcdsDeployment(deploymentId: string, updates: Partial<AcdsDeployment>): Promise<AcdsDeployment> {
-    const deployment = Array.from(this.acdsDeployments.values()).find(d => d.deploymentId === deploymentId);
-    if (!deployment) throw new Error("ACDS deployment not found");
+    const deployment = Array.from(this.surgeDeployments.values()).find(d => d.deploymentId === deploymentId);
+    if (!deployment) throw new Error("SURGE deployment not found");
     
     const updatedDeployment = { ...deployment, ...updates, updatedAt: new Date() };
-    this.acdsDeployments.set(deployment.id, updatedDeployment);
+    this.surgeDeployments.set(deployment.id, updatedDeployment);
     return updatedDeployment;
   }
 
   async deleteAcdsDeployment(deploymentId: string): Promise<void> {
-    const deployment = Array.from(this.acdsDeployments.values()).find(d => d.deploymentId === deploymentId);
+    const deployment = Array.from(this.surgeDeployments.values()).find(d => d.deploymentId === deploymentId);
     if (deployment) {
-      this.acdsDeployments.delete(deployment.id);
+      this.surgeDeployments.delete(deployment.id);
     }
   }
 
   async getAcdsDeploymentsByDrone(droneId: string): Promise<AcdsDeployment[]> {
-    const deployments = Array.from(this.acdsDeployments.values());
+    const deployments = Array.from(this.surgeDeployments.values());
     return deployments.filter(d => d.droneId === droneId);
   }
 
   async getAcdsDeploymentsByMission(missionId: string): Promise<AcdsDeployment[]> {
-    const deployments = Array.from(this.acdsDeployments.values());
+    const deployments = Array.from(this.surgeDeployments.values());
     return deployments.filter(d => d.missionId === missionId);
   }
 
@@ -2125,14 +2125,14 @@ export class MemStorage implements IStorage {
     return this.getAcdsDeployments(organizationId, 'active');
   }
   
-  // ACDS Coordination operations
+  // SURGE Coordination operations
   async getAcdsCoordinations(organizationId?: string): Promise<AcdsCoordination[]> {
-    const coordinations = Array.from(this.acdsCoordinations.values());
+    const coordinations = Array.from(this.surgeCoordinations.values());
     return organizationId ? coordinations.filter(c => c.organizationId === organizationId) : coordinations;
   }
 
   async getAcdsCoordination(coordinationId: string): Promise<AcdsCoordination | undefined> {
-    return Array.from(this.acdsCoordinations.values()).find(c => c.coordinationEventId === coordinationId);
+    return Array.from(this.surgeCoordinations.values()).find(c => c.coordinationEventId === coordinationId);
   }
 
   async createAcdsCoordination(insertCoordination: InsertAcdsCoordination): Promise<AcdsCoordination> {
@@ -2149,27 +2149,27 @@ export class MemStorage implements IStorage {
       implementationResults: insertCoordination.implementationResults ?? null,
       geneticAlgorithmGeneration: insertCoordination.geneticAlgorithmGeneration ?? null,
       geneticAlgorithmFitness: insertCoordination.geneticAlgorithmFitness ?? null,
-      cydefRecommendation: insertCoordination.cydefRecommendation ?? null,
+      pulseRecommendation: insertCoordination.pulseRecommendation ?? null,
       performanceMetrics: insertCoordination.performanceMetrics ?? null,
       lessonsLearned: insertCoordination.lessonsLearned ?? null
     };
-    this.acdsCoordinations.set(id, coordination);
+    this.surgeCoordinations.set(id, coordination);
     return coordination;
   }
 
   async updateAcdsCoordination(coordinationId: string, updates: Partial<AcdsCoordination>): Promise<AcdsCoordination> {
-    const coordination = Array.from(this.acdsCoordinations.values()).find(c => c.coordinationEventId === coordinationId);
-    if (!coordination) throw new Error("ACDS coordination not found");
+    const coordination = Array.from(this.surgeCoordinations.values()).find(c => c.coordinationEventId === coordinationId);
+    if (!coordination) throw new Error("SURGE coordination not found");
     
     const updatedCoordination = { ...coordination, ...updates };
-    this.acdsCoordinations.set(coordination.id, updatedCoordination);
+    this.surgeCoordinations.set(coordination.id, updatedCoordination);
     return updatedCoordination;
   }
 
   async deleteAcdsCoordination(coordinationId: string): Promise<void> {
-    const coordination = Array.from(this.acdsCoordinations.values()).find(c => c.coordinationEventId === coordinationId);
+    const coordination = Array.from(this.surgeCoordinations.values()).find(c => c.coordinationEventId === coordinationId);
     if (coordination) {
-      this.acdsCoordinations.delete(coordination.id);
+      this.surgeCoordinations.delete(coordination.id);
     }
   }
 
@@ -2179,19 +2179,19 @@ export class MemStorage implements IStorage {
   }
 
   async getAcdsCoordinationsBySwarm(swarmId: string): Promise<AcdsCoordination[]> {
-    const coordinations = Array.from(this.acdsCoordinations.values());
+    const coordinations = Array.from(this.surgeCoordinations.values());
     return coordinations.filter(c => c.swarmId === swarmId);
   }
   
-  // ACDS Analytics operations
+  // SURGE Analytics operations
   async getAcdsAnalytics(organizationId?: string, analyticsType?: string): Promise<AcdsAnalytics[]> {
-    const analytics = Array.from(this.acdsAnalytics.values());
+    const analytics = Array.from(this.surgeAnalytics.values());
     let filtered = organizationId ? analytics.filter(a => a.organizationId === organizationId) : analytics;
     return analyticsType ? filtered.filter(a => a.analyticsType === analyticsType) : filtered;
   }
 
   async getAcdsAnalytic(analyticId: string): Promise<AcdsAnalytics | undefined> {
-    return this.acdsAnalytics.get(analyticId);
+    return this.surgeAnalytics.get(analyticId);
   }
 
   async createAcdsAnalytic(insertAnalytic: InsertAcdsAnalytics): Promise<AcdsAnalytics> {
@@ -2207,27 +2207,27 @@ export class MemStorage implements IStorage {
       trendAnalysis: insertAnalytic.trendAnalysis ?? null,
       predictiveInsights: insertAnalytic.predictiveInsights ?? null,
       alertThresholds: insertAnalytic.alertThresholds ?? null,
-      dataSource: insertAnalytic.dataSource ?? 'acds_service',
+      dataSource: insertAnalytic.dataSource ?? 'surge_service',
       validationStatus: insertAnalytic.validationStatus ?? 'pending',
       dataQualityScore: insertAnalytic.dataQualityScore ?? null,
       correlationFactors: insertAnalytic.correlationFactors ?? null,
       timestamp: new Date()
     };
-    this.acdsAnalytics.set(id, analytic);
+    this.surgeAnalytics.set(id, analytic);
     return analytic;
   }
 
   async updateAcdsAnalytic(analyticId: string, updates: Partial<AcdsAnalytics>): Promise<AcdsAnalytics> {
-    const analytic = this.acdsAnalytics.get(analyticId);
-    if (!analytic) throw new Error("ACDS analytic not found");
+    const analytic = this.surgeAnalytics.get(analyticId);
+    if (!analytic) throw new Error("SURGE analytic not found");
     
     const updatedAnalytic = { ...analytic, ...updates };
-    this.acdsAnalytics.set(analyticId, updatedAnalytic);
+    this.surgeAnalytics.set(analyticId, updatedAnalytic);
     return updatedAnalytic;
   }
 
   async deleteAcdsAnalytic(analyticId: string): Promise<void> {
-    this.acdsAnalytics.delete(analyticId);
+    this.surgeAnalytics.delete(analyticId);
   }
 
   async getAcdsAnalyticsByCategory(category: string, organizationId?: string): Promise<AcdsAnalytics[]> {

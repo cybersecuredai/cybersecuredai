@@ -413,7 +413,7 @@ export default function Platform() {
                 </span>
               </h2>
               <p className="text-xl md:text-2xl text-gray-200 max-w-5xl mx-auto mb-12 leading-relaxed">
-                Cross-system analytics and correlation across CyDEF, Live Location, CypherHUM with live avatar, ACDS, 
+                Cross-system analytics and correlation across PULSE, Live Location, ECHO with live avatar, SURGE, 
                 and Unified Integration - all powered by real-time WebSocket architecture
               </p>
             </div>
@@ -421,7 +421,7 @@ export default function Platform() {
             {/* Unified Dashboard Showcase */}
             <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 mb-16">
               
-              {/* CyDEF Dashboard */}
+              {/* PULSE Dashboard */}
               <Card className="bg-gradient-to-br from-purple-900/60 to-slate-800/60 border border-purple-500/40 hover:border-purple-400/70 transition-all duration-300 group">
                 <CardHeader className="p-6">
                   <div className="w-12 h-12 bg-purple-500/30 rounded-xl flex items-center justify-center mx-auto mb-4 border border-purple-400/50">
@@ -432,7 +432,7 @@ export default function Platform() {
                   </Badge>
                 </CardHeader>
                 <CardContent className="p-6 pt-0 text-center">
-                  <h3 className="text-lg font-bold text-white mb-2">CyDEF</h3>
+                  <h3 className="text-lg font-bold text-white mb-2">PULSE</h3>
                   <p className="text-sm text-gray-300 mb-4">Autonomous Cyber Defense</p>
                   <div className="text-2xl font-bold text-purple-400 mb-1">99.2%</div>
                   <div className="text-xs text-purple-300">AI Accuracy</div>
@@ -457,7 +457,7 @@ export default function Platform() {
                 </CardContent>
               </Card>
 
-              {/* CypherHUM Dashboard */}
+              {/* ECHO Dashboard */}
               <Card className="bg-gradient-to-br from-blue-900/60 to-slate-800/60 border border-blue-500/40 hover:border-blue-400/70 transition-all duration-300 group">
                 <CardHeader className="p-6">
                   <div className="w-12 h-12 bg-blue-500/30 rounded-xl flex items-center justify-center mx-auto mb-4 border border-blue-400/50">
@@ -468,14 +468,14 @@ export default function Platform() {
                   </Badge>
                 </CardHeader>
                 <CardContent className="p-6 pt-0 text-center">
-                  <h3 className="text-lg font-bold text-white mb-2">CypherHUM</h3>
+                  <h3 className="text-lg font-bold text-white mb-2">ECHO</h3>
                   <p className="text-sm text-gray-300 mb-4">5D Avatar Interface</p>
                   <div className="text-2xl font-bold text-blue-400 mb-1">5D</div>
                   <div className="text-xs text-blue-300">Live Human-Like Avatar</div>
                 </CardContent>
               </Card>
 
-              {/* ACDS Dashboard */}
+              {/* SURGE Dashboard */}
               <Card className="bg-gradient-to-br from-red-900/60 to-slate-800/60 border border-red-500/40 hover:border-red-400/70 transition-all duration-300 group">
                 <CardHeader className="p-6">
                   <div className="w-12 h-12 bg-red-500/30 rounded-xl flex items-center justify-center mx-auto mb-4 border border-red-400/50">
@@ -486,7 +486,7 @@ export default function Platform() {
                   </Badge>
                 </CardHeader>
                 <CardContent className="p-6 pt-0 text-center">
-                  <h3 className="text-lg font-bold text-white mb-2">ACDS</h3>
+                  <h3 className="text-lg font-bold text-white mb-2">SURGE</h3>
                   <p className="text-sm text-gray-300 mb-4">Autonomous Defense</p>
                   <div className="text-2xl font-bold text-red-400 mb-1">AI</div>
                   <div className="text-xs text-red-300">Swarm Control</div>
@@ -577,7 +577,7 @@ export default function Platform() {
                   👁️ REVOLUTIONARY INTERFACE TECHNOLOGY
                 </Badge>
                 <h3 className="text-4xl font-bold text-white mb-6">
-                  CypherHUM Live Human-Like Avatar Interface
+                  ECHO Live Human-Like Avatar Interface
                 </h3>
                 <p className="text-xl text-gray-300 mb-8 leading-relaxed">
                   The world's first human-like AI avatar cybersecurity interface. Experience threat visualization 
@@ -625,7 +625,7 @@ export default function Platform() {
                   <Button 
                     size="lg" 
                     className="button-4d px-8 py-3"
-                    onClick={() => window.location.href = '/dashboard/cypherHUM'}
+                    onClick={() => window.location.href = '/dashboard/echo'}
                   >
                     <Enhanced4DEyeIcon className="mr-2 w-5 h-5" size={20} />
                     Enter Holographic Interface
@@ -644,7 +644,7 @@ export default function Platform() {
               <div className="relative">
                 <img 
                   src={networkSecurityImg}
-                  alt="CypherHUM Live Avatar Interface"
+                  alt="ECHO Live Avatar Interface"
                   className="w-full rounded-xl border border-blue-500/30 shadow-2xl"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-blue-900/60 to-transparent rounded-xl"></div>

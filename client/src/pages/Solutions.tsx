@@ -49,21 +49,21 @@ export default function Solutions() {
   const [, setLocation] = useLocation();
   const customerTestimonials = [
     {
-      quote: "The CyDEF genetic algorithm system discovered threats that our previous solutions completely missed. With 99.2% accuracy and autonomous policy generation, it's like having an AI security expert that evolves with every new threat. The CypherHUM live human-like avatar interface gives our SOC team unprecedented situational awareness - we can literally navigate threats in 5D space with an intelligent AI guide that responds to threats with natural movements and facial expressions.",
+      quote: "The PULSE genetic algorithm system discovered threats that our previous solutions completely missed. With 99.2% accuracy and autonomous policy generation, it's like having an AI security expert that evolves with every new threat. The ECHO live human-like avatar interface gives our SOC team unprecedented situational awareness - we can literally navigate threats in 5D space with an intelligent AI guide that responds to threats with natural movements and facial expressions.",
       name: "Dr. Sarah Chen",
       title: "University System Chancellor", 
       company: "State University System",
       image: educationImg
     },
     {
-      quote: "Deploying the ACDS drone swarm system across our federal facilities was a game-changer. The autonomous cyber defense capabilities integrate seamlessly with our existing infrastructure, while the Live Location tracking provides real-time geospatial intelligence that's critical for national security operations. The genetic AI evolution means our defenses get smarter every day.",
+      quote: "Deploying the SURGE drone swarm system across our federal facilities was a game-changer. The autonomous cyber defense capabilities integrate seamlessly with our existing infrastructure, while the Live Location tracking provides real-time geospatial intelligence that's critical for national security operations. The genetic AI evolution means our defenses get smarter every day.",
       name: "General Patricia Martinez",
       title: "Chief Information Officer",
       company: "Federal Agency Alliance", 
       image: governmentImg
     },
     {
-      quote: "When the unified integration platform correlated threats across all five revolutionary systems, we contained a sophisticated multi-vector attack in under eight minutes. The genetic algorithms in CyDEF identified the attack pattern, Live Location tracked the threat vectors, and ACDS coordinated our physical response - it's like nothing else in the industry.",
+      quote: "When the unified integration platform correlated threats across all five revolutionary systems, we contained a sophisticated multi-vector attack in under eight minutes. The genetic algorithms in PULSE identified the attack pattern, Live Location tracked the threat vectors, and SURGE coordinated our physical response - it's like nothing else in the industry.",
       name: "Marcus Rodriguez",
       title: "Director of IT Security",
       company: "Metropolitan School District",
@@ -146,14 +146,14 @@ export default function Solutions() {
             {/* Individual System Solutions */}
             <div className="space-y-20">
               
-              {/* CyDEF Solution */}
+              {/* PULSE Solution */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                 <div>
                   <Badge className="mb-6 bg-purple-500/20 text-purple-300 border-purple-500/30">
                     🧠 GENETIC AI EVOLUTION
                   </Badge>
                   <h3 className="text-4xl font-bold text-white mb-6">
-                    CyDEF - Autonomous Cyber Defense
+                    PULSE - Autonomous Cyber Defense
                   </h3>
                   <p className="text-xl text-gray-300 mb-8 leading-relaxed">
                     Self-evolving genetic algorithms achieve 99.2% threat detection accuracy through 
@@ -220,10 +220,10 @@ export default function Solutions() {
                     <Button 
                       size="lg" 
                       className="button-4d px-8 py-3"
-                      onClick={() => window.location.href = '/dashboard/cydef'}
+                      onClick={() => window.location.href = '/dashboard/pulse'}
                     >
                       <Enhanced4DBrainIcon className="mr-2 w-5 h-5" size={20} />
-                      Access CyDEF Dashboard
+                      Access PULSE Dashboard
                     </Button>
                     <Button 
                       size="lg" 
@@ -239,7 +239,7 @@ export default function Solutions() {
                 <div className="relative">
                   <img 
                     src={managedEdrImg}
-                    alt="CyDEF Genetic AI Interface"
+                    alt="PULSE Genetic AI Interface"
                     className="w-full rounded-xl border border-purple-500/30 shadow-2xl"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-purple-900/60 to-transparent rounded-xl"></div>
@@ -327,14 +327,14 @@ export default function Solutions() {
                 </div>
               </div>
 
-              {/* CypherHUM Solution */}
+              {/* ECHO Solution */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                 <div>
                   <Badge className="mb-6 bg-blue-500/20 text-blue-300 border-blue-500/30">
                     👁️ 5D HOLOGRAPHIC AVATAR INTERFACE
                   </Badge>
                   <h3 className="text-4xl font-bold text-white mb-6">
-                    CypherHUM - Live Human-Like Avatar Interface
+                    ECHO - Live Human-Like Avatar Interface
                   </h3>
                   <p className="text-xl text-gray-300 mb-8 leading-relaxed">
                     Revolutionary 5D threat visualization with live human-like avatar guide featuring natural movements, 
@@ -382,7 +382,7 @@ export default function Solutions() {
                     <Button 
                       size="lg" 
                       className="button-4d px-8 py-3"
-                      onClick={() => window.location.href = '/dashboard/cypherHUM'}
+                      onClick={() => window.location.href = '/dashboard/echo'}
                     >
                       <Enhanced4DEyeIcon className="mr-2 w-5 h-5" size={20} />
                       Enter Holographic Interface
@@ -401,21 +401,21 @@ export default function Solutions() {
                 <div className="relative">
                   <img 
                     src={platformImg}
-                    alt="CypherHUM Live Avatar Interface"
+                    alt="ECHO Live Avatar Interface"
                     className="w-full rounded-xl border border-blue-500/30 shadow-2xl"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-blue-900/60 to-transparent rounded-xl"></div>
                 </div>
               </div>
 
-              {/* ACDS Solution */}
+              {/* SURGE Solution */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                 <div className="lg:order-2">
                   <Badge className="mb-6 bg-red-500/20 text-red-300 border-red-500/30">
                     🚁 AUTONOMOUS DRONE SWARM
                   </Badge>
                   <h3 className="text-4xl font-bold text-white mb-6">
-                    ACDS - Autonomous Cyber Defense Swarm
+                    SURGE - Autonomous Cyber Defense Swarm
                   </h3>
                   <p className="text-xl text-gray-300 mb-8 leading-relaxed">
                     Drone swarm coordination and monitoring with autonomous defensive operations. 
@@ -463,10 +463,10 @@ export default function Solutions() {
                     <Button 
                       size="lg" 
                       className="button-4d px-8 py-3"
-                      onClick={() => window.location.href = '/dashboard/acds'}
+                      onClick={() => window.location.href = '/dashboard/surge'}
                     >
                       <Enhanced4DZapIcon className="mr-2 w-5 h-5" size={20} />
-                      Access ACDS Control
+                      Access SURGE Control
                     </Button>
                     <Button 
                       size="lg" 
@@ -482,7 +482,7 @@ export default function Solutions() {
                 <div className="relative lg:order-1">
                   <img 
                     src={governmentImg}
-                    alt="ACDS Drone Swarm Control"
+                    alt="SURGE Drone Swarm Control"
                     className="w-full rounded-xl border border-red-500/30 shadow-2xl"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-red-900/60 to-transparent rounded-xl"></div>
@@ -600,7 +600,7 @@ export default function Solutions() {
                   <Enhanced4DShieldIcon className="w-8 h-8 text-purple-400 mb-4" size={32} />
                   <h4 className="text-xl font-semibold text-white mb-3">Defense Agencies</h4>
                   <p className="text-gray-300 text-sm">
-                    CyDEF genetic algorithms adapt to nation-state threats. ACDS provides 
+                    PULSE genetic algorithms adapt to nation-state threats. SURGE provides 
                     perimeter defense for critical military installations.
                   </p>
                 </div>
@@ -608,7 +608,7 @@ export default function Solutions() {
                   <Enhanced4DGlobeIcon className="w-8 h-8 text-cyan-400 mb-4" size={32} />
                   <h4 className="text-xl font-semibold text-white mb-3">Intelligence Services</h4>
                   <p className="text-gray-300 text-sm">
-                    Live Location tracking for asset security. CypherHUM's human-like avatar provides 
+                    Live Location tracking for asset security. ECHO's human-like avatar provides 
                     5D immersive threat analysis with contextual guidance for intelligence operations.
                   </p>
                 </div>

@@ -93,10 +93,10 @@ const navigationCategories: NavigationCategory[] = [
     label: "Revolutionary Systems",
     icon: Crown,
     items: [
-      { id: "cydef-dashboard", label: "CyDEF Genetic AI", icon: Brain, path: "/cydef-dashboard" },
+      { id: "pulse-dashboard", label: "PULSE Genetic AI", icon: Brain, path: "/pulse-dashboard" },
       { id: "live-location-dashboard", label: "Live Location Tracking", icon: MapPin, path: "/live-location-dashboard" },
-      { id: "cypherhum-interface", label: "CypherHUM 3D Interface", icon: Eye, path: "/cypherhum-interface" },
-      { id: "acds-dashboard", label: "ACDS Drone Swarm", icon: Drone, path: "/acds-dashboard" },
+      { id: "echo-interface", label: "ECHO 3D Interface", icon: Eye, path: "/echo-interface" },
+      { id: "surge-dashboard", label: "SURGE Drone Swarm", icon: Drone, path: "/surge-dashboard" },
     ]
   },
 

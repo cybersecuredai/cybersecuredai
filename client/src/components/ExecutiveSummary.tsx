@@ -41,7 +41,7 @@ interface ExecutiveSummaryData {
     trend: 'improving' | 'stable' | 'declining';
   };
   systemPerformance: {
-    cydef: {
+    pulse: {
       effectiveness: number;
       autonomyLevel: number;
       threatsNeutralized: number;
@@ -51,12 +51,12 @@ interface ExecutiveSummaryData {
       responseTime: number;
       alertAccuracy: number;
     };
-    cypherHum: {
+    echo: {
       visualizationQuality: number;
       userEngagement: number;
       insightGeneration: number;
     };
-    acds: {
+    surge: {
       swarmEfficiency: number;
       missionSuccessRate: number;
       coordinationScore: number;
@@ -235,24 +235,24 @@ export default function ExecutiveSummary() {
                     <span>Revolutionary Systems Performance</span>
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    {/* CyDEF Performance */}
+                    {/* PULSE Performance */}
                     <div className="bg-purple-900/20 border border-purple-500/30 rounded-lg p-4">
                       <div className="flex items-center space-x-2 mb-3">
                         <Brain className="w-5 h-5 text-purple-400" />
-                        <span className="font-medium text-white">CyDEF Genetic AI</span>
+                        <span className="font-medium text-white">PULSE Genetic AI</span>
                       </div>
                       <div className="space-y-2 text-sm">
                         <div className="flex justify-between">
                           <span className="text-gray-400">Effectiveness:</span>
-                          <span className="text-white">{executiveData.systemPerformance.cydef.effectiveness}%</span>
+                          <span className="text-white">{executiveData.systemPerformance.pulse.effectiveness}%</span>
                         </div>
                         <div className="flex justify-between">
                           <span className="text-gray-400">Autonomy:</span>
-                          <span className="text-white">{executiveData.systemPerformance.cydef.autonomyLevel}%</span>
+                          <span className="text-white">{executiveData.systemPerformance.pulse.autonomyLevel}%</span>
                         </div>
                         <div className="flex justify-between">
                           <span className="text-gray-400">Neutralized:</span>
-                          <span className="text-green-400">{executiveData.systemPerformance.cydef.threatsNeutralized}</span>
+                          <span className="text-green-400">{executiveData.systemPerformance.pulse.threatsNeutralized}</span>
                         </div>
                       </div>
                     </div>
@@ -279,46 +279,46 @@ export default function ExecutiveSummary() {
                       </div>
                     </div>
 
-                    {/* CypherHUM Performance */}
+                    {/* ECHO Performance */}
                     <div className="bg-green-900/20 border border-green-500/30 rounded-lg p-4">
                       <div className="flex items-center space-x-2 mb-3">
                         <Eye className="w-5 h-5 text-green-400" />
-                        <span className="font-medium text-white">CypherHUM 3D</span>
+                        <span className="font-medium text-white">ECHO 3D</span>
                       </div>
                       <div className="space-y-2 text-sm">
                         <div className="flex justify-between">
                           <span className="text-gray-400">Visualization:</span>
-                          <span className="text-white">{executiveData.systemPerformance.cypherHum.visualizationQuality}%</span>
+                          <span className="text-white">{executiveData.systemPerformance.echo.visualizationQuality}%</span>
                         </div>
                         <div className="flex justify-between">
                           <span className="text-gray-400">Engagement:</span>
-                          <span className="text-white">{executiveData.systemPerformance.cypherHum.userEngagement}%</span>
+                          <span className="text-white">{executiveData.systemPerformance.echo.userEngagement}%</span>
                         </div>
                         <div className="flex justify-between">
                           <span className="text-gray-400">Insights:</span>
-                          <span className="text-green-400">{executiveData.systemPerformance.cypherHum.insightGeneration}</span>
+                          <span className="text-green-400">{executiveData.systemPerformance.echo.insightGeneration}</span>
                         </div>
                       </div>
                     </div>
 
-                    {/* ACDS Performance */}
+                    {/* SURGE Performance */}
                     <div className="bg-orange-900/20 border border-orange-500/30 rounded-lg p-4">
                       <div className="flex items-center space-x-2 mb-3">
                         <Drone className="w-5 h-5 text-orange-400" />
-                        <span className="font-medium text-white">ACDS Swarm</span>
+                        <span className="font-medium text-white">SURGE Swarm</span>
                       </div>
                       <div className="space-y-2 text-sm">
                         <div className="flex justify-between">
                           <span className="text-gray-400">Efficiency:</span>
-                          <span className="text-white">{executiveData.systemPerformance.acds.swarmEfficiency}%</span>
+                          <span className="text-white">{executiveData.systemPerformance.surge.swarmEfficiency}%</span>
                         </div>
                         <div className="flex justify-between">
                           <span className="text-gray-400">Success Rate:</span>
-                          <span className="text-white">{executiveData.systemPerformance.acds.missionSuccessRate}%</span>
+                          <span className="text-white">{executiveData.systemPerformance.surge.missionSuccessRate}%</span>
                         </div>
                         <div className="flex justify-between">
                           <span className="text-gray-400">Coordination:</span>
-                          <span className="text-green-400">{executiveData.systemPerformance.acds.coordinationScore}%</span>
+                          <span className="text-green-400">{executiveData.systemPerformance.surge.coordinationScore}%</span>
                         </div>
                       </div>
                     </div>

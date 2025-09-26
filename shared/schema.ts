@@ -2011,10 +2011,10 @@ export type InsertIamIntegration = z.infer<typeof insertIamIntegrationSchema>;
 export type InsertSecurityInfrastructure = z.infer<typeof insertSecurityInfrastructureSchema>;
 export type InsertThreatIntelligenceSource = z.infer<typeof insertThreatIntelligenceSourceSchema>;
 
-// ===== CyDEF (Autonomous Cyber Defense) System Tables =====
+// ===== PULSE (Precision Unified Location & Security Engine) System Tables =====
 
-// CyDEF System Instances and Configuration
-export const cydefSystems = pgTable("cydef_systems", {
+// PULSE System Instances and Configuration
+export const pulseSystems = pgTable("pulse_systems", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   systemName: varchar("system_name").notNull(),
   organizationId: varchar("organization_id").notNull(),
@@ -2035,9 +2035,9 @@ export const cydefSystems = pgTable("cydef_systems", {
 });
 
 // Autonomous Response Actions and Outcomes
-export const cydefAutonomousResponses = pgTable("cydef_autonomous_responses", {
+export const pulseAutonomousResponses = pgTable("pulse_autonomous_responses", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  cydefSystemId: varchar("cydef_system_id").notNull().references(() => cydefSystems.id),
+  pulseSystemId: varchar("pulse_system_id").notNull().references(() => pulseSystems.id),
   threatId: varchar("threat_id").references(() => threats.id),
   responseType: varchar("response_type").notNull(), // isolate, block, monitor, quarantine, escalate, adapt_policy
   triggerEvent: text("trigger_event").notNull(), // What triggered this response
@@ -2057,9 +2057,9 @@ export const cydefAutonomousResponses = pgTable("cydef_autonomous_responses", {
 });
 
 // Real-time Defense Policy Generation History  
-export const cydefPolicyGenerations = pgTable("cydef_policy_generations", {
+export const pulsePolicyGenerations = pgTable("pulse_policy_generations", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  cydefSystemId: varchar("cydef_system_id").notNull().references(() => cydefSystems.id),
+  pulseSystemId: varchar("pulse_system_id").notNull().references(() => pulseSystems.id),
   generation: integer("generation").notNull(),
   sector: varchar("sector").notNull(), // FERPA, FISMA, CIPA, GENERAL
   policyRules: jsonb("policy_rules").notNull(), // Generated security policy rules
@@ -2080,10 +2080,10 @@ export const cydefPolicyGenerations = pgTable("cydef_policy_generations", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
-// Real-time CyDEF Events for WebSocket Streaming
-export const cydefRealTimeEvents = pgTable("cydef_real_time_events", {
+// Real-time PULSE Events for WebSocket Streaming
+export const pulseRealTimeEvents = pgTable("pulse_real_time_events", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  cydefSystemId: varchar("cydef_system_id").notNull().references(() => cydefSystems.id),
+  pulseSystemId: varchar("pulse_system_id").notNull().references(() => pulseSystems.id),
   eventType: varchar("event_type").notNull(), // threat_detected, response_executed, policy_evolved, accuracy_improved, system_status
   eventCategory: varchar("event_category").notNull(), // genetic_algorithm, threat_response, system_health, performance
   severity: varchar("severity").notNull(), // info, warning, critical, emergency
@@ -2098,10 +2098,10 @@ export const cydefRealTimeEvents = pgTable("cydef_real_time_events", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
-// CyDEF Performance Metrics and Analytics
-export const cydefPerformanceMetrics = pgTable("cydef_performance_metrics", {
+// PULSE Performance Metrics and Analytics
+export const pulsePerformanceMetrics = pgTable("pulse_performance_metrics", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  cydefSystemId: varchar("cydef_system_id").notNull().references(() => cydefSystems.id),
+  pulseSystemId: varchar("pulse_system_id").notNull().references(() => pulseSystems.id),
   metricType: varchar("metric_type").notNull(), // accuracy, response_time, threat_detection, false_positive_rate, throughput
   metricCategory: varchar("metric_category").notNull(), // real_time, hourly, daily, weekly, monthly
   value: integer("value").notNull(), // Metric value (scaled for precision)
@@ -2117,10 +2117,10 @@ export const cydefPerformanceMetrics = pgTable("cydef_performance_metrics", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
-// CyDEF Threat Analysis Results
-export const cydefThreatAnalyses = pgTable("cydef_threat_analyses", {
+// PULSE Threat Analysis Results
+export const pulseThreatAnalyses = pgTable("pulse_threat_analyses", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  cydefSystemId: varchar("cydef_system_id").notNull().references(() => cydefSystems.id),
+  pulseSystemId: varchar("pulse_system_id").notNull().references(() => pulseSystems.id),
   threatId: varchar("threat_id").references(() => threats.id),
   analysisType: varchar("analysis_type").notNull(), // real_time, batch, scheduled, on_demand
   threatVector: varchar("threat_vector"), // email, network, web, malware, social_engineering
@@ -2139,54 +2139,54 @@ export const cydefThreatAnalyses = pgTable("cydef_threat_analyses", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
-// ===== CyDEF Insert Schemas =====
+// ===== PULSE Insert Schemas =====
 
-export const insertCydefSystemSchema = createInsertSchema(cydefSystems).omit({
+export const insertPulseSystemSchema = createInsertSchema(pulseSystems).omit({
   id: true,
   createdAt: true,
   updatedAt: true,
 });
 
-export const insertCydefAutonomousResponseSchema = createInsertSchema(cydefAutonomousResponses).omit({
+export const insertPulseAutonomousResponseSchema = createInsertSchema(pulseAutonomousResponses).omit({
   id: true,
   createdAt: true,
 });
 
-export const insertCydefPolicyGenerationSchema = createInsertSchema(cydefPolicyGenerations).omit({
+export const insertPulsePolicyGenerationSchema = createInsertSchema(pulsePolicyGenerations).omit({
   id: true,
   createdAt: true,
 });
 
-export const insertCydefRealTimeEventSchema = createInsertSchema(cydefRealTimeEvents).omit({
+export const insertPulseRealTimeEventSchema = createInsertSchema(pulseRealTimeEvents).omit({
   id: true,
   createdAt: true,
 });
 
-export const insertCydefPerformanceMetricSchema = createInsertSchema(cydefPerformanceMetrics).omit({
+export const insertPulsePerformanceMetricSchema = createInsertSchema(pulsePerformanceMetrics).omit({
   id: true,
   recordedAt: true,
   createdAt: true,
 });
 
-export const insertCydefThreatAnalysisSchema = createInsertSchema(cydefThreatAnalyses).omit({
+export const insertPulseThreatAnalysisSchema = createInsertSchema(pulseThreatAnalyses).omit({
   id: true,
   createdAt: true,
 });
 
-// ===== CyDEF Type Definitions =====
+// ===== PULSE Type Definitions =====
 
-export type CydefSystem = typeof cydefSystems.$inferSelect;
-export type InsertCydefSystem = z.infer<typeof insertCydefSystemSchema>;
-export type CydefAutonomousResponse = typeof cydefAutonomousResponses.$inferSelect;
-export type InsertCydefAutonomousResponse = z.infer<typeof insertCydefAutonomousResponseSchema>;
-export type CydefPolicyGeneration = typeof cydefPolicyGenerations.$inferSelect;
-export type InsertCydefPolicyGeneration = z.infer<typeof insertCydefPolicyGenerationSchema>;
-export type CydefRealTimeEvent = typeof cydefRealTimeEvents.$inferSelect;
-export type InsertCydefRealTimeEvent = z.infer<typeof insertCydefRealTimeEventSchema>;
-export type CydefPerformanceMetric = typeof cydefPerformanceMetrics.$inferSelect;
-export type InsertCydefPerformanceMetric = z.infer<typeof insertCydefPerformanceMetricSchema>;
-export type CydefThreatAnalysis = typeof cydefThreatAnalyses.$inferSelect;
-export type InsertCydefThreatAnalysis = z.infer<typeof insertCydefThreatAnalysisSchema>;
+export type PulseSystem = typeof pulseSystems.$inferSelect;
+export type InsertPulseSystem = z.infer<typeof insertPulseSystemSchema>;
+export type PulseAutonomousResponse = typeof pulseAutonomousResponses.$inferSelect;
+export type InsertPulseAutonomousResponse = z.infer<typeof insertPulseAutonomousResponseSchema>;
+export type PulsePolicyGeneration = typeof pulsePolicyGenerations.$inferSelect;
+export type InsertPulsePolicyGeneration = z.infer<typeof insertPulsePolicyGenerationSchema>;
+export type PulseRealTimeEvent = typeof pulseRealTimeEvents.$inferSelect;
+export type InsertPulseRealTimeEvent = z.infer<typeof insertPulseRealTimeEventSchema>;
+export type PulsePerformanceMetric = typeof pulsePerformanceMetrics.$inferSelect;
+export type InsertPulsePerformanceMetric = z.infer<typeof insertPulsePerformanceMetricSchema>;
+export type PulseThreatAnalysis = typeof pulseThreatAnalyses.$inferSelect;
+export type InsertPulseThreatAnalysis = z.infer<typeof insertPulseThreatAnalysisSchema>;
 
 // ===== Live Location Tracking System Tables =====
 
@@ -2440,9 +2440,9 @@ export type InsertLiveLocationAsset = z.infer<typeof insertLiveLocationAssetSche
 export type LiveLocationNetworkSegment = typeof liveLocationNetworkSegments.$inferSelect;
 export type InsertLiveLocationNetworkSegment = z.infer<typeof insertLiveLocationNetworkSegmentSchema>;
 
-// ===== CypherHUM Tables =====
+// ===== ECHO (Enhanced Cybersecurity Holographic Operations) Tables =====
 
-export const cypherhumSessions = pgTable("cypherhum_sessions", {
+export const echoSessions = pgTable("echo_sessions", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   userId: varchar("user_id").notNull().references(() => users.id),
   sessionType: varchar("session_type").notNull().default("holographic"), // holographic, ar, vr, mixed_reality
@@ -2452,14 +2452,14 @@ export const cypherhumSessions = pgTable("cypherhum_sessions", {
   duration: integer("duration"), // in seconds
   threatsVisualized: integer("threats_visualized").default(0),
   aiInteractions: integer("ai_interactions").default(0),
-  visualizationPresetId: varchar("visualization_preset_id").references(() => cypherhumVisualizations.id),
+  visualizationPresetId: varchar("visualization_preset_id").references(() => echoVisualizations.id),
   sessionData: jsonb("session_data"), // Camera positions, user preferences, session state
   performanceMetrics: jsonb("performance_metrics"), // FPS, rendering stats, interaction latency
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-export const cypherhumVisualizations = pgTable("cypherhum_visualizations", {
+export const echoVisualizations = pgTable("echo_visualizations", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   name: varchar("name").notNull(),
   description: text("description"),
@@ -2479,9 +2479,9 @@ export const cypherhumVisualizations = pgTable("cypherhum_visualizations", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-export const cypherhumInteractions = pgTable("cypherhum_interactions", {
+export const echoInteractions = pgTable("echo_interactions", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  sessionId: varchar("session_id").notNull().references(() => cypherhumSessions.id),
+  sessionId: varchar("session_id").notNull().references(() => echoSessions.id),
   interactionType: varchar("interaction_type").notNull(), // voice_command, text_query, gesture, eye_tracking, 3d_manipulation
   inputData: jsonb("input_data").notNull(), // Raw input data (voice, text, coordinates, etc.)
   processedInput: text("processed_input"), // Cleaned/processed input for AI analysis
@@ -2496,7 +2496,7 @@ export const cypherhumInteractions = pgTable("cypherhum_interactions", {
   timestamp: timestamp("timestamp").defaultNow(),
 });
 
-export const cypherhumThreatModels = pgTable("cypherhum_threat_models", {
+export const echoThreatModels = pgTable("echo_threat_models", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   threatId: varchar("threat_id").notNull().references(() => threats.id),
   modelType: varchar("model_type").notNull(), // particle_system, 3d_mesh, hologram, volumetric
@@ -2515,9 +2515,9 @@ export const cypherhumThreatModels = pgTable("cypherhum_threat_models", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-export const cypherhumAnalytics = pgTable("cypherhum_analytics", {
+export const echoAnalytics = pgTable("echo_analytics", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  sessionId: varchar("session_id").references(() => cypherhumSessions.id),
+  sessionId: varchar("session_id").references(() => echoSessions.id),
   userId: varchar("user_id").notNull().references(() => users.id),
   metricType: varchar("metric_type").notNull(), // performance, interaction, ai_effectiveness, user_behavior
   metricName: varchar("metric_name").notNull(), // fps, response_time, threat_detection_accuracy, etc.
@@ -2531,53 +2531,53 @@ export const cypherhumAnalytics = pgTable("cypherhum_analytics", {
   timestamp: timestamp("timestamp").defaultNow(),
 });
 
-// ===== CypherHUM Insert Schemas =====
+// ===== ECHO Insert Schemas =====
 
-export const insertCypherhumSessionSchema = createInsertSchema(cypherhumSessions).omit({
+export const insertEchoSessionSchema = createInsertSchema(echoSessions).omit({
   id: true,
   createdAt: true,
   updatedAt: true,
 });
 
-export const insertCypherhumVisualizationSchema = createInsertSchema(cypherhumVisualizations).omit({
+export const insertEchoVisualizationSchema = createInsertSchema(echoVisualizations).omit({
   id: true,
   createdAt: true,
   updatedAt: true,
 });
 
-export const insertCypherhumInteractionSchema = createInsertSchema(cypherhumInteractions).omit({
+export const insertEchoInteractionSchema = createInsertSchema(echoInteractions).omit({
   id: true,
   timestamp: true,
 });
 
-export const insertCypherhumThreatModelSchema = createInsertSchema(cypherhumThreatModels).omit({
+export const insertEchoThreatModelSchema = createInsertSchema(echoThreatModels).omit({
   id: true,
   createdAt: true,
   updatedAt: true,
 });
 
-export const insertCypherhumAnalyticsSchema = createInsertSchema(cypherhumAnalytics).omit({
+export const insertEchoAnalyticsSchema = createInsertSchema(echoAnalytics).omit({
   id: true,
   timestamp: true,
 });
 
-// ===== CypherHUM Type Definitions =====
+// ===== ECHO Type Definitions =====
 
-export type CypherhumSession = typeof cypherhumSessions.$inferSelect;
-export type InsertCypherhumSession = z.infer<typeof insertCypherhumSessionSchema>;
-export type CypherhumVisualization = typeof cypherhumVisualizations.$inferSelect;
-export type InsertCypherhumVisualization = z.infer<typeof insertCypherhumVisualizationSchema>;
-export type CypherhumInteraction = typeof cypherhumInteractions.$inferSelect;
-export type InsertCypherhumInteraction = z.infer<typeof insertCypherhumInteractionSchema>;
-export type CypherhumThreatModel = typeof cypherhumThreatModels.$inferSelect;
-export type InsertCypherhumThreatModel = z.infer<typeof insertCypherhumThreatModelSchema>;
-export type CypherhumAnalytics = typeof cypherhumAnalytics.$inferSelect;
-export type InsertCypherhumAnalytics = z.infer<typeof insertCypherhumAnalyticsSchema>;
+export type EchoSession = typeof echoSessions.$inferSelect;
+export type InsertEchoSession = z.infer<typeof insertEchoSessionSchema>;
+export type EchoVisualization = typeof echoVisualizations.$inferSelect;
+export type InsertEchoVisualization = z.infer<typeof insertEchoVisualizationSchema>;
+export type EchoInteraction = typeof echoInteractions.$inferSelect;
+export type InsertEchoInteraction = z.infer<typeof insertEchoInteractionSchema>;
+export type EchoThreatModel = typeof echoThreatModels.$inferSelect;
+export type InsertEchoThreatModel = z.infer<typeof insertEchoThreatModelSchema>;
+export type EchoAnalytics = typeof echoAnalytics.$inferSelect;
+export type InsertEchoAnalytics = z.infer<typeof insertEchoAnalyticsSchema>;
 
-// ===== ACDS (Autonomous Cyber Defense Swarm) Tables =====
+// ===== SURGE (Strategic Unified Response & Guardian Engine) Tables =====
 
 // Individual Drone Specifications and Status
-export const acdsDrones = pgTable("acds_drones", {
+export const surgeDrones = pgTable("surge_drones", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   droneId: varchar("drone_id").notNull().unique(), // Unique identifier for physical drone
   droneName: varchar("drone_name").notNull(),
@@ -2602,7 +2602,7 @@ export const acdsDrones = pgTable("acds_drones", {
   assignedMissionId: varchar("assigned_mission_id"),
   swarmRole: varchar("swarm_role").default("follower"), // leader, coordinator, follower, scout, guardian, specialist
   autonomyLevel: varchar("autonomy_level").default("semi_autonomous"), // manual, semi_autonomous, autonomous, ai_driven
-  cydefIntegration: boolean("cydef_integration").default(true), // Integration with CyDEF genetic algorithms
+  pulseIntegration: boolean("pulse_integration").default(true), // Integration with PULSE genetic algorithms
   threatDetectionCapabilities: jsonb("threat_detection_capabilities").default('[]'), // AI threat detection sensors
   communicationChannels: jsonb("communication_channels").default('[]'), // Available communication methods
   defensiveCapabilities: jsonb("defensive_capabilities").default('[]'), // Countermeasure capabilities
@@ -2626,7 +2626,7 @@ export const acdsDrones = pgTable("acds_drones", {
 });
 
 // Swarm Mission Planning and Execution
-export const acdsSwarmMissions = pgTable("acds_swarm_missions", {
+export const surgeSwarmMissions = pgTable("surge_swarm_missions", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   missionName: varchar("mission_name").notNull(),
   missionType: varchar("mission_type").notNull(), // threat_response, perimeter_patrol, network_scan, incident_investigation, proactive_hunt, emergency_response
@@ -2635,7 +2635,7 @@ export const acdsSwarmMissions = pgTable("acds_swarm_missions", {
   missionDescription: text("mission_description"),
   targetArea: jsonb("target_area").notNull(), // Geographic area with coordinates, boundaries
   objectives: jsonb("objectives").notNull(), // Mission-specific goals and success criteria
-  threatContext: jsonb("threat_context"), // Related threat information from CyDEF
+  threatContext: jsonb("threat_context"), // Related threat information from PULSE
   estimatedDuration: integer("estimated_duration").default(3600), // Estimated duration in seconds
   actualDuration: integer("actual_duration"), // Actual mission duration
   requiredDroneCount: integer("required_drone_count").default(1),
@@ -2650,7 +2650,7 @@ export const acdsSwarmMissions = pgTable("acds_swarm_missions", {
   dataCollectionRequirements: jsonb("data_collection_requirements"), // What data to collect
   realTimeReporting: boolean("real_time_reporting").default(true),
   emergencyProcedures: jsonb("emergency_procedures"), // Emergency protocols and fallback plans
-  cydefIntegration: jsonb("cydef_integration"), // Integration with genetic algorithm decisions
+  pulseIntegration: jsonb("pulse_integration"), // Integration with genetic algorithm decisions
   liveLocationIntegration: boolean("live_location_integration").default(true),
   plannedStartTime: timestamp("planned_start_time"),
   actualStartTime: timestamp("actual_start_time"),
@@ -2668,11 +2668,11 @@ export const acdsSwarmMissions = pgTable("acds_swarm_missions", {
 });
 
 // Real-time Drone Deployment and Positioning
-export const acdsDeployments = pgTable("acds_deployments", {
+export const surgeDeployments = pgTable("surge_deployments", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   deploymentId: varchar("deployment_id").notNull().unique(),
-  missionId: varchar("mission_id").references(() => acdsSwarmMissions.id),
-  droneId: varchar("drone_id").notNull().references(() => acdsDrones.id),
+  missionId: varchar("mission_id").references(() => surgeSwarmMissions.id),
+  droneId: varchar("drone_id").notNull().references(() => surgeDrones.id),
   deploymentType: varchar("deployment_type").notNull(), // autonomous_patrol, threat_response, emergency_deployment, scheduled_mission, reactive_deployment
   deploymentStatus: varchar("deployment_status").notNull().default("preparing"), // preparing, deploying, active, returning, completed, failed, emergency_recall
   currentLatitude: varchar("current_latitude"),
@@ -2692,7 +2692,7 @@ export const acdsDeployments = pgTable("acds_deployments", {
   communicationLog: jsonb("communication_log").default('[]'), // Inter-drone communications
   coordinationCommands: jsonb("coordination_commands").default('[]'), // Swarm coordination instructions
   autonomousDecisions: jsonb("autonomous_decisions").default('[]'), // AI-driven decisions made
-  cydefResponses: jsonb("cydef_responses").default('[]'), // Responses from CyDEF genetic algorithms
+  pulseResponses: jsonb("pulse_responses").default('[]'), // Responses from PULSE genetic algorithms
   environmentalFactors: jsonb("environmental_factors"), // Weather, obstacles, interference
   riskLevelCurrent: varchar("risk_level_current").default("low"), // Current assessed risk level
   emergencyProceduresActive: boolean("emergency_procedures_active").default(false),
@@ -2712,7 +2712,7 @@ export const acdsDeployments = pgTable("acds_deployments", {
 });
 
 // Swarm Coordination Algorithms and Decision Records
-export const acdsCoordination = pgTable("acds_coordination", {
+export const surgeCoordination = pgTable("surge_coordination", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   coordinationEventId: varchar("coordination_event_id").notNull().unique(),
   eventType: varchar("event_type").notNull(), // formation_change, role_reassignment, threat_response_coordination, emergency_coordination, optimization_decision
@@ -2722,9 +2722,9 @@ export const acdsCoordination = pgTable("acds_coordination", {
   decisionTrigger: varchar("decision_trigger").notNull(), // threat_detected, mission_objective, operator_command, ai_recommendation, emergency_situation
   inputData: jsonb("input_data").notNull(), // Data used for coordination decision
   algorithmParameters: jsonb("algorithm_parameters"), // Configuration for coordination algorithm
-  geneticAlgorithmGeneration: integer("genetic_algorithm_generation"), // CyDEF integration data
+  geneticAlgorithmGeneration: integer("genetic_algorithm_generation"), // PULSE integration data
   geneticAlgorithmFitness: integer("genetic_algorithm_fitness"), // Fitness score from genetic algorithm
-  cydefRecommendation: jsonb("cydef_recommendation"), // AI recommendation from CyDEF system
+  pulseRecommendation: jsonb("pulse_recommendation"), // AI recommendation from PULSE system
   coordinationDecision: jsonb("coordination_decision").notNull(), // Final coordination decision made
   decisionConfidence: integer("decision_confidence").default(100), // 0-100 confidence in decision
   implementationStatus: varchar("implementation_status").default("pending"), // pending, implementing, completed, failed, overridden
@@ -2749,7 +2749,7 @@ export const acdsCoordination = pgTable("acds_coordination", {
 });
 
 // Performance Metrics and Analytics
-export const acdsAnalytics = pgTable("acds_analytics", {
+export const surgeAnalytics = pgTable("surge_analytics", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   analyticsType: varchar("analytics_type").notNull(), // performance, mission_success, drone_health, swarm_efficiency, threat_response, ai_effectiveness
   metricCategory: varchar("metric_category").notNull(), // operational, financial, security, compliance, performance, predictive
@@ -2758,11 +2758,11 @@ export const acdsAnalytics = pgTable("acds_analytics", {
   metricUnit: varchar("metric_unit"), // percentage, seconds, meters, count, score
   aggregationPeriod: varchar("aggregation_period").default("real_time"), // real_time, hourly, daily, weekly, monthly, mission_based
   organizationId: varchar("organization_id").notNull(),
-  droneId: varchar("drone_id").references(() => acdsDrones.id), // Specific drone metrics
-  missionId: varchar("mission_id").references(() => acdsSwarmMissions.id), // Mission-specific metrics
+  droneId: varchar("drone_id").references(() => surgeDrones.id), // Specific drone metrics
+  missionId: varchar("mission_id").references(() => surgeSwarmMissions.id), // Mission-specific metrics
   swarmId: varchar("swarm_id"), // Swarm-level metrics
-  deploymentId: varchar("deployment_id").references(() => acdsDeployments.id), // Deployment metrics
-  coordinationEventId: varchar("coordination_event_id").references(() => acdsCoordination.id), // Coordination metrics
+  deploymentId: varchar("deployment_id").references(() => surgeDeployments.id), // Deployment metrics
+  coordinationEventId: varchar("coordination_event_id").references(() => surgeCoordination.id), // Coordination metrics
   metricData: jsonb("metric_data").notNull(), // Detailed metric information and breakdowns
   comparisonBaseline: jsonb("comparison_baseline"), // Historical or target values for comparison
   trendAnalysis: jsonb("trend_analysis"), // Trend data and projections
@@ -2771,7 +2771,7 @@ export const acdsAnalytics = pgTable("acds_analytics", {
   alertsTriggered: jsonb("alerts_triggered").default('[]'), // Performance alerts generated
   improvementSuggestions: jsonb("improvement_suggestions").default('[]'), // AI-generated recommendations
   correlatedMetrics: jsonb("correlated_metrics").default('[]'), // Related metrics and dependencies
-  cydefIntegration: jsonb("cydef_integration"), // Integration with genetic algorithm metrics
+  pulseIntegration: jsonb("pulse_integration"), // Integration with genetic algorithm metrics
   liveLocationCorrelation: jsonb("live_location_correlation"), // Asset tracking correlations
   environmentalImpact: jsonb("environmental_impact"), // Weather and environmental factors
   operationalContext: jsonb("operational_context"), // Operational circumstances during measurement
@@ -2784,50 +2784,50 @@ export const acdsAnalytics = pgTable("acds_analytics", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
-// ===== ACDS Insert Schemas =====
+// ===== SURGE Insert Schemas =====
 
-export const insertAcdsDroneSchema = createInsertSchema(acdsDrones).omit({
+export const insertSurgeDroneSchema = createInsertSchema(surgeDrones).omit({
   id: true,
   createdAt: true,
   updatedAt: true,
 });
 
-export const insertAcdsSwarmMissionSchema = createInsertSchema(acdsSwarmMissions).omit({
+export const insertSurgeSwarmMissionSchema = createInsertSchema(surgeSwarmMissions).omit({
   id: true,
   createdAt: true,
   updatedAt: true,
 });
 
-export const insertAcdsDeploymentSchema = createInsertSchema(acdsDeployments).omit({
+export const insertSurgeDeploymentSchema = createInsertSchema(surgeDeployments).omit({
   id: true,
   createdAt: true,
   updatedAt: true,
 });
 
-export const insertAcdsCoordinationSchema = createInsertSchema(acdsCoordination).omit({
+export const insertSurgeCoordinationSchema = createInsertSchema(surgeCoordination).omit({
   id: true,
   createdAt: true,
   eventTimestamp: true,
 });
 
-export const insertAcdsAnalyticsSchema = createInsertSchema(acdsAnalytics).omit({
+export const insertSurgeAnalyticsSchema = createInsertSchema(surgeAnalytics).omit({
   id: true,
   calculatedAt: true,
   createdAt: true,
 });
 
-// ===== ACDS Type Definitions =====
+// ===== SURGE Type Definitions =====
 
-export type AcdsDrone = typeof acdsDrones.$inferSelect;
-export type InsertAcdsDrone = z.infer<typeof insertAcdsDroneSchema>;
-export type AcdsSwarmMission = typeof acdsSwarmMissions.$inferSelect;
-export type InsertAcdsSwarmMission = z.infer<typeof insertAcdsSwarmMissionSchema>;
-export type AcdsDeployment = typeof acdsDeployments.$inferSelect;
-export type InsertAcdsDeployment = z.infer<typeof insertAcdsDeploymentSchema>;
-export type AcdsCoordination = typeof acdsCoordination.$inferSelect;
-export type InsertAcdsCoordination = z.infer<typeof insertAcdsCoordinationSchema>;
-export type AcdsAnalytics = typeof acdsAnalytics.$inferSelect;
-export type InsertAcdsAnalytics = z.infer<typeof insertAcdsAnalyticsSchema>;
+export type SurgeDrone = typeof surgeDrones.$inferSelect;
+export type InsertSurgeDrone = z.infer<typeof insertSurgeDroneSchema>;
+export type SurgeSwarmMission = typeof surgeSwarmMissions.$inferSelect;
+export type InsertSurgeSwarmMission = z.infer<typeof insertSurgeSwarmMissionSchema>;
+export type SurgeDeployment = typeof surgeDeployments.$inferSelect;
+export type InsertSurgeDeployment = z.infer<typeof insertSurgeDeploymentSchema>;
+export type SurgeCoordination = typeof surgeCoordination.$inferSelect;
+export type InsertSurgeCoordination = z.infer<typeof insertSurgeCoordinationSchema>;
+export type SurgeAnalytics = typeof surgeAnalytics.$inferSelect;
+export type InsertSurgeAnalytics = z.infer<typeof insertSurgeAnalyticsSchema>;
 
 // ===== UNIFIED SYSTEM TYPES FOR CROSS-SYSTEM INTEGRATION =====
 
@@ -2838,7 +2838,7 @@ export const UnifiedSystemStatusSchema = z.object({
   status: z.enum(['operational', 'warning', 'critical', 'maintenance', 'offline']),
   lastUpdate: z.string().datetime(),
   subsystems: z.object({
-    cydef: z.object({
+    pulse: z.object({
       status: z.enum(['operational', 'warning', 'critical', 'offline']),
       activeThreats: z.number(),
       geneticGeneration: z.number(),
@@ -2854,7 +2854,7 @@ export const UnifiedSystemStatusSchema = z.object({
       geofenceBreaches: z.number(),
       lastLocationUpdate: z.string().datetime().optional(),
     }),
-    cypherHUM: z.object({
+    echo: z.object({
       status: z.enum(['operational', 'warning', 'critical', 'offline']),
       activeSessions: z.number(),
       threatsVisualized: z.number(),
@@ -2862,7 +2862,7 @@ export const UnifiedSystemStatusSchema = z.object({
       holographicQuality: z.enum(['low', 'medium', 'high', 'ultra']),
       averageFPS: z.number(),
     }),
-    acds: z.object({
+    surge: z.object({
       status: z.enum(['operational', 'warning', 'critical', 'offline']),
       totalDrones: z.number(),
       activeDrones: z.number(),
@@ -2888,10 +2888,10 @@ export const CrossSystemMetricsSchema = z.object({
     end: z.string().datetime(),
   }),
   correlationAnalysis: z.object({
-    cydefLiveLocationCorrelation: z.number(), // -1 to 1 correlation coefficient
-    cydefACDSCorrelation: z.number(),
-    liveLocationACDSCorrelation: z.number(),
-    cypherHUMEffectiveness: z.number(),
+    pulseLiveLocationCorrelation: z.number(), // -1 to 1 correlation coefficient
+    pulseSurgeCorrelation: z.number(),
+    liveLocationSurgeCorrelation: z.number(),
+    echoEffectiveness: z.number(),
     overallSystemSynergy: z.number(),
   }),
   threatResponseMetrics: z.object({
@@ -2966,7 +2966,7 @@ export const ExecutiveMetricsSchema = z.object({
 export const UnifiedAlertSchema = z.object({
   id: z.string(),
   alertId: z.string(),
-  sourceSystem: z.enum(['cydef', 'liveLocation', 'cypherHUM', 'acds', 'unified']),
+  sourceSystem: z.enum(['pulse', 'liveLocation', 'echo', 'surge', 'unified']),
   sourceId: z.string(), // ID in the source system
   alertType: z.enum(['security_threat', 'system_anomaly', 'device_offline', 'geofence_breach', 'mission_critical', 'ai_correlation', 'compliance_violation', 'performance_degradation']),
   severity: z.enum(['info', 'low', 'medium', 'high', 'critical', 'emergency']),
@@ -3010,10 +3010,10 @@ export const AlertStatsSchema = z.object({
   }),
   totalAlerts: z.number(),
   alertsBySystem: z.object({
-    cydef: z.number(),
+    pulse: z.number(),
     liveLocation: z.number(),
-    cypherHUM: z.number(),
-    acds: z.number(),
+    echo: z.number(),
+    surge: z.number(),
     unified: z.number(),
   }),
   alertsBySeverity: z.object({

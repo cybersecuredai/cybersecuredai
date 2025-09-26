@@ -1,5 +1,5 @@
 /**
- * CyDEF (Autonomous Cyber Defense) Dashboard
+ * PULSE (Predictive Universal Learning Security Engine) Dashboard
  * 
  * Real-time visualization of:
  * - Genetic algorithm evolution and fitness scores
@@ -35,7 +35,7 @@ import {
   Bot
 } from 'lucide-react';
 
-interface CydefSystemStatus {
+interface PulseSystemStatus {
   systemId: string;
   status: 'initializing' | 'active' | 'paused' | 'maintenance' | 'error';
   geneticAlgorithmStatus: 'stopped' | 'running' | 'evolving' | 'converged';
@@ -48,7 +48,7 @@ interface CydefSystemStatus {
   lastEvolutionCycle?: Date;
 }
 
-interface CydefRealTimeEvent {
+interface PulseRealTimeEvent {
   id: string;
   eventType: string;
   eventCategory: string;
@@ -59,7 +59,7 @@ interface CydefRealTimeEvent {
   createdAt: Date;
 }
 
-interface CydefPerformanceMetric {
+interface PulsePerformanceMetric {
   id: string;
   metricType: string;
   value: number;
@@ -69,7 +69,7 @@ interface CydefPerformanceMetric {
   recordedAt: Date;
 }
 
-interface CydefAutonomousResponse {
+interface PulseAutonomousResponse {
   id: string;
   responseType: string;
   confidenceScore: number;
@@ -80,33 +80,33 @@ interface CydefAutonomousResponse {
   effectivenessScore?: number;
 }
 
-export default function CydefDashboard() {
+export default function PulseDashboard() {
   const [selectedSystem, setSelectedSystem] = useState<string>('');
-  const [realtimeEvents, setRealtimeEvents] = useState<CydefRealTimeEvent[]>([]);
+  const [realtimeEvents, setRealtimeEvents] = useState<PulseRealTimeEvent[]>([]);
   const [isWebSocketConnected, setIsWebSocketConnected] = useState(false);
 
-  // Fetch CyDEF system status
-  const { data: systemStatus, isLoading: isLoadingStatus } = useQuery<CydefSystemStatus[]>({
-    queryKey: ['/api/cydef/systems/status'],
+  // Fetch PULSE system status
+  const { data: systemStatus, isLoading: isLoadingStatus } = useQuery<PulseSystemStatus[]>({
+    queryKey: ['/api/pulse/systems/status'],
     refetchInterval: 5000, // Refresh every 5 seconds
   });
 
   // Fetch real-time events
-  const { data: events } = useQuery<CydefRealTimeEvent[]>({
-    queryKey: ['/api/cydef/events'],
+  const { data: events } = useQuery<PulseRealTimeEvent[]>({
+    queryKey: ['/api/pulse/events'],
     refetchInterval: 2000, // Refresh every 2 seconds
   });
 
   // Fetch performance metrics
-  const { data: performanceMetrics } = useQuery<CydefPerformanceMetric[]>({
-    queryKey: ['/api/cydef/metrics', selectedSystem],
+  const { data: performanceMetrics } = useQuery<PulsePerformanceMetric[]>({
+    queryKey: ['/api/pulse/metrics', selectedSystem],
     enabled: !!selectedSystem,
     refetchInterval: 3000,
   });
 
   // Fetch autonomous responses
-  const { data: autonomousResponses } = useQuery<CydefAutonomousResponse[]>({
-    queryKey: ['/api/cydef/responses', selectedSystem],
+  const { data: autonomousResponses } = useQuery<PulseAutonomousResponse[]>({
+    queryKey: ['/api/pulse/responses', selectedSystem],
     enabled: !!selectedSystem,
     refetchInterval: 5000,
   });
@@ -114,13 +114,13 @@ export default function CydefDashboard() {
   // Initialize WebSocket connection
   useEffect(() => {
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const wsUrl = `${protocol}//${window.location.host}/ws/cydef`;
+    const wsUrl = `${protocol}//${window.location.host}/ws/pulse`;
     
     try {
       const ws = new WebSocket(wsUrl);
       
       ws.onopen = () => {
-        console.log('🔗 CyDEF WebSocket connected');
+        console.log('🔗 PULSE WebSocket connected');
         setIsWebSocketConnected(true);
       };
       
@@ -132,18 +132,18 @@ export default function CydefDashboard() {
       };
       
       ws.onclose = () => {
-        console.log('🔌 CyDEF WebSocket disconnected');
+        console.log('🔌 PULSE WebSocket disconnected');
         setIsWebSocketConnected(false);
       };
       
       ws.onerror = (error) => {
-        console.error('❌ CyDEF WebSocket error:', error);
+        console.error('❌ PULSE WebSocket error:', error);
         setIsWebSocketConnected(false);
       };
       
       return () => ws.close();
     } catch (error) {
-      console.error('Failed to connect to CyDEF WebSocket:', error);
+      console.error('Failed to connect to PULSE WebSocket:', error);
     }
   }, []);
 
@@ -195,14 +195,14 @@ export default function CydefDashboard() {
   };
 
   return (
-    <div className="container mx-auto p-6 space-y-6" data-testid="cydef-dashboard">
+    <div className="container mx-auto p-6 space-y-6" data-testid="pulse-dashboard">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-3">
           <Shield className="w-8 h-8 text-primary" />
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">CyDEF Dashboard</h1>
-            <p className="text-gray-600 dark:text-gray-300">Autonomous Cyber Defense System</p>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">PULSE Dashboard</h1>
+            <p className="text-gray-600 dark:text-gray-300">Predictive Universal Learning Security Engine</p>
           </div>
         </div>
         

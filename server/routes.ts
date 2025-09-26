@@ -11,7 +11,7 @@ import { AuthService, authenticateJWT, authorizeRoles, sensitiveOperationLimiter
 import { phiRedactionMiddleware, contactTracingPhiMinimization, phiAuditMiddleware, validatePublicHealthAccess } from "./hipaa-compliance";
 import { convertToMMWRFormat, convertToNNDSSFormat, convertToNEDSSFormat, convertToHANFormat, MMWRDataSchema, NNDSSDataSchema, NEDSSDataSchema, HANAlertSchema, getCDCIntegrationService, createPHINMessageHeader } from "./cdc-integration";
 import { registerHipaaAdminRoutes } from "./hipaa-api-routes";
-import { insertUserSchema, insertThreatSchema, insertFileSchema, insertIncidentSchema, insertThreatNotificationSchema, insertSubscriberSchema, insertLiveLocationDeviceSchema, insertLiveLocationHistorySchema, insertLiveLocationAlertSchema, insertLiveLocationGeoFenceSchema, insertLiveLocationAssetSchema, insertLiveLocationNetworkSegmentSchema, insertCypherhumSessionSchema, insertCypherhumVisualizationSchema, insertCypherhumInteractionSchema, insertCypherhumThreatModelSchema, insertCypherhumAnalyticsSchema, insertAcdsDroneSchema, insertAcdsSwarmMissionSchema, insertAcdsDeploymentSchema, insertAcdsCoordinationSchema, insertAcdsAnalyticsSchema, insertPublicHealthIncidentSchema, insertDiseaseSurveillanceSchema, insertContactTracingSchema, insertContactTracingLocationHistorySchema, insertContactProximityDetectionSchema, insertContactTracingNotificationTemplateSchema, insertContactTracingNotificationLogSchema, insertContactTracingPrivacyConsentSchema, insertHealthFacilitySchema, insertPublicHealthAlertSchema, insertEpidemiologicalDataSchema, insertCatalogCategorySchema, insertBomComponentSchema, insertCatalogProductSchema, insertProductBomSchema, insertCatalogServiceSchema, insertCatalogSolutionSchema, insertSolutionComponentSchema, insertPricingHistorySchema, insertCompetitiveAnalysisSchema } from "@shared/schema";
+import { insertUserSchema, insertThreatSchema, insertFileSchema, insertIncidentSchema, insertThreatNotificationSchema, insertSubscriberSchema, insertLiveLocationDeviceSchema, insertLiveLocationHistorySchema, insertLiveLocationAlertSchema, insertLiveLocationGeoFenceSchema, insertLiveLocationAssetSchema, insertLiveLocationNetworkSegmentSchema, insertEchoSessionSchema, insertEchoVisualizationSchema, insertEchoInteractionSchema, insertEchoThreatModelSchema, insertEchoAnalyticsSchema, insertSurgeDroneSchema, insertSurgeSwarmMissionSchema, insertSurgeDeploymentSchema, insertSurgeCoordinationSchema, insertSurgeAnalyticsSchema, insertPublicHealthIncidentSchema, insertDiseaseSurveillanceSchema, insertContactTracingSchema, insertContactTracingLocationHistorySchema, insertContactProximityDetectionSchema, insertContactTracingNotificationTemplateSchema, insertContactTracingNotificationLogSchema, insertContactTracingPrivacyConsentSchema, insertHealthFacilitySchema, insertPublicHealthAlertSchema, insertEpidemiologicalDataSchema, insertCatalogCategorySchema, insertBomComponentSchema, insertCatalogProductSchema, insertProductBomSchema, insertCatalogServiceSchema, insertCatalogSolutionSchema, insertSolutionComponentSchema, insertPricingHistorySchema, insertCompetitiveAnalysisSchema } from "@shared/schema";
 import { ObjectStorageService } from "./objectStorage";
 import { initializeDataRetentionService, getDataRetentionService } from "./services/data-retention-service";
 // Engine types only - no instantiation imports
@@ -3148,7 +3148,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     return liveLocationService;
   };
 
-  // Initialize CypherHUM Service instance
+  // Initialize ECHO Service instance
   let cypherhumService: any = null;
   const initCypherHumService = async () => {
     if (!cypherhumService) {
@@ -3680,20 +3680,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // ===== ACDS (Autonomous Cyber Defense Swarm) API Endpoints =====
+  // ===== SURGE (Autonomous Cyber Defense Swarm) API Endpoints =====
   
-  let acdsService: any = null;
+  let surgeService: any = null;
   
-  const initACDSService = async () => {
-    if (!acdsService) {
-      const { ACDSService } = await import('./services/acds-service.js');
+  const initSURGEService = async () => {
+    if (!surgeService) {
+      const { SurgeService } = await import('./services/surge-service.js');
       
-      acdsService = new ACDSService({
+      surgeService = new SurgeService({
         organizationId: 'default-org',
         swarmSize: 10,
         autonomyLevel: 'autonomous',
         coordinationAlgorithm: 'ai_optimized',
-        cydefIntegrationEnabled: true,
+        pulseIntegrationEnabled: true,
         liveLocationIntegrationEnabled: true,
         realTimeCoordinationEnabled: true,
         emergencyResponseEnabled: true,
@@ -3702,15 +3702,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         threatResponseThreshold: 75
       });
       
-      await acdsService.initialize();
+      await surgeService.initialize();
     }
-    return acdsService;
+    return surgeService;
   };
 
   // Get drone fleet status
-  app.get('/api/acds/drones', authenticateJWT, authorizeRoles("user", "admin"), async (req: AuthenticatedRequest, res) => {
+  app.get('/api/surge/drones', authenticateJWT, authorizeRoles("user", "admin"), async (req: AuthenticatedRequest, res) => {
     try {
-      const service = await initACDSService();
+      const service = await initSURGEService();
       const drones = await service.getAllDrones();
       res.json(drones);
     } catch (error) {
@@ -3720,9 +3720,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get drone fleet status summary
-  app.get('/api/acds/drones/status', authenticateJWT, authorizeRoles("user", "admin"), async (req: AuthenticatedRequest, res) => {
+  app.get('/api/surge/drones/status', authenticateJWT, authorizeRoles("user", "admin"), async (req: AuthenticatedRequest, res) => {
     try {
-      const service = await initACDSService();
+      const service = await initSURGEService();
       const status = await service.getDroneFleetStatus();
       res.json(status);
     } catch (error) {
@@ -3732,9 +3732,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get specific drone by ID
-  app.get('/api/acds/drones/:droneId', authenticateJWT, authorizeRoles("user", "admin"), async (req: AuthenticatedRequest, res) => {
+  app.get('/api/surge/drones/:droneId', authenticateJWT, authorizeRoles("user", "admin"), async (req: AuthenticatedRequest, res) => {
     try {
-      const service = await initACDSService();
+      const service = await initSURGEService();
       const { droneId } = req.params;
       const drones = await service.getAllDrones();
       const drone = drones.find(d => d.droneId === droneId);
@@ -3751,9 +3751,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Update drone status
-  app.put('/api/acds/drones/:droneId', authenticateJWT, authorizeRoles("admin"), sensitiveOperationLimiter(10, 60 * 1000), async (req: AuthenticatedRequest, res) => {
+  app.put('/api/surge/drones/:droneId', authenticateJWT, authorizeRoles("admin"), sensitiveOperationLimiter(10, 60 * 1000), async (req: AuthenticatedRequest, res) => {
     try {
-      const service = await initACDSService();
+      const service = await initSURGEService();
       const { droneId } = req.params;
       const updateData = req.body;
       
@@ -3766,9 +3766,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Deploy drone
-  app.post('/api/acds/drones/:droneId/deploy', authenticateJWT, authorizeRoles("admin"), sensitiveOperationLimiter(5, 60 * 1000), async (req: AuthenticatedRequest, res) => {
+  app.post('/api/surge/drones/:droneId/deploy', authenticateJWT, authorizeRoles("admin"), sensitiveOperationLimiter(5, 60 * 1000), async (req: AuthenticatedRequest, res) => {
     try {
-      const service = await initACDSService();
+      const service = await initSURGEService();
       const { droneId } = req.params;
       const deploymentData = req.body;
       
@@ -3781,9 +3781,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get swarm missions
-  app.get('/api/acds/swarm-missions', authenticateJWT, authorizeRoles("user", "admin"), async (req: AuthenticatedRequest, res) => {
+  app.get('/api/surge/swarm-missions', authenticateJWT, authorizeRoles("user", "admin"), async (req: AuthenticatedRequest, res) => {
     try {
-      const service = await initACDSService();
+      const service = await initSURGEService();
       const missions = await service.getActiveMissions();
       res.json(missions);
     } catch (error) {
@@ -3793,9 +3793,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Create new swarm mission
-  app.post('/api/acds/swarm-missions', authenticateJWT, authorizeRoles("admin"), sensitiveOperationLimiter(5, 60 * 1000), async (req: AuthenticatedRequest, res) => {
+  app.post('/api/surge/swarm-missions', authenticateJWT, authorizeRoles("admin"), sensitiveOperationLimiter(5, 60 * 1000), async (req: AuthenticatedRequest, res) => {
     try {
-      const service = await initACDSService();
+      const service = await initSURGEService();
       const missionData = req.body;
       
       const mission = await service.createMission(missionData);
@@ -3807,9 +3807,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get specific mission by ID
-  app.get('/api/acds/swarm-missions/:missionId', authenticateJWT, authorizeRoles("user", "admin"), async (req: AuthenticatedRequest, res) => {
+  app.get('/api/surge/swarm-missions/:missionId', authenticateJWT, authorizeRoles("user", "admin"), async (req: AuthenticatedRequest, res) => {
     try {
-      const service = await initACDSService();
+      const service = await initSURGEService();
       const { missionId } = req.params;
       const missions = await service.getActiveMissions();
       const mission = missions.find(m => m.id === missionId);
@@ -3826,9 +3826,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get active deployments
-  app.get('/api/acds/deployments', authenticateJWT, authorizeRoles("user", "admin"), async (req: AuthenticatedRequest, res) => {
+  app.get('/api/surge/deployments', authenticateJWT, authorizeRoles("user", "admin"), async (req: AuthenticatedRequest, res) => {
     try {
-      const service = await initACDSService();
+      const service = await initSURGEService();
       const deployments = await service.getActiveDeployments();
       res.json(deployments);
     } catch (error) {
@@ -3838,9 +3838,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get specific deployment by ID
-  app.get('/api/acds/deployments/:deploymentId', authenticateJWT, authorizeRoles("user", "admin"), async (req: AuthenticatedRequest, res) => {
+  app.get('/api/surge/deployments/:deploymentId', authenticateJWT, authorizeRoles("user", "admin"), async (req: AuthenticatedRequest, res) => {
     try {
-      const service = await initACDSService();
+      const service = await initSURGEService();
       const { deploymentId } = req.params;
       const deployments = await service.getActiveDeployments();
       const deployment = deployments.find(d => d.id === deploymentId);
@@ -3857,9 +3857,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Swarm coordination endpoint
-  app.get('/api/acds/coordination', authenticateJWT, authorizeRoles("user", "admin"), async (req: AuthenticatedRequest, res) => {
+  app.get('/api/surge/coordination', authenticateJWT, authorizeRoles("user", "admin"), async (req: AuthenticatedRequest, res) => {
     try {
-      const service = await initACDSService();
+      const service = await initSURGEService();
       
       // Get current coordination status
       const status = await service.getDroneFleetStatus();
@@ -3884,9 +3884,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Trigger manual coordination decision
-  app.post('/api/acds/coordination/trigger', authenticateJWT, authorizeRoles("admin"), sensitiveOperationLimiter(3, 60 * 1000), async (req: AuthenticatedRequest, res) => {
+  app.post('/api/surge/coordination/trigger', authenticateJWT, authorizeRoles("admin"), sensitiveOperationLimiter(3, 60 * 1000), async (req: AuthenticatedRequest, res) => {
     try {
-      const service = await initACDSService();
+      const service = await initSURGEService();
       const { coordinationType, parameters } = req.body;
       
       // Emit coordination trigger event
@@ -3908,22 +3908,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get ACDS analytics
-  app.get('/api/acds/analytics', authenticateJWT, authorizeRoles("user", "admin"), async (req: AuthenticatedRequest, res) => {
+  // Get SURGE analytics
+  app.get('/api/surge/analytics', authenticateJWT, authorizeRoles("user", "admin"), async (req: AuthenticatedRequest, res) => {
     try {
-      const service = await initACDSService();
+      const service = await initSURGEService();
       const analytics = await service.getAnalytics();
       res.json(analytics);
     } catch (error) {
-      console.error('Error fetching ACDS analytics:', error);
-      res.status(500).json({ error: 'Failed to fetch ACDS analytics' });
+      console.error('Error fetching SURGE analytics:', error);
+      res.status(500).json({ error: 'Failed to fetch SURGE analytics' });
     }
   });
 
-  // Get ACDS dashboard data
-  app.get('/api/acds/dashboard', authenticateJWT, authorizeRoles("user", "admin"), async (req: AuthenticatedRequest, res) => {
+  // Get SURGE dashboard data
+  app.get('/api/surge/dashboard', authenticateJWT, authorizeRoles("user", "admin"), async (req: AuthenticatedRequest, res) => {
     try {
-      const service = await initACDSService();
+      const service = await initSURGEService();
       
       const [drones, missions, deployments, analytics, fleetStatus] = await Promise.all([
         service.getAllDrones(),
@@ -3955,15 +3955,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json(dashboardData);
     } catch (error) {
-      console.error('Error fetching ACDS dashboard data:', error);
-      res.status(500).json({ error: 'Failed to fetch ACDS dashboard data' });
+      console.error('Error fetching SURGE dashboard data:', error);
+      res.status(500).json({ error: 'Failed to fetch SURGE dashboard data' });
     }
   });
 
   // Emergency protocols
-  app.post('/api/acds/emergency/recall', authenticateJWT, authorizeRoles("admin"), sensitiveOperationLimiter(2, 60 * 1000), async (req: AuthenticatedRequest, res) => {
+  app.post('/api/surge/emergency/recall', authenticateJWT, authorizeRoles("admin"), sensitiveOperationLimiter(2, 60 * 1000), async (req: AuthenticatedRequest, res) => {
     try {
-      const service = await initACDSService();
+      const service = await initSURGEService();
       const { reason, droneIds } = req.body;
       
       // Emit emergency recall
@@ -3987,9 +3987,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Real-time swarm telemetry for WebSocket (polled endpoint)
-  app.get('/api/acds/telemetry', authenticateJWT, authorizeRoles("user", "admin"), async (req: AuthenticatedRequest, res) => {
+  app.get('/api/surge/telemetry', authenticateJWT, authorizeRoles("user", "admin"), async (req: AuthenticatedRequest, res) => {
     try {
-      const service = await initACDSService();
+      const service = await initSURGEService();
       const [fleetStatus, deployments] = await Promise.all([
         service.getDroneFleetStatus(),
         service.getActiveDeployments()
@@ -4022,8 +4022,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json(telemetry);
     } catch (error) {
-      console.error('Error fetching ACDS telemetry:', error);
-      res.status(500).json({ error: 'Failed to fetch ACDS telemetry' });
+      console.error('Error fetching SURGE telemetry:', error);
+      res.status(500).json({ error: 'Failed to fetch SURGE telemetry' });
     }
   });
   
@@ -12828,35 +12828,35 @@ startxref
   });
   */
 
-  // ===== CyDEF (Autonomous Cyber Defense) API Endpoints =====
+  // ===== PULSE (Predictive Universal Learning Security Engine) API Endpoints =====
 
-  // Lazy import CyDEF service
-  let cydefService: any = null;
-  const getCydefService = async () => {
-    if (!cydefService) {
-      const { CydefService } = await import('./services/cydef-service.js');
-      cydefService = new CydefService({
+  // Lazy import PULSE service
+  let pulseService: any = null;
+  const getPulseService = async () => {
+    if (!pulseService) {
+      const { PulseService } = await import('./services/pulse-service.js');
+      pulseService = new PulseService({
         organizationId: 'default-org',
-        systemName: 'CyDEF-Primary',
+        systemName: 'PULSE-Primary',
         targetAccuracy: 992, // 99.2%
         autonomousMode: true,
         threatDetectionEngine: 'pytorch_deap',
         evolutionCycleIntervalMs: 30000, // 30 seconds
       });
-      await cydefService.initialize();
+      await pulseService.initialize();
     }
-    return cydefService;
+    return pulseService;
   };
 
-  // Get CyDEF system status
-  app.get('/api/cydef/systems/status', async (req, res) => {
+  // Get PULSE system status
+  app.get('/api/pulse/systems/status', async (req, res) => {
     try {
-      const service = await getCydefService();
+      const service = await getPulseService();
       const status = await service.getSystemStatus();
       
       res.json(status);
     } catch (error: any) {
-      console.error('❌ Failed to get CyDEF system status:', error);
+      console.error('❌ Failed to get PULSE system status:', error);
       res.status(500).json({ 
         error: 'Failed to get system status',
         message: error.message 
@@ -12864,16 +12864,16 @@ startxref
     }
   });
 
-  // Get CyDEF real-time events
-  app.get('/api/cydef/events', async (req, res) => {
+  // Get PULSE real-time events
+  app.get('/api/pulse/events', async (req, res) => {
     try {
-      const service = await getCydefService();
+      const service = await getPulseService();
       const limit = parseInt(req.query.limit as string) || 50;
       const events = service.getRealTimeEvents(limit);
       
       res.json(events);
     } catch (error: any) {
-      console.error('❌ Failed to get CyDEF events:', error);
+      console.error('❌ Failed to get PULSE events:', error);
       res.status(500).json({ 
         error: 'Failed to get real-time events',
         message: error.message 
@@ -12881,10 +12881,10 @@ startxref
     }
   });
 
-  // Get CyDEF performance metrics
-  app.get('/api/cydef/metrics/:systemId?', async (req, res) => {
+  // Get PULSE performance metrics
+  app.get('/api/pulse/metrics/:systemId?', async (req, res) => {
     try {
-      const service = await getCydefService();
+      const service = await getPulseService();
       const { systemId } = req.params;
       const metricType = req.query.metricType as string;
       
@@ -12892,7 +12892,7 @@ startxref
       
       res.json(metrics);
     } catch (error: any) {
-      console.error('❌ Failed to get CyDEF metrics:', error);
+      console.error('❌ Failed to get PULSE metrics:', error);
       res.status(500).json({ 
         error: 'Failed to get performance metrics',
         message: error.message 
@@ -12901,9 +12901,9 @@ startxref
   });
 
   // Get autonomous response history
-  app.get('/api/cydef/responses/:systemId?', async (req, res) => {
+  app.get('/api/pulse/responses/:systemId?', async (req, res) => {
     try {
-      const service = await getCydefService();
+      const service = await getPulseService();
       const { systemId } = req.params;
       const limit = parseInt(req.query.limit as string) || 100;
       
@@ -12951,10 +12951,10 @@ startxref
     }
   });
 
-  // Process threat through CyDEF
-  app.post('/api/cydef/analyze-threat', async (req, res) => {
+  // Process threat through PULSE
+  app.post('/api/pulse/analyze-threat', async (req, res) => {
     try {
-      const service = await getCydefService();
+      const service = await getPulseService();
       const { threatData } = req.body;
       
       if (!threatData || !threatData.id) {
@@ -12988,10 +12988,10 @@ startxref
     }
   });
 
-  // Get CyDEF dashboard overview
-  app.get('/api/cydef/dashboard', async (req, res) => {
+  // Get PULSE dashboard overview
+  app.get('/api/pulse/dashboard', async (req, res) => {
     try {
-      const service = await getCydefService();
+      const service = await getPulseService();
       const systemStatus = await service.getSystemStatus();
       const events = service.getRealTimeEvents(10);
       
@@ -13010,7 +13010,7 @@ startxref
       
       res.json(overview);
     } catch (error: any) {
-      console.error('❌ Failed to get CyDEF dashboard:', error);
+      console.error('❌ Failed to get PULSE dashboard:', error);
       res.status(500).json({ 
         error: 'Failed to get dashboard data',
         message: error.message 
@@ -13018,9 +13018,9 @@ startxref
     }
   });
 
-  // ===== CypherHUM API Endpoints =====
+  // ===== ECHO API Endpoints =====
   
-  // CypherHUM Dashboard - Main interface status and overview
+  // ECHO Dashboard - Main interface status and overview
   app.get("/api/cypherhum/dashboard", authenticateJWT, async (req: AuthenticatedRequest, res) => {
     try {
       const userId = req.user?.id;
@@ -13028,7 +13028,7 @@ startxref
         return res.status(401).json({ error: "User not authenticated" });
       }
 
-      // Get user's active CypherHUM sessions
+      // Get user's active ECHO sessions
       const sessions = await storage.getCypherhumSessions(userId);
       const activeSessions = sessions.filter(s => s.status === "active");
       
@@ -13056,12 +13056,12 @@ startxref
       
       res.json(dashboardData);
     } catch (error) {
-      console.error('Error fetching CypherHUM dashboard:', error);
+      console.error('Error fetching ECHO dashboard:', error);
       res.status(500).json({ error: 'Failed to fetch dashboard data' });
     }
   });
   
-  // CypherHUM Sessions - Holographic session management
+  // ECHO Sessions - Holographic session management
   app.get("/api/cypherhum/sessions", authenticateJWT, async (req: AuthenticatedRequest, res) => {
     try {
       const userId = req.user?.id;
@@ -13072,7 +13072,7 @@ startxref
       const sessions = await storage.getCypherhumSessions(userId);
       res.json(sessions);
     } catch (error) {
-      console.error('Error fetching CypherHUM sessions:', error);
+      console.error('Error fetching ECHO sessions:', error);
       res.status(500).json({ error: 'Failed to fetch sessions' });
     }
   });
@@ -13093,7 +13093,7 @@ startxref
       const session = await storage.createCypherhumSession(sessionData);
       res.status(201).json(session);
     } catch (error) {
-      console.error('Error creating CypherHUM session:', error);
+      console.error('Error creating ECHO session:', error);
       res.status(400).json({ error: 'Failed to create session' });
     }
   });
@@ -13106,12 +13106,12 @@ startxref
       const session = await storage.updateCypherhumSession(sessionId, updates);
       res.json(session);
     } catch (error) {
-      console.error('Error updating CypherHUM session:', error);
+      console.error('Error updating ECHO session:', error);
       res.status(400).json({ error: 'Failed to update session' });
     }
   });
   
-  // CypherHUM Visualizations - 3D visualization presets and configurations
+  // ECHO Visualizations - 3D visualization presets and configurations
   app.get("/api/cypherhum/visualizations", authenticateJWT, async (req: AuthenticatedRequest, res) => {
     try {
       const userId = req.user?.id;
@@ -13122,7 +13122,7 @@ startxref
       const visualizations = await storage.getCypherhumVisualizations(userId);
       res.json(visualizations);
     } catch (error) {
-      console.error('Error fetching CypherHUM visualizations:', error);
+      console.error('Error fetching ECHO visualizations:', error);
       res.status(500).json({ error: 'Failed to fetch visualizations' });
     }
   });
@@ -13142,12 +13142,12 @@ startxref
       const visualization = await storage.createCypherhumVisualization(visualizationData);
       res.status(201).json(visualization);
     } catch (error) {
-      console.error('Error creating CypherHUM visualization:', error);
+      console.error('Error creating ECHO visualization:', error);
       res.status(400).json({ error: 'Failed to create visualization' });
     }
   });
   
-  // CypherHUM AI Analysis - AI-powered threat analysis and processing
+  // ECHO AI Analysis - AI-powered threat analysis and processing
   app.post("/api/cypherhum/ai-analysis", authenticateJWT, async (req: AuthenticatedRequest, res) => {
     try {
       const userId = req.user?.id;
@@ -13184,25 +13184,25 @@ startxref
           processingTime: Math.floor(Math.random() * 1000) + 100
         },
         timestamp: new Date().toISOString(),
-        processedBy: "CypherHUM-AI-Engine",
+        processedBy: "ECHO-AI-Engine",
         userId
       };
       
       res.json(analysis);
     } catch (error) {
-      console.error('Error processing CypherHUM AI analysis:', error);
+      console.error('Error processing ECHO AI analysis:', error);
       res.status(500).json({ error: 'Failed to process AI analysis' });
     }
   });
   
-  // CypherHUM Interactions - AI command processing and natural language interface
+  // ECHO Interactions - AI command processing and natural language interface
   app.get("/api/cypherhum/interactions", authenticateJWT, async (req: AuthenticatedRequest, res) => {
     try {
       const { sessionId } = req.query;
       const interactions = await storage.getCypherhumInteractions(sessionId as string);
       res.json(interactions);
     } catch (error) {
-      console.error('Error fetching CypherHUM interactions:', error);
+      console.error('Error fetching ECHO interactions:', error);
       res.status(500).json({ error: 'Failed to fetch interactions' });
     }
   });
@@ -13218,7 +13218,7 @@ startxref
         'unknown command';
       
       const aiResponse = {
-        text: `Processing: "${processedInput}". CypherHUM AI is analyzing your request...`,
+        text: `Processing: "${processedInput}". ECHO AI is analyzing your request...`,
         action: interactionData.interactionType === 'voice_command' ? 'voice_response' : 'text_response',
         confidence: 0.85 + Math.random() * 0.15
       };
@@ -13234,12 +13234,12 @@ startxref
       
       res.status(201).json(interaction);
     } catch (error) {
-      console.error('Error creating CypherHUM interaction:', error);
+      console.error('Error creating ECHO interaction:', error);
       res.status(400).json({ error: 'Failed to process interaction' });
     }
   });
   
-  // CypherHUM 3D Data - 3D rendering data generation for holographic displays  
+  // ECHO 3D Data - 3D rendering data generation for holographic displays  
   app.get("/api/cypherhum/3d-data", authenticateJWT, async (req: AuthenticatedRequest, res) => {
     try {
       const { threatId, modelType, complexity } = req.query;
@@ -13282,12 +13282,12 @@ startxref
       
       res.json(threeDData);
     } catch (error) {
-      console.error('Error generating CypherHUM 3D data:', error);
+      console.error('Error generating ECHO 3D data:', error);
       res.status(500).json({ error: 'Failed to generate 3D data' });
     }
   });
   
-  // CypherHUM Analytics - Performance analytics and usage statistics
+  // ECHO Analytics - Performance analytics and usage statistics
   app.get("/api/cypherhum/analytics", authenticateJWT, async (req: AuthenticatedRequest, res) => {
     try {
       const userId = req.user?.id;
@@ -13320,7 +13320,7 @@ startxref
         summary
       });
     } catch (error) {
-      console.error('Error fetching CypherHUM analytics:', error);
+      console.error('Error fetching ECHO analytics:', error);
       res.status(500).json({ error: 'Failed to fetch analytics' });
     }
   });
@@ -13340,19 +13340,19 @@ startxref
       const analytic = await storage.createCypherhumAnalytic(analyticData);
       res.status(201).json(analytic);
     } catch (error) {
-      console.error('Error creating CypherHUM analytic:', error);
+      console.error('Error creating ECHO analytic:', error);
       res.status(400).json({ error: 'Failed to create analytic' });
     }
   });
   
-  // CypherHUM Threat Models - 3D threat model management and visualization
+  // ECHO Threat Models - 3D threat model management and visualization
   app.get("/api/cypherhum/threat-models", authenticateJWT, async (req: AuthenticatedRequest, res) => {
     try {
       const { threatId } = req.query;
       const threatModels = await storage.getCypherhumThreatModels(threatId as string);
       res.json(threatModels);
     } catch (error) {
-      console.error('Error fetching CypherHUM threat models:', error);
+      console.error('Error fetching ECHO threat models:', error);
       res.status(500).json({ error: 'Failed to fetch threat models' });
     }
   });
@@ -13363,7 +13363,7 @@ startxref
       const threatModel = await storage.createCypherhumThreatModel(threatModelData);
       res.status(201).json(threatModel);
     } catch (error) {
-      console.error('Error creating CypherHUM threat model:', error);
+      console.error('Error creating ECHO threat model:', error);
       res.status(400).json({ error: 'Failed to create threat model' });
     }
   });
@@ -13376,33 +13376,33 @@ startxref
       const threatModel = await storage.updateCypherhumThreatModel(modelId, updates);
       res.json(threatModel);
     } catch (error) {
-      console.error('Error updating CypherHUM threat model:', error);
+      console.error('Error updating ECHO threat model:', error);
       res.status(400).json({ error: 'Failed to update threat model' });
     }
   });
 
-  // ===== WebSocket Integration for Real-time CyDEF Updates =====
+  // ===== WebSocket Integration for Real-time PULSE Updates =====
   
-  // Setup WebSocket server for real-time CyDEF events (guarded by feature flag)
+  // Setup WebSocket server for real-time PULSE events (guarded by feature flag)
   if (process.env.ENABLE_WS !== 'false') {
     try {
       const { WebSocketServer } = await import('ws');
       const wss = new WebSocketServer({ 
         server: httpServer,
-        path: '/ws/cydef'
+        path: '/ws/pulse'
       });
 
   wss.on('connection', (ws) => {
-    console.log('🔗 CyDEF WebSocket client connected');
+    console.log('🔗 PULSE WebSocket client connected');
     
     // Send welcome message
     ws.send(JSON.stringify({
       type: 'welcome',
-      message: 'Connected to CyDEF real-time updates',
+      message: 'Connected to PULSE real-time updates',
       timestamp: new Date().toISOString()
     }));
 
-    // Setup CyDEF service event handlers
+    // Setup PULSE service event handlers
     const handleRealtimeEvent = (event: any) => {
       if (ws.readyState === ws.OPEN) {
         ws.send(JSON.stringify({
@@ -13412,7 +13412,7 @@ startxref
       }
     };
 
-    // Initialize CyDEF service and setup listeners
+    // Initialize PULSE service and setup listeners
     getCydefService().then(service => {
       service.on('realtimeEvent', handleRealtimeEvent);
       
@@ -13426,7 +13426,7 @@ startxref
         }
       });
     }).catch(error => {
-      console.error('❌ Failed to initialize CyDEF service for WebSocket:', error);
+      console.error('❌ Failed to initialize PULSE service for WebSocket:', error);
     });
 
     ws.on('message', (message) => {
@@ -13451,7 +13451,7 @@ startxref
     });
 
     ws.on('close', () => {
-      console.log('🔌 CyDEF WebSocket client disconnected');
+      console.log('🔌 PULSE WebSocket client disconnected');
       // Remove event listeners when client disconnects
       getCydefService().then(service => {
         service.removeListener('realtimeEvent', handleRealtimeEvent);
@@ -13461,27 +13461,27 @@ startxref
     });
 
     ws.on('error', (error) => {
-      console.error('❌ CyDEF WebSocket error:', error);
+      console.error('❌ PULSE WebSocket error:', error);
     });
   });
 
-      console.log('🚀 CyDEF WebSocket server initialized at /ws/cydef');
+      console.log('🚀 PULSE WebSocket server initialized at /ws/pulse');
 
-      // ===== CypherHUM WebSocket Support =====
+      // ===== ECHO WebSocket Support =====
 
-      // CypherHUM WebSocket endpoint for real-time 3D holographic updates
+      // ECHO WebSocket endpoint for real-time 3D holographic updates
       wss.on('connection', async (ws, request) => {
         let url: URL;
         try {
           url = new URL(request.url!, `http://${request.headers.host}`);
         } catch (error) {
-          console.error('❌ Invalid CypherHUM WebSocket URL:', request.url, error);
+          console.error('❌ Invalid ECHO WebSocket URL:', request.url, error);
           ws.close(1008, 'Invalid URL format');
           return;
         }
         
-        // Handle CypherHUM WebSocket connections
-        if (url.pathname === '/ws/cypherhum') {
+        // Handle ECHO WebSocket connections
+        if (url.pathname === '/ws/echo') {
           try {
             // Extract and verify JWT token for WebSocket authentication
             let token: string | null = null;
@@ -13498,7 +13498,7 @@ startxref
             }
             
             if (!token) {
-              console.warn('⚠️ CypherHUM WebSocket connection rejected: No authentication token provided');
+              console.warn('⚠️ ECHO WebSocket connection rejected: No authentication token provided');
               ws.close(1008, 'Authentication required');
               return;
             }
@@ -13508,13 +13508,13 @@ startxref
             const payload = AuthService.verifyToken(token);
             
             if (!payload || !payload.userId) {
-              console.warn('⚠️ CypherHUM WebSocket connection rejected: Invalid authentication token');
+              console.warn('⚠️ ECHO WebSocket connection rejected: Invalid authentication token');
               ws.close(1008, 'Invalid authentication token');
               return;
             }
             
             // Log successful authentication with detailed info
-            console.log(`✅ CypherHUM WebSocket authenticated successfully:`);
+            console.log(`✅ ECHO WebSocket authenticated successfully:`);
             console.log(`   📧 User: ${payload.email}`);
             console.log(`   🔑 Role: ${payload.role}`);
             console.log(`   🆔 User ID: ${payload.userId}`);
@@ -13526,13 +13526,13 @@ startxref
             (ws as any).userRole = payload.role;
             (ws as any).connectedAt = new Date().toISOString();
             
-            // Initialize CypherHUM service
+            // Initialize ECHO service
             const service = await initCypherHumService();
             
             // Extract session ID from query parameters
             const sessionId = url.searchParams.get('sessionId');
             if (!sessionId) {
-              console.warn('⚠️ CypherHUM WebSocket connection rejected: No session ID provided');
+              console.warn('⚠️ ECHO WebSocket connection rejected: No session ID provided');
               ws.close(1008, 'Session ID required');
               return;
             }
@@ -13540,7 +13540,7 @@ startxref
             // Verify session ownership
             const session = await service.getSession(sessionId);
             if (!session || (session.userId !== payload.userId && payload.role !== 'admin')) {
-              console.warn('⚠️ CypherHUM WebSocket connection rejected: Invalid session or access denied');
+              console.warn('⚠️ ECHO WebSocket connection rejected: Invalid session or access denied');
               ws.close(1008, 'Invalid session or access denied');
               return;
             }
@@ -13558,7 +13558,7 @@ startxref
               }));
             }
             
-            // Handle incoming messages for CypherHUM interactions
+            // Handle incoming messages for ECHO interactions
             ws.on('message', async (message) => {
               try {
                 const data = JSON.parse(message.toString());
@@ -13600,7 +13600,7 @@ startxref
                     break;
                 }
               } catch (error) {
-                console.error('❌ Error processing CypherHUM WebSocket message:', error);
+                console.error('❌ Error processing ECHO WebSocket message:', error);
                 ws.send(JSON.stringify({
                   type: 'error',
                   message: 'Failed to process message'
@@ -13609,11 +13609,11 @@ startxref
             });
             
             ws.on('close', () => {
-              console.log(`🔌 CypherHUM WebSocket disconnected: ${payload.email}`);
+              console.log(`🔌 ECHO WebSocket disconnected: ${payload.email}`);
             });
             
           } catch (authError) {
-            console.error('❌ CypherHUM WebSocket authentication failed:', authError);
+            console.error('❌ ECHO WebSocket authentication failed:', authError);
             ws.close(1008, 'Authentication failed');
             return;
           }
@@ -13872,28 +13872,28 @@ startxref
 
       console.log('📍 Live Location WebSocket server initialized at /ws/live-location');
 
-      // ===== ACDS (Autonomous Cyber Defense Swarm) WebSocket Support =====
+      // ===== SURGE (Autonomous Cyber Defense Swarm) WebSocket Support =====
 
-      // ACDS WebSocket endpoint for real-time drone swarm coordination
-      const acdsWss = new WebSocketServer({ 
+      // SURGE WebSocket endpoint for real-time drone swarm coordination
+      const surgeWss = new WebSocketServer({ 
         server: httpServer,
-        path: '/ws/acds'
+        path: '/ws/surge'
       });
 
-      acdsWss.on('connection', async (ws, request) => {
+      surgeWss.on('connection', async (ws, request) => {
         // Parse URL to handle query parameters properly
         let url: URL;
         try {
           url = new URL(request.url!, `http://${request.headers.host}`);
         } catch (error) {
-          console.error('❌ Invalid ACDS WebSocket URL:', request.url, error);
+          console.error('❌ Invalid SURGE WebSocket URL:', request.url, error);
           ws.close(1008, 'Invalid URL format');
           return;
         }
         
         // Check if the pathname matches the expected WebSocket endpoint
-        if (url.pathname !== '/ws/acds') {
-          console.warn(`⚠️ ACDS WebSocket connection rejected: Invalid path "${url.pathname}"`);
+        if (url.pathname !== '/ws/surge') {
+          console.warn(`⚠️ SURGE WebSocket connection rejected: Invalid path "${url.pathname}"`);
           ws.close(1008, 'Invalid path');
           return;
         }
@@ -13914,7 +13914,7 @@ startxref
           }
           
           if (!token) {
-            console.warn('⚠️ ACDS WebSocket connection rejected: No authentication token provided');
+            console.warn('⚠️ SURGE WebSocket connection rejected: No authentication token provided');
             ws.close(1008, 'Authentication required');
             return;
           }
@@ -13924,13 +13924,13 @@ startxref
           const payload = AuthService.verifyToken(token);
           
           if (!payload || !payload.userId) {
-            console.warn('⚠️ ACDS WebSocket connection rejected: Invalid authentication token');
+            console.warn('⚠️ SURGE WebSocket connection rejected: Invalid authentication token');
             ws.close(1008, 'Invalid authentication token');
             return;
           }
           
           // Log successful authentication with detailed info
-          console.log(`✅ ACDS WebSocket authenticated successfully:`);
+          console.log(`✅ SURGE WebSocket authenticated successfully:`);
           console.log(`   📧 User: ${payload.email}`);
           console.log(`   🔑 Role: ${payload.role}`);
           console.log(`   🚁 Swarm access granted for: ${payload.userId}`);
@@ -13943,16 +13943,16 @@ startxref
         // Send welcome message with initial swarm status
         ws.send(JSON.stringify({
           type: 'welcome',
-          message: 'Connected to ACDS Swarm Coordination System',
+          message: 'Connected to SURGE Swarm Coordination System',
           user: payload.email,
           timestamp: new Date().toISOString()
         }));
 
         try {
-          // Initialize ACDS service for this WebSocket connection
-          const acdsService = await initACDSService();
+          // Initialize SURGE service for this WebSocket connection
+          const surgeService = await initSURGEService();
           
-          // Setup real-time event handlers for ACDS updates
+          // Setup real-time event handlers for SURGE updates
           const handleSwarmTelemetry = (telemetryData: any) => {
             if (ws.readyState === WebSocket.OPEN) {
               ws.send(JSON.stringify({
@@ -14014,16 +14014,16 @@ startxref
           };
 
           // Register event listeners for real-time swarm updates
-          acdsService.on('swarmTelemetry', handleSwarmTelemetry);
-          acdsService.on('droneStatusUpdate', handleDroneStatusUpdate);
-          acdsService.on('missionUpdate', handleMissionUpdate);
-          acdsService.on('deploymentUpdate', handleDeploymentUpdate);
-          acdsService.on('coordinationDecision', handleCoordinationDecision);
-          acdsService.on('emergencyAlert', handleEmergencyAlert);
+          surgeService.on('swarmTelemetry', handleSwarmTelemetry);
+          surgeService.on('droneStatusUpdate', handleDroneStatusUpdate);
+          surgeService.on('missionUpdate', handleMissionUpdate);
+          surgeService.on('deploymentUpdate', handleDeploymentUpdate);
+          surgeService.on('coordinationDecision', handleCoordinationDecision);
+          surgeService.on('emergencyAlert', handleEmergencyAlert);
 
           // Send initial swarm status on connection
           try {
-            const swarmStatus = await acdsService.getSwarmStatus();
+            const swarmStatus = await surgeService.getSwarmStatus();
             if (ws.readyState === WebSocket.OPEN) {
               ws.send(JSON.stringify({
                 type: 'swarm_status',
@@ -14032,14 +14032,14 @@ startxref
               }));
             }
           } catch (error) {
-            console.error('❌ Failed to get initial ACDS swarm status:', error);
+            console.error('❌ Failed to get initial SURGE swarm status:', error);
           }
 
           // Handle incoming WebSocket messages
           ws.on('message', async (message) => {
             try {
               const data = JSON.parse(message.toString());
-              console.log('📨 Received ACDS WebSocket message:', data);
+              console.log('📨 Received SURGE WebSocket message:', data);
               
               // Handle different message types
               switch (data.type) {
@@ -14052,7 +14052,7 @@ startxref
                   
                 case 'requestSwarmStatus':
                   try {
-                    const swarmStatus = await acdsService.getSwarmStatus();
+                    const swarmStatus = await surgeService.getSwarmStatus();
                     ws.send(JSON.stringify({
                       type: 'swarm_status',
                       payload: swarmStatus,
@@ -14065,7 +14065,7 @@ startxref
                   
                 case 'requestFleetStatus':
                   try {
-                    const fleetStatus = await acdsService.getFleetStatus();
+                    const fleetStatus = await surgeService.getFleetStatus();
                     ws.send(JSON.stringify({
                       type: 'fleet_status',
                       payload: fleetStatus,
@@ -14078,9 +14078,9 @@ startxref
                   
                 case 'emergencyRecall':
                   try {
-                    const recallResult = await acdsService.initiateEmergencyRecall(data.payload);
+                    const recallResult = await surgeService.initiateEmergencyRecall(data.payload);
                     // Broadcast emergency recall to all connected clients
-                    acdsWss.clients.forEach((client) => {
+                    surgeWss.clients.forEach((client) => {
                       if (client.readyState === WebSocket.OPEN) {
                         client.send(JSON.stringify({
                           type: 'emergency_alert',
@@ -14100,7 +14100,7 @@ startxref
                   
                 case 'triggerCoordination':
                   try {
-                    const coordinationResult = await acdsService.triggerCoordination(data.payload);
+                    const coordinationResult = await surgeService.triggerCoordination(data.payload);
                     ws.send(JSON.stringify({
                       type: 'coordination_decision',
                       payload: coordinationResult,
@@ -14113,14 +14113,14 @@ startxref
                   
                 case 'subscribe':
                   // Handle subscription to specific event types
-                  console.log('📡 ACDS WebSocket subscription request:', data.payload);
+                  console.log('📡 SURGE WebSocket subscription request:', data.payload);
                   break;
                   
                 default:
-                  console.log('Unknown ACDS WebSocket message type:', data.type);
+                  console.log('Unknown SURGE WebSocket message type:', data.type);
               }
             } catch (error) {
-              console.error('❌ Failed to parse ACDS WebSocket message:', error);
+              console.error('❌ Failed to parse SURGE WebSocket message:', error);
             }
           });
 
@@ -14128,7 +14128,7 @@ startxref
           const telemetryInterval = setInterval(async () => {
             try {
               if (ws.readyState === WebSocket.OPEN) {
-                const telemetryData = await acdsService.getSwarmTelemetry();
+                const telemetryData = await surgeService.getSwarmTelemetry();
                 ws.send(JSON.stringify({
                   type: 'swarm_telemetry',
                   payload: telemetryData,
@@ -14149,40 +14149,40 @@ startxref
               ? `(connected for ${Math.round((Date.now() - new Date((ws as any).connectedAt).getTime()) / 1000)}s)`
               : '';
             
-            console.log(`🔌 ACDS WebSocket disconnected: ${userInfo} ${connectedDuration}`);
+            console.log(`🔌 SURGE WebSocket disconnected: ${userInfo} ${connectedDuration}`);
             console.log(`   📊 Close code: ${code}, Reason: ${reason || 'No reason provided'}`);
             
             // Remove event listeners to prevent memory leaks
-            acdsService.removeListener('swarmTelemetry', handleSwarmTelemetry);
-            acdsService.removeListener('droneStatusUpdate', handleDroneStatusUpdate);
-            acdsService.removeListener('missionUpdate', handleMissionUpdate);
-            acdsService.removeListener('deploymentUpdate', handleDeploymentUpdate);
-            acdsService.removeListener('coordinationDecision', handleCoordinationDecision);
-            acdsService.removeListener('emergencyAlert', handleEmergencyAlert);
+            surgeService.removeListener('swarmTelemetry', handleSwarmTelemetry);
+            surgeService.removeListener('droneStatusUpdate', handleDroneStatusUpdate);
+            surgeService.removeListener('missionUpdate', handleMissionUpdate);
+            surgeService.removeListener('deploymentUpdate', handleDeploymentUpdate);
+            surgeService.removeListener('coordinationDecision', handleCoordinationDecision);
+            surgeService.removeListener('emergencyAlert', handleEmergencyAlert);
           });
 
         } catch (error) {
-          console.error('❌ Failed to initialize ACDS service for WebSocket:', error);
+          console.error('❌ Failed to initialize SURGE service for WebSocket:', error);
           ws.send(JSON.stringify({
             type: 'error',
-            message: 'Failed to initialize ACDS service',
+            message: 'Failed to initialize SURGE service',
             timestamp: new Date().toISOString()
           }));
         }
 
         } catch (authError) {
-          console.error('❌ ACDS WebSocket authentication failed:', authError);
+          console.error('❌ SURGE WebSocket authentication failed:', authError);
           ws.close(1008, 'Authentication failed');
           return;
         }
 
         // Enhanced error handling
         ws.on('error', (error) => {
-          console.error('❌ ACDS WebSocket error:', error);
+          console.error('❌ SURGE WebSocket error:', error);
         });
       });
 
-      console.log('🚁 ACDS WebSocket server initialized at /ws/acds');
+      console.log('🚁 SURGE WebSocket server initialized at /ws/surge');
 
       // ===== UNIFIED SYSTEM WEBSOCKET SERVER =====
       
@@ -14258,7 +14258,7 @@ startxref
             message: 'Connected to Unified CyberSecured AI Platform',
             user: payload.email,
             timestamp: new Date().toISOString(),
-            systems: ['cydef', 'liveLocation', 'cypherHUM', 'acds']
+            systems: ['pulse', 'liveLocation', 'echo', 'surge']
           }));
 
           try {

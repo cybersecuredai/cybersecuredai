@@ -64,7 +64,7 @@ export async function seedCatalogData() {
       { componentName: 'Genetic Algorithm Engine Core', componentType: 'software', vendorName: 'ORCA Federal', vendorPartNumber: 'GAE-CORE-2025', unitCost: 125000, description: 'Proprietary self-evolving AI algorithm engine', leadTimeDays: 14, minimumOrderQuantity: 1 },
       { componentName: 'Real-time Correlation Engine', componentType: 'software', vendorName: 'ORCA Federal', vendorPartNumber: 'RCE-2025', unitCost: 85000, description: 'Advanced threat correlation and analysis engine', leadTimeDays: 14, minimumOrderQuantity: 1 },
       { componentName: 'Holographic Rendering Framework', componentType: 'software', vendorName: 'ORCA Federal', vendorPartNumber: 'HRF-5D-2025', unitCost: 95000, description: '5D holographic visualization rendering engine', leadTimeDays: 21, minimumOrderQuantity: 1 },
-      { componentName: 'Swarm Coordination Protocol', componentType: 'software', vendorName: 'ORCA Federal', vendorPartNumber: 'SCP-ACDS-2025', unitCost: 75000, description: 'Autonomous defense swarm coordination software', leadTimeDays: 14, minimumOrderQuantity: 1 },
+      { componentName: 'Swarm Coordination Protocol', componentType: 'software', vendorName: 'ORCA Federal', vendorPartNumber: 'SCP-SURGE-2025', unitCost: 75000, description: 'Strategic unified response & guardian engine swarm coordination software', leadTimeDays: 14, minimumOrderQuantity: 1 },
       
       // Services Components
       { componentName: 'Senior Cybersecurity Engineer', componentType: 'labor', unitCost: 175, description: 'Senior-level cybersecurity engineering expertise', leadTimeDays: 1, minimumOrderQuantity: 40 },
@@ -89,12 +89,12 @@ export async function seedCatalogData() {
 
     const coreProducts: InsertCatalogProduct[] = [
       {
-        name: 'CyDEF Genetic Algorithm Engine',
-        slug: 'cydef-genetic-algorithm-engine',
-        productCode: 'CYDEF-GAE-2025',
+        name: 'PULSE Genetic Algorithm Engine',
+        slug: 'pulse-genetic-algorithm-engine',
+        productCode: 'PULSE-GAE-2025',
         categoryId: createdCategories.find(c => c.slug === 'core-ai-systems')!.id,
-        shortDescription: 'Revolutionary self-evolving AI cybersecurity system with genetic algorithm optimization',
-        fullDescription: 'The CyDEF Genetic Algorithm Engine represents a breakthrough in autonomous cybersecurity. This self-evolving AI system continuously adapts and improves its threat detection capabilities through genetic algorithm optimization, learning from every security event to strengthen organizational defenses.',
+        shortDescription: 'Revolutionary AI-powered location intelligence and security system with genetic algorithm optimization',
+        fullDescription: 'The PULSE Genetic Algorithm Engine represents a breakthrough in location intelligence and cybersecurity. This AI-powered system continuously adapts and improves its threat detection capabilities through genetic algorithm optimization, providing precise unified location and security analysis to strengthen organizational defenses.',
         technicalSpecifications: {
           processors: 'Multi-GPU acceleration support',
           memory: '256GB RAM minimum',
@@ -134,12 +134,12 @@ export async function seedCatalogData() {
         releaseDate: new Date('2025-01-15')
       },
       {
-        name: 'CypherHUM 5D Interface',
+        name: 'ECHO 5D Interface',
         slug: 'cypherhum-5d-interface',
         productCode: 'CHUM-5D-2025',
         categoryId: createdCategories.find(c => c.slug === 'visualization-platforms')!.id,
         shortDescription: 'Immersive 5D holographic cybersecurity visualization platform with live AI avatar',
-        fullDescription: 'CypherHUM 5D Interface revolutionizes cybersecurity monitoring through immersive holographic visualization. This cutting-edge platform presents complex security data in an intuitive 5D environment, complete with an intelligent AI avatar that provides real-time analysis and recommendations.',
+        fullDescription: 'ECHO 5D Interface revolutionizes cybersecurity monitoring through immersive holographic visualization. This cutting-edge Enhanced Cybersecurity Holographic Operations platform presents complex security data in an intuitive 5D environment, complete with an intelligent AI avatar that provides real-time analysis and recommendations.',
         technicalSpecifications: {
           display: '5D Holographic Projection System',
           resolution: '8K per eye, 120Hz refresh rate',
@@ -224,12 +224,12 @@ export async function seedCatalogData() {
         releaseDate: new Date('2025-02-01')
       },
       {
-        name: 'ACDS Control Platform',
-        slug: 'acds-control-platform',
-        productCode: 'ACDS-CP-2025',
+        name: 'SURGE Control Platform',
+        slug: 'surge-control-platform',
+        productCode: 'SURGE-CP-2025',
         categoryId: createdCategories.find(c => c.slug === 'defense-platforms')!.id,
         shortDescription: 'Autonomous Cyber Defense Swarm coordination and control platform',
-        fullDescription: 'The ACDS Control Platform orchestrates autonomous cyber defense swarms to provide unprecedented protection against sophisticated threats. This revolutionary system coordinates multiple AI-driven defense nodes that work in concert to identify, isolate, and neutralize cyber threats in real-time.',
+        fullDescription: 'The SURGE Control Platform orchestrates strategic unified response and guardian engine swarms to provide unprecedented protection against sophisticated threats. This revolutionary system coordinates multiple AI-driven defense nodes that work in concert to identify, isolate, and neutralize cyber threats in real-time.',
         technicalSpecifications: {
           nodeCapacity: 'Up to 10,000 coordinated defense nodes',
           responseTime: 'Sub-millisecond threat response',

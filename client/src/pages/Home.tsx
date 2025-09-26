@@ -440,7 +440,7 @@ export default function Home() {
             {/* Five Revolutionary Systems Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               
-              {/* CyDEF - Autonomous Cyber Defense */}
+              {/* PULSE - Predictive Universal Learning Security Engine */}
               <Card className="bg-gradient-to-br from-purple-900/60 to-slate-800/60 border border-purple-500/40 hover:border-purple-400/70 transition-all duration-300 group lg:col-span-1">
                 <CardHeader className="p-8">
                   <div className="flex items-center justify-between mb-6">
@@ -451,8 +451,8 @@ export default function Home() {
                       🧠 GENETIC AI
                     </Badge>
                   </div>
-                  <CardTitle className="text-2xl text-white mb-4">CyDEF</CardTitle>
-                  <p className="text-lg text-purple-300 font-semibold mb-3">Autonomous Cyber Defense</p>
+                  <CardTitle className="text-2xl text-white mb-4">PULSE</CardTitle>
+                  <p className="text-lg text-purple-300 font-semibold mb-3">Predictive Universal Learning Security Engine</p>
                   <p className="text-gray-300 text-sm leading-relaxed">
                     Self-evolving genetic algorithms with 99.2% accuracy. Multi-generational learning, 
                     autonomous threat response, and federal-grade AI-powered defense systems.
@@ -475,9 +475,9 @@ export default function Home() {
                   </div>
                   <Button 
                     className="button-4d w-full"
-                    onClick={() => window.location.href = '/dashboard/cydef'}
+                    onClick={() => window.location.href = '/pulse-dashboard'}
                   >
-                    Access CyDEF Dashboard
+                    Access PULSE Dashboard
                     <Enhanced4DArrowRightIcon className="ml-2 w-4 h-4" size={16} />
                   </Button>
                 </CardContent>
@@ -526,7 +526,7 @@ export default function Home() {
                 </CardContent>
               </Card>
 
-              {/* CypherHUM - Holographic Interface */}
+              {/* ECHO - Enhanced Cybersecurity Holographic Operations */}
               <Card className="bg-gradient-to-br from-blue-900/60 to-slate-800/60 border border-blue-500/40 hover:border-blue-400/70 transition-all duration-300 group">
                 <CardHeader className="p-8">
                   <div className="flex items-center justify-between mb-6">
@@ -537,8 +537,8 @@ export default function Home() {
                       👁️ 5D HOLOGRAPHIC AVATAR
                     </Badge>
                   </div>
-                  <CardTitle className="text-2xl text-white mb-4">CypherHUM</CardTitle>
-                  <p className="text-lg text-blue-300 font-semibold mb-3">Live Human-Like Avatar Interface</p>
+                  <CardTitle className="text-2xl text-white mb-4">ECHO</CardTitle>
+                  <p className="text-lg text-blue-300 font-semibold mb-3">Enhanced Cybersecurity Holographic Operations</p>
                   <p className="text-gray-300 text-sm leading-relaxed">
                     Revolutionary 5D threat visualization with live human-like avatar guide featuring natural movements, 
                     facial expressions, and contextual gestures. Experience temporal threat analysis across time and space dimensions.
@@ -561,15 +561,15 @@ export default function Home() {
                   </div>
                   <Button 
                     className="button-4d w-full"
-                    onClick={() => window.location.href = '/dashboard/cypherHUM'}
+                    onClick={() => window.location.href = '/echo-interface'}
                   >
-                    Enter Holographic Interface
+                    Enter ECHO Interface
                     <Enhanced4DArrowRightIcon className="ml-2 w-4 h-4" size={16} />
                   </Button>
                 </CardContent>
               </Card>
 
-              {/* ACDS - Autonomous Cyber Defense Swarm */}
+              {/* SURGE - Strategic Unified Response Generation Engine */}
               <Card className="bg-gradient-to-br from-red-900/60 to-slate-800/60 border border-red-500/40 hover:border-red-400/70 transition-all duration-300 group md:col-span-2 lg:col-span-1">
                 <CardHeader className="p-8">
                   <div className="flex items-center justify-between mb-6">
@@ -580,8 +580,8 @@ export default function Home() {
                       🚁 DRONE SWARM
                     </Badge>
                   </div>
-                  <CardTitle className="text-2xl text-white mb-4">ACDS</CardTitle>
-                  <p className="text-lg text-red-300 font-semibold mb-3">Autonomous Cyber Defense Swarm</p>
+                  <CardTitle className="text-2xl text-white mb-4">SURGE</CardTitle>
+                  <p className="text-lg text-red-300 font-semibold mb-3">Strategic Unified Response Generation Engine</p>
                   <p className="text-gray-300 text-sm leading-relaxed">
                     Drone swarm coordination and monitoring with autonomous defensive operations, 
                     real-time swarm intelligence, and integrated cyber-physical security systems.
@@ -604,9 +604,9 @@ export default function Home() {
                   </div>
                   <Button 
                     className="button-4d w-full"
-                    onClick={() => window.location.href = '/dashboard/acds'}
+                    onClick={() => window.location.href = '/surge-dashboard'}
                   >
-                    Access ACDS Control
+                    Access SURGE Control
                     <Enhanced4DArrowRightIcon className="ml-2 w-4 h-4" size={16} />
                   </Button>
                 </CardContent>

@@ -1,7 +1,7 @@
 /**
- * CyDEF (Autonomous Cyber Defense) Service
+ * PULSE (Precision Unified Location & Security Engine) Service
  * 
- * Main service orchestrating the CyDEF system components:
+ * Main service orchestrating the PULSE system components:
  * - Genetic Algorithm Engine integration
  * - Autonomous threat response coordination
  * - Real-time event management
@@ -15,20 +15,20 @@ import { CypherAIService } from './cypher-ai.js';
 import { GeneticMemoryStore } from './genetic-memory-store.js';
 import type { DbProvider } from '../db.js';
 import type { 
-  CydefSystem, 
-  InsertCydefSystem,
-  CydefAutonomousResponse,
-  InsertCydefAutonomousResponse,
-  CydefRealTimeEvent,
-  InsertCydefRealTimeEvent,
-  CydefPerformanceMetric,
-  InsertCydefPerformanceMetric,
-  CydefPolicyGeneration,
-  InsertCydefPolicyGeneration,
+  PulseSystem, 
+  InsertPulseSystem,
+  PulseAutonomousResponse,
+  InsertPulseAutonomousResponse,
+  PulseRealTimeEvent,
+  InsertPulseRealTimeEvent,
+  PulsePerformanceMetric,
+  InsertPulsePerformanceMetric,
+  PulsePolicyGeneration,
+  InsertPulsePolicyGeneration,
   Threat
 } from '../../shared/schema.js';
 
-export interface CydefSystemStatus {
+export interface PulseSystemStatus {
   systemId: string;
   status: 'initializing' | 'active' | 'paused' | 'maintenance' | 'error';
   geneticAlgorithmStatus: 'stopped' | 'running' | 'evolving' | 'converged';
@@ -50,7 +50,7 @@ export interface ThreatResponseDecision {
   recommendedActions: any[];
 }
 
-export interface CydefConfig {
+export interface PulseConfig {
   organizationId: string;
   systemName: string;
   targetAccuracy: number; // 992 = 99.2%
@@ -60,35 +60,35 @@ export interface CydefConfig {
   dbProvider?: DbProvider;
 }
 
-export class CydefService extends EventEmitter {
-  private systems: Map<string, CydefSystem> = new Map();
+export class PulseService extends EventEmitter {
+  private systems: Map<string, PulseSystem> = new Map();
   private geneticEngines: Map<string, CypherAIGeneticEngine> = new Map();
   private isInitialized: boolean = false;
   private initPromise: Promise<void> | null = null;
-  private config: CydefConfig;
+  private config: PulseConfig;
   private geneticMemoryStore: GeneticMemoryStore;
   private evolutionInterval: NodeJS.Timeout | null = null;
   
   // Performance tracking
-  private performanceMetrics: Map<string, CydefPerformanceMetric[]> = new Map();
-  private realtimeEvents: CydefRealTimeEvent[] = [];
+  private performanceMetrics: Map<string, PulsePerformanceMetric[]> = new Map();
+  private realtimeEvents: PulseRealTimeEvent[] = [];
   
   // Threat processing queues
   private threatQueue: Threat[] = [];
   private processingThreats: Set<string> = new Set();
 
-  constructor(config: CydefConfig) {
+  constructor(config: PulseConfig) {
     super();
     this.config = config;
     this.geneticMemoryStore = new GeneticMemoryStore({
       dbProvider: config.dbProvider
     });
 
-    console.log('🛡️ CyDEF Service constructed for organization:', config.organizationId);
+    console.log('🛡️ PULSE Service constructed for organization:', config.organizationId);
   }
 
   /**
-   * Initialize the CyDEF service with all subsystems
+   * Initialize the PULSE service with all subsystems
    */
   async initialize(): Promise<void> {
     if (this.initPromise) {
@@ -104,11 +104,11 @@ export class CydefService extends EventEmitter {
       return;
     }
 
-    console.log('🚀 Initializing CyDEF Service...');
+    console.log('🚀 Initializing PULSE Service...');
     
     try {
-      // Create or load CyDEF system instance
-      await this.createOrLoadCydefSystem();
+      // Create or load PULSE system instance
+      await this.createOrLoadPulseSystem();
       
       // Initialize genetic algorithm engines
       await this.initializeGeneticEngines();
@@ -125,7 +125,7 @@ export class CydefService extends EventEmitter {
       this.startPerformanceMonitoring();
       
       this.isInitialized = true;
-      console.log('✅ CyDEF Service initialized successfully');
+      console.log('✅ PULSE Service initialized successfully');
       
       // Emit system ready event
       this.emit('systemReady', {
@@ -135,19 +135,19 @@ export class CydefService extends EventEmitter {
       });
       
     } catch (error) {
-      console.error('❌ Failed to initialize CyDEF Service:', error);
+      console.error('❌ Failed to initialize PULSE Service:', error);
       this.emit('systemError', error);
       throw error;
     }
   }
 
   /**
-   * Create or load existing CyDEF system configuration
+   * Create or load existing PULSE system configuration
    */
-  private async createOrLoadCydefSystem(): Promise<void> {
+  private async createOrLoadPulseSystem(): Promise<void> {
     // For demo purposes, create a default system
-    const system: CydefSystem = {
-      id: `cydef-${this.config.organizationId}-${Date.now()}`,
+    const system: PulseSystem = {
+      id: `pulse-${this.config.organizationId}-${Date.now()}`,
       systemName: this.config.systemName,
       organizationId: this.config.organizationId,
       status: 'initializing',
@@ -171,7 +171,7 @@ export class CydefService extends EventEmitter {
     };
 
     this.systems.set(system.id, system);
-    console.log(`🛡️ CyDEF System created: ${system.id}`);
+    console.log(`🛡️ PULSE System created: ${system.id}`);
   }
 
   /**
@@ -292,7 +292,7 @@ export class CydefService extends EventEmitter {
         eventCategory: 'threat_response',
         severity: threat.severity as any,
         title: `Autonomous Threat Response: ${threat.type}`,
-        message: `CyDEF processed ${threat.type} with ${decision.confidenceScore}% confidence`,
+        message: `PULSE processed ${threat.type} with ${decision.confidenceScore}% confidence`,
         eventData: {
           threatId: threat.id,
           responseType: decision.responseType,
@@ -311,7 +311,7 @@ export class CydefService extends EventEmitter {
   }
 
   /**
-   * Get current status of all CyDEF systems
+   * Get current status of all PULSE systems
    */
   async getSystemStatus(): Promise<CydefSystemStatus[]> {
     await this.ensureInitialized();
@@ -429,7 +429,7 @@ export class CydefService extends EventEmitter {
     
     // Create autonomous response record
     const response: Omit<CydefAutonomousResponse, 'id' | 'createdAt'> = {
-      cydefSystemId: Array.from(this.systems.keys())[0], // Use first system
+      pulseSystemId: Array.from(this.systems.keys())[0], // Use first system
       threatId: threat.id,
       responseType: decision.responseType,
       triggerEvent: decision.triggerEvent,
@@ -487,7 +487,7 @@ export class CydefService extends EventEmitter {
     // Add new performance metrics
     metrics.push({
       id: `metric-${Date.now()}-${Math.random()}`,
-      cydefSystemId: systemId,
+      pulseSystemId: systemId,
       metricType: 'threat_detection',
       metricCategory: 'real_time',
       value: Math.floor(decision.confidenceScore * 100), // Convert to basis points
@@ -520,7 +520,7 @@ export class CydefService extends EventEmitter {
     
     const event: CydefRealTimeEvent = {
       id: `event-${Date.now()}-${Math.random()}`,
-      cydefSystemId: systemId,
+      pulseSystemId: systemId,
       eventType: eventData.eventType!,
       eventCategory: eventData.eventCategory!,
       severity: eventData.severity!,
@@ -599,7 +599,7 @@ export class CydefService extends EventEmitter {
     // Collect various system metrics
     metrics.push({
       id: `metric-accuracy-${Date.now()}`,
-      cydefSystemId: systemId,
+      pulseSystemId: systemId,
       metricType: 'accuracy',
       metricCategory: 'hourly',
       value: system.actualAccuracy,
@@ -650,7 +650,7 @@ export class CydefService extends EventEmitter {
       eventCategory: 'genetic_algorithm',
       severity: 'info',
       title: 'Target Accuracy Reached!',
-      message: `CyDEF achieved ${data.accuracy}% accuracy in ${data.sector}`,
+      message: `PULSE achieved ${data.accuracy}% accuracy in ${data.sector}`,
       eventData: data
     });
   }
@@ -676,7 +676,7 @@ export class CydefService extends EventEmitter {
    * Cleanup and shutdown
    */
   async shutdown(): Promise<void> {
-    console.log('🛑 Shutting down CyDEF Service...');
+    console.log('🛑 Shutting down PULSE Service...');
     
     if (this.evolutionInterval) {
       clearInterval(this.evolutionInterval);
@@ -689,8 +689,8 @@ export class CydefService extends EventEmitter {
     }
     
     this.emit('systemShutdown');
-    console.log('✅ CyDEF Service shutdown complete');
+    console.log('✅ PULSE Service shutdown complete');
   }
 }
 
-export default CydefService;
+export default PulseService;

@@ -51,26 +51,26 @@ import {
   type Subscriber,
   type InsertSubscriber,
   type UpsertUser,
-  type CypherhumSession,
-  type InsertCypherhumSession,
-  type CypherhumVisualization,
-  type InsertCypherhumVisualization,
-  type CypherhumInteraction,
-  type InsertCypherhumInteraction,
-  type CypherhumThreatModel,
-  type InsertCypherhumThreatModel,
-  type CypherhumAnalytics,
-  type InsertCypherhumAnalytics,
-  type AcdsDrone,
-  type InsertAcdsDrone,
-  type AcdsSwarmMission,
-  type InsertAcdsSwarmMission,
-  type AcdsDeployment,
-  type InsertAcdsDeployment,
-  type AcdsCoordination,
-  type InsertAcdsCoordination,
-  type AcdsAnalytics,
-  type InsertAcdsAnalytics,
+  type EchoSession,
+  type InsertEchoSession,
+  type EchoVisualization,
+  type InsertEchoVisualization,
+  type EchoInteraction,
+  type InsertEchoInteraction,
+  type EchoThreatModel,
+  type InsertEchoThreatModel,
+  type EchoAnalytics,
+  type InsertEchoAnalytics,
+  type SurgeDrone,
+  type InsertSurgeDrone,
+  type SurgeSwarmMission,
+  type InsertSurgeSwarmMission,
+  type SurgeDeployment,
+  type InsertSurgeDeployment,
+  type SurgeCoordination,
+  type InsertSurgeCoordination,
+  type SurgeAnalytics,
+  type InsertSurgeAnalytics,
   // Public Health imports
   type PublicHealthIncident,
   type InsertPublicHealthIncident,
@@ -894,7 +894,7 @@ export class DbStorage implements IStorage {
   // All remaining methods would follow similar patterns with proper database operations,
   // audit logging, and HIPAA compliance measures
   
-  // CypherHUM Operations
+  // ECHO Operations
   async getCypherhumSessions(userId?: string): Promise<CypherhumSession[]> { return []; }
   async getCypherhumSession(sessionId: string): Promise<CypherhumSession | undefined> { return undefined; }
   async createCypherhumSession(session: InsertCypherhumSession): Promise<CypherhumSession> { throw new Error('Not implemented yet'); }
@@ -925,7 +925,7 @@ export class DbStorage implements IStorage {
   async updateCypherhumAnalytic(analyticId: string, updates: Partial<CypherhumAnalytics>): Promise<CypherhumAnalytics> { throw new Error('Not implemented yet'); }
   async deleteCypherhumAnalytic(analyticId: string): Promise<void> { }
 
-  // ACDS Operations - stub implementations
+  // SURGE Operations - stub implementations
   async getAcdsDrones(organizationId?: string): Promise<AcdsDrone[]> { return []; }
   async getAcdsDrone(droneId: string): Promise<AcdsDrone | undefined> { return undefined; }
   async createAcdsDrone(drone: InsertAcdsDrone): Promise<AcdsDrone> { throw new Error('Not implemented yet'); }
@@ -1115,10 +1115,6 @@ export class DbStorage implements IStorage {
     }
   }
 
-  async createSecureAuditLog(auditLog: InsertHipaaSecureAuditLog): Promise<HipaaSecureAuditLog> {
-    // This delegates to the main createSecureAuditLog method
-    return await this.createSecureAuditLog(auditLog, auditLog.organizationId);
-  }
   
   async getEmergencyAccess(organizationId: string, status?: string): Promise<HipaaEmergencyAccess[]> { return []; }
   async getEmergencyAccessById(id: string): Promise<HipaaEmergencyAccess | undefined> { return undefined; }

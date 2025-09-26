@@ -1,7 +1,7 @@
 /**
  * Holographic 3D Renderer Component
  * 
- * Custom Three.js React wrapper for revolutionary CypherHUM 3D holographic threat visualization
+ * Custom Three.js React wrapper for revolutionary ECHO 3D holographic threat visualization
  * - Advanced WebGL rendering with holographic effects
  * - Real-time threat particle systems and animations
  * - Interactive 3D controls and navigation
