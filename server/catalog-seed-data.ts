@@ -225,7 +225,7 @@ export async function seedCatalogData() {
       },
       {
         name: 'SURGE Control Platform',
-        slug: 'acds-control-platform',
+        slug: 'surge-control-platform',
         productCode: 'SURGE-CP-2025',
         categoryId: createdCategories.find(c => c.slug === 'defense-platforms')!.id,
         shortDescription: 'Autonomous Cyber Defense Swarm coordination and control platform',

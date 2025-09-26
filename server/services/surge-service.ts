@@ -183,7 +183,7 @@ export class SurgeService extends EventEmitter {
   }
 
   /**
-   * Initialize the ACDS service with all subsystems
+   * Initialize the SURGE service with all subsystems
    */
   async initialize(): Promise<void> {
     if (this.initPromise) {
@@ -263,7 +263,7 @@ export class SurgeService extends EventEmitter {
   private createMockDroneFleet(): void {
     const mockDrones: Partial<AcdsDrone>[] = [
       {
-        droneId: 'ACDS-ALPHA-001',
+        droneId: 'SURGE-ALPHA-001',
         droneName: 'Alpha Leader',
         droneType: 'threat_hunter',
         category: 'autonomous',
@@ -275,7 +275,7 @@ export class SurgeService extends EventEmitter {
         homeBaseLatitude: '38.8951',
         homeBaseLongitude: '-77.0364',
         organizationId: this.config.organizationId,
-        cydefIntegration: true,
+        pulseIntegration: true,
         capabilities: {
           sensors: ['thermal', 'optical', 'network_scanner', 'signal_analyzer'],
           communication: ['mesh_network', 'encrypted_channel', 'satellite_uplink'],
@@ -283,7 +283,7 @@ export class SurgeService extends EventEmitter {
         }
       },
       {
-        droneId: 'ACDS-BRAVO-002',
+        droneId: 'SURGE-BRAVO-002',
         droneName: 'Bravo Scout',
         droneType: 'cyber_patrol',
         category: 'autonomous',
@@ -295,7 +295,7 @@ export class SurgeService extends EventEmitter {
         homeBaseLatitude: '38.8951',
         homeBaseLongitude: '-77.0364',
         organizationId: this.config.organizationId,
-        cydefIntegration: true,
+        pulseIntegration: true,
         capabilities: {
           sensors: ['network_scanner', 'wifi_analyzer', 'bluetooth_scanner'],
           communication: ['mesh_network', 'encrypted_channel'],
@@ -303,7 +303,7 @@ export class SurgeService extends EventEmitter {
         }
       },
       {
-        droneId: 'ACDS-CHARLIE-003',
+        droneId: 'SURGE-CHARLIE-003',
         droneName: 'Charlie Guardian',
         droneType: 'response_unit',
         category: 'autonomous',
@@ -315,7 +315,7 @@ export class SurgeService extends EventEmitter {
         homeBaseLatitude: '38.8951',
         homeBaseLongitude: '-77.0364',
         organizationId: this.config.organizationId,
-        cydefIntegration: true,
+        pulseIntegration: true,
         capabilities: {
           sensors: ['thermal', 'optical', 'motion_detector'],
           communication: ['mesh_network', 'emergency_beacon'],
@@ -326,7 +326,7 @@ export class SurgeService extends EventEmitter {
 
     mockDrones.forEach((drone, index) => {
       const fullDrone: AcdsDrone = {
-        id: `acds-drone-${index + 1}`,
+        id: `surge-drone-${index + 1}`,
         droneId: drone.droneId!,
         droneName: drone.droneName!,
         droneType: drone.droneType!,
@@ -350,7 +350,7 @@ export class SurgeService extends EventEmitter {
         assignedMissionId: null,
         swarmRole: drone.swarmRole!,
         autonomyLevel: drone.autonomyLevel!,
-        cydefIntegration: drone.cydefIntegration!,
+        pulseIntegration: drone.pulseIntegration!,
         threatDetectionCapabilities: ['malware_detection', 'network_intrusion', 'anomaly_detection'],
         communicationChannels: ['encrypted_mesh', 'satellite', 'cellular'],
         defensiveCapabilities: ['signal_jamming', 'network_isolation'],
@@ -441,7 +441,7 @@ export class SurgeService extends EventEmitter {
       ],
       estimatedDuration: 28800, // 8 hours
       requiredDroneCount: 3,
-      assignedDrones: ['ACDS-ALPHA-001', 'ACDS-BRAVO-002', 'ACDS-CHARLIE-003'],
+      assignedDrones: ['SURGE-ALPHA-001', 'SURGE-BRAVO-002', 'SURGE-CHARLIE-003'],
       coordinationAlgorithm: 'distributed_consensus',
       autonomyLevel: 'autonomous',
       pulseIntegration: {
@@ -711,11 +711,11 @@ export class SurgeService extends EventEmitter {
       executionTime: Date.now() - startTime
     };
     
-    // Add CyDEF integration if available
-    if (this.config.cydefIntegrationEnabled && this.cydefService) {
+    // Add PULSE integration if available
+    if (this.config.pulseIntegrationEnabled && this.pulseService) {
       // Get genetic algorithm recommendation
-      decision.cydefIntegration = {
-        generation: 42, // Mock data - would come from actual CyDEF service
+      decision.pulseIntegration = {
+        generation: 42, // Mock data - would come from actual PULSE service
         fitnessScore: 87,
         recommendation: { action: 'optimize_formation', confidence: 0.87 }
       };
@@ -967,9 +967,9 @@ export class SurgeService extends EventEmitter {
         coordinationDecision: decision.decision,
         decisionConfidence: decision.confidence,
         implementationStatus: 'implementing',
-        geneticAlgorithmGeneration: decision.cydefIntegration?.generation,
-        geneticAlgorithmFitness: decision.cydefIntegration?.fitnessScore,
-        cydefRecommendation: decision.cydefIntegration?.recommendation,
+        geneticAlgorithmGeneration: decision.pulseIntegration?.generation,
+        geneticAlgorithmFitness: decision.pulseIntegration?.fitnessScore,
+        pulseRecommendation: decision.pulseIntegration?.recommendation,
         organizationId: this.config.organizationId,
         eventTimestamp: new Date(),
         implementationStartTime: new Date()
@@ -1214,7 +1214,7 @@ export class SurgeService extends EventEmitter {
         aggregationPeriod: 'real_time',
         organizationId: this.config.organizationId,
         metricData: metrics,
-        dataSource: 'acds_service',
+        dataSource: 'surge_service',
         validationStatus: 'validated'
       };
       
@@ -1235,13 +1235,13 @@ export class SurgeService extends EventEmitter {
   /**
    * Calculate analytics
    */
-  private async calculateAnalytics(): Promise<ACDSAnalytics> {
+  private async calculateAnalytics(): Promise<SURGEAnalytics> {
     const drones = Array.from(this.drones.values());
     const missions = Array.from(this.swarmMissions.values());
     const completedMissions = missions.filter(m => m.status === 'completed');
     const activeDrones = drones.filter(d => d.currentStatus === 'active');
     
-    const analytics: ACDSAnalytics = {
+    const analytics: SURGEAnalytics = {
       missionSuccessRate: completedMissions.length / Math.max(1, missions.length) * 100,
       averageResponseTime: this.responseTimeMs.length > 0 ? 
         this.responseTimeMs.reduce((a, b) => a + b, 0) / this.responseTimeMs.length : 0,
@@ -1377,7 +1377,7 @@ export class SurgeService extends EventEmitter {
   /**
    * Get analytics data
    */
-  async getAnalytics(): Promise<ACDSAnalytics> {
+  async getAnalytics(): Promise<SURGEAnalytics> {
     return await this.calculateAnalytics();
   }
 
@@ -1409,7 +1409,7 @@ export class SurgeService extends EventEmitter {
       dataCollectionRequirements: missionData.dataCollectionRequirements || [],
       realTimeReporting: missionData.realTimeReporting || true,
       emergencyProcedures: missionData.emergencyProcedures || {},
-      cydefIntegration: missionData.cydefIntegration || {},
+      pulseIntegration: missionData.pulseIntegration || {},
       liveLocationIntegration: missionData.liveLocationIntegration || true,
       plannedStartTime: missionData.plannedStartTime || null,
       actualStartTime: null,
@@ -1465,7 +1465,7 @@ export class SurgeService extends EventEmitter {
       communicationLog: [],
       coordinationCommands: [],
       autonomousDecisions: [],
-      cydefResponses: [],
+      pulseResponses: [],
       environmentalFactors: {},
       riskLevelCurrent: 'low',
       emergencyProceduresActive: false,
@@ -1510,7 +1510,7 @@ export class SurgeService extends EventEmitter {
     return drone;
   }
 
-  // ===== CyDEF Genetic Algorithm Integration =====
+  // ===== PULSE Genetic Algorithm Integration =====
 
   /**
    * Get PULSE genetic algorithm recommendations for drone deployment decisions
@@ -1523,7 +1523,7 @@ export class SurgeService extends EventEmitter {
 
     try {
       // Process threat through PULSE genetic algorithms
-      const threatResponse = await this.cydefService.processThreat(threatData);
+      const threatResponse = await this.pulseService.processThreat(threatData);
       
       // Calculate optimal drone deployment based on GA recommendations
       const deploymentRecommendation = {
@@ -1539,16 +1539,16 @@ export class SurgeService extends EventEmitter {
         riskAssessment: this.assessDeploymentRisk(threatData, threatResponse)
       };
 
-      console.log(`🧬 CyDEF deployment recommendation generated for threat with ${threatResponse.confidenceScore}% confidence`);
+      console.log(`🧬 PULSE deployment recommendation generated for threat with ${threatResponse.confidenceScore}% confidence`);
       return deploymentRecommendation;
     } catch (error) {
-      console.error('❌ Failed to get CyDEF deployment recommendations:', error);
+      console.error('❌ Failed to get PULSE deployment recommendations:', error);
       return null;
     }
   }
 
   /**
-   * Process threat and autonomously deploy drones using CyDEF genetic algorithm insights
+   * Process threat and autonomously deploy drones using PULSE genetic algorithm insights
    */
   async processThreatwithAutonomousDeployment(threat: any): Promise<SwarmCoordinationDecision> {
     console.log(`🚁 Processing threat for autonomous deployment: ${threat.type || 'unknown'}`);
@@ -1565,18 +1565,18 @@ export class SurgeService extends EventEmitter {
         throw new Error('No drones available for autonomous deployment');
       }
 
-      // Get CyDEF genetic algorithm recommendations
-      const cydefRecommendation = await this.getCydefDeploymentRecommendations(threat, availableDrones);
+      // Get PULSE genetic algorithm recommendations
+      const pulseRecommendation = await this.getCydefDeploymentRecommendations(threat, availableDrones);
       
-      if (!cydefRecommendation) {
-        throw new Error('Failed to get CyDEF deployment recommendations');
+      if (!pulseRecommendation) {
+        throw new Error('Failed to get PULSE deployment recommendations');
       }
 
       // Create coordination decision based on genetic algorithm insights
       const coordinationDecision: SwarmCoordinationDecision = {
         coordinationId: `coord-${Date.now()}`,
         decisionType: 'threat_response',
-        participatingDrones: cydefRecommendation.recommendedDrones.map((d: any) => d.droneId),
+        participatingDrones: pulseRecommendation.recommendedDrones.map((d: any) => d.droneId),
         algorithmUsed: 'genetic_algorithm',
         inputData: {
           threat: threat,
@@ -1585,18 +1585,18 @@ export class SurgeService extends EventEmitter {
           location: threat.location
         },
         decision: {
-          deploymentPattern: cydefRecommendation.formationPattern,
-          coordinationAlgorithm: cydefRecommendation.coordinationAlgorithm,
-          autonomyLevel: cydefRecommendation.autonomyLevel,
-          estimatedDuration: cydefRecommendation.estimatedDuration || 3600,
-          priority: cydefRecommendation.deploymentPriority
+          deploymentPattern: pulseRecommendation.formationPattern,
+          coordinationAlgorithm: pulseRecommendation.coordinationAlgorithm,
+          autonomyLevel: pulseRecommendation.autonomyLevel,
+          estimatedDuration: pulseRecommendation.estimatedDuration || 3600,
+          priority: pulseRecommendation.deploymentPriority
         },
-        confidence: cydefRecommendation.confidence,
+        confidence: pulseRecommendation.confidence,
         executionTime: Date.now() - startTime,
-        cydefIntegration: {
-          generation: cydefRecommendation.geneticGeneration || 0,
-          fitnessScore: cydefRecommendation.estimatedEffectiveness || 0,
-          recommendation: cydefRecommendation
+        pulseIntegration: {
+          generation: pulseRecommendation.geneticGeneration || 0,
+          fitnessScore: pulseRecommendation.estimatedEffectiveness || 0,
+          recommendation: pulseRecommendation
         }
       };
 
@@ -1618,20 +1618,20 @@ export class SurgeService extends EventEmitter {
   }
 
   /**
-   * Select optimal drones for threat response based on CyDEF recommendations
+   * Select optimal drones for threat response based on PULSE recommendations
    */
-  private selectOptimalDronesForThreat(threat: any, availableDrones: AcdsDrone[], cydefResponse: any): AcdsDrone[] {
+  private selectOptimalDronesForThreat(threat: any, availableDrones: AcdsDrone[], pulseResponse: any): AcdsDrone[] {
     // Sort drones by suitability for threat type
     const suitabilityScores = availableDrones.map(drone => ({
       drone,
-      score: this.calculateDroneSuitabilityScore(drone, threat, cydefResponse)
+      score: this.calculateDroneSuitabilityScore(drone, threat, pulseResponse)
     }));
 
     // Sort by score and select top drones
     suitabilityScores.sort((a, b) => b.score - a.score);
     
-    // Determine number of drones needed based on threat severity and CyDEF confidence
-    const droneCount = this.calculateRequiredDroneCount(threat, cydefResponse);
+    // Determine number of drones needed based on threat severity and PULSE confidence
+    const droneCount = this.calculateRequiredDroneCount(threat, pulseResponse);
     
     return suitabilityScores.slice(0, droneCount).map(item => item.drone);
   }
@@ -1639,7 +1639,7 @@ export class SurgeService extends EventEmitter {
   /**
    * Calculate drone suitability score for specific threat
    */
-  private calculateDroneSuitabilityScore(drone: AcdsDrone, threat: any, cydefResponse: any): number {
+  private calculateDroneSuitabilityScore(drone: AcdsDrone, threat: any, pulseResponse: any): number {
     let score = 0;
     
     // Base score from drone health and battery
@@ -1652,8 +1652,8 @@ export class SurgeService extends EventEmitter {
     if (threat.type === 'data_exfiltration' && drone.droneType === 'response_unit') score += 25;
     if (threat.type === 'unknown' && drone.droneType === 'surveillance') score += 15;
     
-    // CyDEF confidence bonus
-    score += (cydefResponse.confidenceScore / 100) * 15;
+    // PULSE confidence bonus
+    score += (pulseResponse.confidenceScore / 100) * 15;
     
     // Swarm role suitability
     if (drone.swarmRole === 'leader') score += 10;
@@ -1663,9 +1663,9 @@ export class SurgeService extends EventEmitter {
   }
 
   /**
-   * Calculate required drone count based on threat and CyDEF analysis
+   * Calculate required drone count based on threat and PULSE analysis
    */
-  private calculateRequiredDroneCount(threat: any, cydefResponse: any): number {
+  private calculateRequiredDroneCount(threat: any, pulseResponse: any): number {
     let baseCount = 2; // Minimum swarm size
     
     // Adjust based on threat severity
@@ -1676,18 +1676,18 @@ export class SurgeService extends EventEmitter {
       case 'low': baseCount = 1; break;
     }
     
-    // Adjust based on CyDEF confidence (lower confidence = more drones)
-    if (cydefResponse.confidenceScore < 70) baseCount += 1;
-    if (cydefResponse.confidenceScore < 50) baseCount += 1;
+    // Adjust based on PULSE confidence (lower confidence = more drones)
+    if (pulseResponse.confidenceScore < 70) baseCount += 1;
+    if (pulseResponse.confidenceScore < 50) baseCount += 1;
     
     return Math.min(baseCount, 6); // Maximum 6 drones per threat
   }
 
   /**
-   * Calculate optimal formation pattern based on CyDEF recommendations
+   * Calculate optimal formation pattern based on PULSE recommendations
    */
-  private calculateOptimalFormation(threat: any, cydefResponse: any): string {
-    const confidence = cydefResponse.confidenceScore;
+  private calculateOptimalFormation(threat: any, pulseResponse: any): string {
+    const confidence = pulseResponse.confidenceScore;
     
     // High confidence threats use focused formations
     if (confidence > 80) {
@@ -1704,15 +1704,15 @@ export class SurgeService extends EventEmitter {
   }
 
   /**
-   * Select coordination algorithm based on CyDEF analysis
+   * Select coordination algorithm based on PULSE analysis
    */
-  private selectCoordinationAlgorithm(cydefResponse: any): string {
+  private selectCoordinationAlgorithm(pulseResponse: any): string {
     // Use genetic algorithm insights to choose best coordination method
-    if (cydefResponse.confidenceScore > 85) {
+    if (pulseResponse.confidenceScore > 85) {
       return 'ai_optimized'; // High confidence allows AI optimization
     }
     
-    if (cydefResponse.responseType === 'escalate') {
+    if (pulseResponse.responseType === 'escalate') {
       return 'hierarchical'; // Escalations need clear command structure
     }
     
@@ -1720,20 +1720,20 @@ export class SurgeService extends EventEmitter {
   }
 
   /**
-   * Determine autonomy level based on CyDEF recommendations
+   * Determine autonomy level based on PULSE recommendations
    */
-  private determineAutonomyLevel(cydefResponse: any): string {
-    // Higher CyDEF confidence allows more autonomy
-    if (cydefResponse.confidenceScore > 90) return 'autonomous';
-    if (cydefResponse.confidenceScore > 70) return 'semi_autonomous';
+  private determineAutonomyLevel(pulseResponse: any): string {
+    // Higher PULSE confidence allows more autonomy
+    if (pulseResponse.confidenceScore > 90) return 'autonomous';
+    if (pulseResponse.confidenceScore > 70) return 'semi_autonomous';
     return 'manual';
   }
 
   /**
-   * Calculate deployment priority based on threat and CyDEF analysis
+   * Calculate deployment priority based on threat and PULSE analysis
    */
-  private calculateDeploymentPriority(threat: any, cydefResponse: any): string {
-    const confidence = cydefResponse.confidenceScore;
+  private calculateDeploymentPriority(threat: any, pulseResponse: any): string {
+    const confidence = pulseResponse.confidenceScore;
     
     if (threat.severity === 'critical' && confidence > 80) return 'emergency';
     if (threat.severity === 'high' || confidence > 90) return 'high';
@@ -1742,14 +1742,14 @@ export class SurgeService extends EventEmitter {
   }
 
   /**
-   * Estimate deployment effectiveness based on CyDEF analysis
+   * Estimate deployment effectiveness based on PULSE analysis
    */
-  private estimateDeploymentEffectiveness(cydefResponse: any): number {
-    // Base effectiveness on CyDEF confidence and response type
-    let effectiveness = cydefResponse.confidenceScore;
+  private estimateDeploymentEffectiveness(pulseResponse: any): number {
+    // Base effectiveness on PULSE confidence and response type
+    let effectiveness = pulseResponse.confidenceScore;
     
     // Adjust based on response type
-    switch (cydefResponse.responseType) {
+    switch (pulseResponse.responseType) {
       case 'isolate': effectiveness += 10; break;
       case 'block': effectiveness += 8; break;
       case 'quarantine': effectiveness += 12; break;
@@ -1761,16 +1761,16 @@ export class SurgeService extends EventEmitter {
   }
 
   /**
-   * Assess deployment risk based on threat and CyDEF analysis
+   * Assess deployment risk based on threat and PULSE analysis
    */
-  private assessDeploymentRisk(threat: any, cydefResponse: any): any {
+  private assessDeploymentRisk(threat: any, pulseResponse: any): any {
     return {
-      operationalRisk: cydefResponse.confidenceScore < 60 ? 'high' : 'low',
+      operationalRisk: pulseResponse.confidenceScore < 60 ? 'high' : 'low',
       batteryRisk: this.calculateBatteryRisk(),
       weatherRisk: 'low', // Would integrate with weather service
       airspaceRisk: 'medium', // Would check airspace restrictions
       collisionRisk: this.calculateCollisionRisk(),
-      overallRisk: cydefResponse.confidenceScore > 80 ? 'low' : 'medium'
+      overallRisk: pulseResponse.confidenceScore > 80 ? 'low' : 'medium'
     };
   }
 
@@ -1802,7 +1802,7 @@ export class SurgeService extends EventEmitter {
         missionId: null, // Autonomous deployments don't need pre-planned missions
         priority: decision.decision.priority,
         estimatedDuration: decision.decision.estimatedDuration,
-        cydefIntegration: decision.cydefIntegration
+        pulseIntegration: decision.pulseIntegration
       });
       
       deployments.push(deployment);
@@ -1872,9 +1872,9 @@ export class SurgeService extends EventEmitter {
         coordinationDecision: decision.decision,
         confidence: decision.confidence,
         executionTimeMs: decision.executionTime,
-        geneticAlgorithmGeneration: decision.cydefIntegration?.generation || null,
-        geneticAlgorithmFitness: decision.cydefIntegration?.fitnessScore || null,
-        cydefRecommendation: decision.cydefIntegration?.recommendation || null,
+        geneticAlgorithmGeneration: decision.pulseIntegration?.generation || null,
+        geneticAlgorithmFitness: decision.pulseIntegration?.fitnessScore || null,
+        pulseRecommendation: decision.pulseIntegration?.recommendation || null,
         timestamp: new Date()
       };
       
@@ -1910,15 +1910,15 @@ export class SurgeService extends EventEmitter {
   }
 
   /**
-   * Integrate with CyDEF system status for comprehensive threat intelligence
+   * Integrate with PULSE system status for comprehensive threat intelligence
    */
   async getCydefSystemStatus(): Promise<any> {
-    if (!this.cydefService) {
+    if (!this.pulseService) {
       return null;
     }
     
     try {
-      const systemStatus = await this.cydefService.getSystemStatus();
+      const systemStatus = await this.pulseService.getSystemStatus();
       return {
         geneticAlgorithmStatus: systemStatus[0]?.geneticAlgorithmStatus || 'stopped',
         currentGeneration: systemStatus[0]?.currentGeneration || 0,
@@ -1928,7 +1928,7 @@ export class SurgeService extends EventEmitter {
         lastEvolutionCycle: systemStatus[0]?.lastEvolutionCycle
       };
     } catch (error) {
-      console.error('❌ Failed to get CyDEF system status:', error);
+      console.error('❌ Failed to get PULSE system status:', error);
       return null;
     }
   }
@@ -1979,7 +1979,7 @@ export class SurgeService extends EventEmitter {
     
     this.isInitialized = false;
     
-    console.log('✅ ACDS Service shutdown complete');
+    console.log('✅ SURGE Service shutdown complete');
     this.emit('shutdown_complete');
   }
 }

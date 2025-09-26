@@ -160,7 +160,7 @@ export class EchoService extends EventEmitter {
     this.dbProvider = dbProvider;
     this.pulseService = pulseService || new PulseService({
       organizationId: 'default',
-      systemName: 'CypherHUM-AI',
+      systemName: 'ECHO-AI',
       targetAccuracy: 992,
       autonomousMode: true,
       threatDetectionEngine: 'hybrid',
@@ -177,7 +177,7 @@ export class EchoService extends EventEmitter {
 
     try {
       // Initialize integrated services
-      await this.cydefService.initialize();
+      await this.pulseService.initialize();
       await this.cypherAIService.initialize?.();
       await this.liveLocationService.initialize?.();
       
@@ -411,8 +411,8 @@ export class EchoService extends EventEmitter {
         threats
       });
 
-      // Integrate with genetic algorithm analysis from CyDEF
-      const geneticAnalysis = await this.cydefService.analyzeThreats(threats);
+      // Integrate with genetic algorithm analysis from PULSE
+      const geneticAnalysis = await this.pulseService.analyzeThreats(threats);
 
       // Generate AI response with visualization recommendations
       const analysis: AIThreatAnalysis = {
@@ -604,7 +604,7 @@ export class EchoService extends EventEmitter {
 
   private initializeRealTimeThreatModeling(): void {
     // Set up listeners for threat updates from various sources
-    this.cydefService.on('threatDetected', async (threat: Threat) => {
+    this.pulseService.on('threatDetected', async (threat: Threat) => {
       const threatModel = await this.generateThreatModel(threat);
       this.broadcastThreatUpdate(threatModel);
     });

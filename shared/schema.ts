@@ -2037,7 +2037,7 @@ export const pulseSystems = pgTable("pulse_systems", {
 // Autonomous Response Actions and Outcomes
 export const pulseAutonomousResponses = pgTable("pulse_autonomous_responses", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  pulseSystemId: varchar("cydef_system_id").notNull().references(() => cydefSystems.id),
+  pulseSystemId: varchar("pulse_system_id").notNull().references(() => pulseSystems.id),
   threatId: varchar("threat_id").references(() => threats.id),
   responseType: varchar("response_type").notNull(), // isolate, block, monitor, quarantine, escalate, adapt_policy
   triggerEvent: text("trigger_event").notNull(), // What triggered this response
@@ -2059,7 +2059,7 @@ export const pulseAutonomousResponses = pgTable("pulse_autonomous_responses", {
 // Real-time Defense Policy Generation History  
 export const pulsePolicyGenerations = pgTable("pulse_policy_generations", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  pulseSystemId: varchar("cydef_system_id").notNull().references(() => cydefSystems.id),
+  pulseSystemId: varchar("pulse_system_id").notNull().references(() => pulseSystems.id),
   generation: integer("generation").notNull(),
   sector: varchar("sector").notNull(), // FERPA, FISMA, CIPA, GENERAL
   policyRules: jsonb("policy_rules").notNull(), // Generated security policy rules
@@ -2083,7 +2083,7 @@ export const pulsePolicyGenerations = pgTable("pulse_policy_generations", {
 // Real-time PULSE Events for WebSocket Streaming
 export const pulseRealTimeEvents = pgTable("pulse_real_time_events", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  pulseSystemId: varchar("cydef_system_id").notNull().references(() => cydefSystems.id),
+  pulseSystemId: varchar("pulse_system_id").notNull().references(() => pulseSystems.id),
   eventType: varchar("event_type").notNull(), // threat_detected, response_executed, policy_evolved, accuracy_improved, system_status
   eventCategory: varchar("event_category").notNull(), // genetic_algorithm, threat_response, system_health, performance
   severity: varchar("severity").notNull(), // info, warning, critical, emergency
@@ -2101,7 +2101,7 @@ export const pulseRealTimeEvents = pgTable("pulse_real_time_events", {
 // PULSE Performance Metrics and Analytics
 export const pulsePerformanceMetrics = pgTable("pulse_performance_metrics", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  pulseSystemId: varchar("cydef_system_id").notNull().references(() => cydefSystems.id),
+  pulseSystemId: varchar("pulse_system_id").notNull().references(() => pulseSystems.id),
   metricType: varchar("metric_type").notNull(), // accuracy, response_time, threat_detection, false_positive_rate, throughput
   metricCategory: varchar("metric_category").notNull(), // real_time, hourly, daily, weekly, monthly
   value: integer("value").notNull(), // Metric value (scaled for precision)
@@ -2120,7 +2120,7 @@ export const pulsePerformanceMetrics = pgTable("pulse_performance_metrics", {
 // PULSE Threat Analysis Results
 export const pulseThreatAnalyses = pgTable("pulse_threat_analyses", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  pulseSystemId: varchar("cydef_system_id").notNull().references(() => cydefSystems.id),
+  pulseSystemId: varchar("pulse_system_id").notNull().references(() => pulseSystems.id),
   threatId: varchar("threat_id").references(() => threats.id),
   analysisType: varchar("analysis_type").notNull(), // real_time, batch, scheduled, on_demand
   threatVector: varchar("threat_vector"), // email, network, web, malware, social_engineering
@@ -2602,7 +2602,7 @@ export const surgeDrones = pgTable("surge_drones", {
   assignedMissionId: varchar("assigned_mission_id"),
   swarmRole: varchar("swarm_role").default("follower"), // leader, coordinator, follower, scout, guardian, specialist
   autonomyLevel: varchar("autonomy_level").default("semi_autonomous"), // manual, semi_autonomous, autonomous, ai_driven
-  pulseIntegration: boolean("pulse_integration").default(true), // Integration with CyDEF genetic algorithms
+  pulseIntegration: boolean("pulse_integration").default(true), // Integration with PULSE genetic algorithms
   threatDetectionCapabilities: jsonb("threat_detection_capabilities").default('[]'), // AI threat detection sensors
   communicationChannels: jsonb("communication_channels").default('[]'), // Available communication methods
   defensiveCapabilities: jsonb("defensive_capabilities").default('[]'), // Countermeasure capabilities
@@ -2635,7 +2635,7 @@ export const surgeSwarmMissions = pgTable("surge_swarm_missions", {
   missionDescription: text("mission_description"),
   targetArea: jsonb("target_area").notNull(), // Geographic area with coordinates, boundaries
   objectives: jsonb("objectives").notNull(), // Mission-specific goals and success criteria
-  threatContext: jsonb("threat_context"), // Related threat information from CyDEF
+  threatContext: jsonb("threat_context"), // Related threat information from PULSE
   estimatedDuration: integer("estimated_duration").default(3600), // Estimated duration in seconds
   actualDuration: integer("actual_duration"), // Actual mission duration
   requiredDroneCount: integer("required_drone_count").default(1),
@@ -2692,7 +2692,7 @@ export const surgeDeployments = pgTable("surge_deployments", {
   communicationLog: jsonb("communication_log").default('[]'), // Inter-drone communications
   coordinationCommands: jsonb("coordination_commands").default('[]'), // Swarm coordination instructions
   autonomousDecisions: jsonb("autonomous_decisions").default('[]'), // AI-driven decisions made
-  cydefResponses: jsonb("cydef_responses").default('[]'), // Responses from CyDEF genetic algorithms
+  pulseResponses: jsonb("pulse_responses").default('[]'), // Responses from PULSE genetic algorithms
   environmentalFactors: jsonb("environmental_factors"), // Weather, obstacles, interference
   riskLevelCurrent: varchar("risk_level_current").default("low"), // Current assessed risk level
   emergencyProceduresActive: boolean("emergency_procedures_active").default(false),
@@ -2722,9 +2722,9 @@ export const surgeCoordination = pgTable("surge_coordination", {
   decisionTrigger: varchar("decision_trigger").notNull(), // threat_detected, mission_objective, operator_command, ai_recommendation, emergency_situation
   inputData: jsonb("input_data").notNull(), // Data used for coordination decision
   algorithmParameters: jsonb("algorithm_parameters"), // Configuration for coordination algorithm
-  geneticAlgorithmGeneration: integer("genetic_algorithm_generation"), // CyDEF integration data
+  geneticAlgorithmGeneration: integer("genetic_algorithm_generation"), // PULSE integration data
   geneticAlgorithmFitness: integer("genetic_algorithm_fitness"), // Fitness score from genetic algorithm
-  cydefRecommendation: jsonb("cydef_recommendation"), // AI recommendation from CyDEF system
+  pulseRecommendation: jsonb("pulse_recommendation"), // AI recommendation from PULSE system
   coordinationDecision: jsonb("coordination_decision").notNull(), // Final coordination decision made
   decisionConfidence: integer("decision_confidence").default(100), // 0-100 confidence in decision
   implementationStatus: varchar("implementation_status").default("pending"), // pending, implementing, completed, failed, overridden
@@ -2758,7 +2758,7 @@ export const surgeAnalytics = pgTable("surge_analytics", {
   metricUnit: varchar("metric_unit"), // percentage, seconds, meters, count, score
   aggregationPeriod: varchar("aggregation_period").default("real_time"), // real_time, hourly, daily, weekly, monthly, mission_based
   organizationId: varchar("organization_id").notNull(),
-  droneId: varchar("drone_id").references(() => acdsDrones.id), // Specific drone metrics
+  droneId: varchar("drone_id").references(() => surgeDrones.id), // Specific drone metrics
   missionId: varchar("mission_id").references(() => surgeSwarmMissions.id), // Mission-specific metrics
   swarmId: varchar("swarm_id"), // Swarm-level metrics
   deploymentId: varchar("deployment_id").references(() => surgeDeployments.id), // Deployment metrics
@@ -2838,7 +2838,7 @@ export const UnifiedSystemStatusSchema = z.object({
   status: z.enum(['operational', 'warning', 'critical', 'maintenance', 'offline']),
   lastUpdate: z.string().datetime(),
   subsystems: z.object({
-    cydef: z.object({
+    pulse: z.object({
       status: z.enum(['operational', 'warning', 'critical', 'offline']),
       activeThreats: z.number(),
       geneticGeneration: z.number(),
@@ -2854,7 +2854,7 @@ export const UnifiedSystemStatusSchema = z.object({
       geofenceBreaches: z.number(),
       lastLocationUpdate: z.string().datetime().optional(),
     }),
-    cypherHUM: z.object({
+    echo: z.object({
       status: z.enum(['operational', 'warning', 'critical', 'offline']),
       activeSessions: z.number(),
       threatsVisualized: z.number(),
@@ -2862,7 +2862,7 @@ export const UnifiedSystemStatusSchema = z.object({
       holographicQuality: z.enum(['low', 'medium', 'high', 'ultra']),
       averageFPS: z.number(),
     }),
-    acds: z.object({
+    surge: z.object({
       status: z.enum(['operational', 'warning', 'critical', 'offline']),
       totalDrones: z.number(),
       activeDrones: z.number(),
@@ -2888,10 +2888,10 @@ export const CrossSystemMetricsSchema = z.object({
     end: z.string().datetime(),
   }),
   correlationAnalysis: z.object({
-    cydefLiveLocationCorrelation: z.number(), // -1 to 1 correlation coefficient
-    cydefACDSCorrelation: z.number(),
-    liveLocationACDSCorrelation: z.number(),
-    cypherHUMEffectiveness: z.number(),
+    pulseLiveLocationCorrelation: z.number(), // -1 to 1 correlation coefficient
+    pulseSurgeCorrelation: z.number(),
+    liveLocationSurgeCorrelation: z.number(),
+    echoEffectiveness: z.number(),
     overallSystemSynergy: z.number(),
   }),
   threatResponseMetrics: z.object({
@@ -2966,7 +2966,7 @@ export const ExecutiveMetricsSchema = z.object({
 export const UnifiedAlertSchema = z.object({
   id: z.string(),
   alertId: z.string(),
-  sourceSystem: z.enum(['cydef', 'liveLocation', 'cypherHUM', 'acds', 'unified']),
+  sourceSystem: z.enum(['pulse', 'liveLocation', 'echo', 'surge', 'unified']),
   sourceId: z.string(), // ID in the source system
   alertType: z.enum(['security_threat', 'system_anomaly', 'device_offline', 'geofence_breach', 'mission_critical', 'ai_correlation', 'compliance_violation', 'performance_degradation']),
   severity: z.enum(['info', 'low', 'medium', 'high', 'critical', 'emergency']),
@@ -3010,10 +3010,10 @@ export const AlertStatsSchema = z.object({
   }),
   totalAlerts: z.number(),
   alertsBySystem: z.object({
-    cydef: z.number(),
+    pulse: z.number(),
     liveLocation: z.number(),
-    cypherHUM: z.number(),
-    acds: z.number(),
+    echo: z.number(),
+    surge: z.number(),
     unified: z.number(),
   }),
   alertsBySeverity: z.object({

@@ -474,7 +474,7 @@ export class UnifiedService extends EventEmitter {
   }
 
   /**
-   * Analyze AI pattern correlations from CypherHUM sessions
+   * Analyze AI pattern correlations from ECHO sessions
    */
   private async analyzeAIPatternCorrelations(sessions: any[]): Promise<ThreatCorrelationResult[]> {
     const correlations: ThreatCorrelationResult[] = [];
@@ -694,10 +694,10 @@ export class UnifiedService extends EventEmitter {
         end: new Date().toISOString(),
       },
       correlationAnalysis: {
-        cydefLiveLocationCorrelation: this.calculateCorrelationStrength('spatial'),
-        cydefACDSCorrelation: this.calculateCorrelationStrength('temporal'),
-        liveLocationACDSCorrelation: 0.65,
-        cypherHUMEffectiveness: this.calculateCorrelationStrength('ai_pattern'),
+        pulseLiveLocationCorrelation: this.calculateCorrelationStrength('spatial'),
+        pulseSURGECorrelation: this.calculateCorrelationStrength('temporal'),
+        liveLocationSURGECorrelation: 0.65,
+        echoEffectiveness: this.calculateCorrelationStrength('ai_pattern'),
         overallSystemSynergy: filteredCorrelations.length > 0 ? 0.85 : 0.50,
       },
       threatResponseMetrics: {
@@ -760,9 +760,9 @@ export class UnifiedService extends EventEmitter {
                                systemStatus.overallHealth > 80 ? 'good' : 
                                systemStatus.overallHealth > 70 ? 'fair' : 
                                systemStatus.overallHealth > 50 ? 'poor' : 'critical',
-        threatLandscapeStatus: systemStatus.subsystems.cydef.activeThreats > 50 ? 'critical' :
-                              systemStatus.subsystems.cydef.activeThreats > 20 ? 'high' :
-                              systemStatus.subsystems.cydef.activeThreats > 5 ? 'elevated' : 'calm',
+        threatLandscapeStatus: systemStatus.subsystems.pulse.activeThreats > 50 ? 'critical' :
+                              systemStatus.subsystems.pulse.activeThreats > 20 ? 'high' :
+                              systemStatus.subsystems.pulse.activeThreats > 5 ? 'elevated' : 'calm',
         systemPerformanceRating: systemStatus.overallHealth,
         complianceStatus: crossSystemMetrics.operationalMetrics.complianceScore > 95 ? 'compliant' :
                          crossSystemMetrics.operationalMetrics.complianceScore > 85 ? 'minor_issues' :
@@ -781,9 +781,9 @@ export class UnifiedService extends EventEmitter {
       },
       trendAnalysis: {
         threatTrends: [
-          { period: '24h', threatCount: systemStatus.subsystems.cydef.activeThreats, severity: 'medium', category: 'malware' },
-          { period: '7d', threatCount: systemStatus.subsystems.cydef.activeThreats * 6, severity: 'medium', category: 'phishing' },
-          { period: '30d', threatCount: systemStatus.subsystems.cydef.activeThreats * 25, severity: 'low', category: 'anomaly' },
+          { period: '24h', threatCount: systemStatus.subsystems.pulse.activeThreats, severity: 'medium', category: 'malware' },
+          { period: '7d', threatCount: systemStatus.subsystems.pulse.activeThreats * 6, severity: 'medium', category: 'phishing' },
+          { period: '30d', threatCount: systemStatus.subsystems.pulse.activeThreats * 25, severity: 'low', category: 'anomaly' },
         ],
         performanceTrends: [
           { period: '24h', metric: 'response_time', value: crossSystemMetrics.threatResponseMetrics.averageResponseTime, trend: 'improving' },
@@ -802,8 +802,8 @@ export class UnifiedService extends EventEmitter {
         ],
         recommendations: [
           'Increase genetic algorithm evolution frequency',
-          'Deploy additional ACDS drones for coverage',
-          'Enhance CypherHUM visualization accuracy',
+          'Deploy additional SURGE drones for coverage',
+          'Enhance ECHO visualization accuracy',
           'Implement predictive threat modeling'
         ],
       },
@@ -887,10 +887,10 @@ export class UnifiedService extends EventEmitter {
       },
       totalAlerts: filteredAlerts.length,
       alertsBySystem: {
-        cydef: filteredAlerts.filter(a => a.sourceSystem === 'cydef').length,
+        pulse: filteredAlerts.filter(a => a.sourceSystem === 'pulse').length,
         liveLocation: filteredAlerts.filter(a => a.sourceSystem === 'liveLocation').length,
-        cypherHUM: filteredAlerts.filter(a => a.sourceSystem === 'cypherHUM').length,
-        acds: filteredAlerts.filter(a => a.sourceSystem === 'acds').length,
+        echo: filteredAlerts.filter(a => a.sourceSystem === 'echo').length,
+        surge: filteredAlerts.filter(a => a.sourceSystem === 'surge').length,
         unified: filteredAlerts.filter(a => a.sourceSystem === 'unified').length,
       },
       alertsBySeverity: {

@@ -285,7 +285,7 @@ export default function SURGEDashboard() {
   // Drone deployment mutation
   const deployDroneMutation = useMutation({
     mutationFn: async ({ droneId, deploymentData }: { droneId: string; deploymentData: any }) => {
-      return apiRequest(`/api/acds/drones/${droneId}/deploy`, {
+      return apiRequest(`/api/surge/drones/${droneId}/deploy`, {
         method: 'POST',
         body: JSON.stringify(deploymentData),
       });
@@ -683,7 +683,7 @@ export default function SURGEDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-green-400 p-6" data-testid="acds-dashboard">
+    <div className="min-h-screen bg-black text-green-400 p-6" data-testid="surge-dashboard">
       {/* Header with connection status */}
       <div className="mb-6">
         <div className="flex items-center justify-between">

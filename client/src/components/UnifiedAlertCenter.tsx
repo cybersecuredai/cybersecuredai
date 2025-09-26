@@ -2,10 +2,10 @@
  * Unified Alert Center Component
  * 
  * Centralizes all alerts and notifications from the four revolutionary cybersecurity systems:
- * - CyDEF genetic algorithm alerts and autonomous response notifications
+ * - PULSE genetic algorithm alerts and autonomous response notifications
  * - Live Location geofence breaches and device status alerts  
- * - CypherHUM visualization anomalies and AI interaction alerts
- * - ACDS drone swarm emergency alerts and mission status updates
+ * - ECHO visualization anomalies and AI interaction alerts
+ * - SURGE drone swarm emergency alerts and mission status updates
  */
 
 import { useState, useEffect } from 'react';
@@ -38,7 +38,7 @@ import {
 
 interface UnifiedAlert {
   id: string;
-  sourceSystem: 'cydef' | 'live-location' | 'cypherhum' | 'acds';
+  sourceSystem: 'pulse' | 'live-location' | 'echo' | 'surge';
   alertType: string;
   severity: 'info' | 'warning' | 'critical' | 'emergency';
   status: 'active' | 'acknowledged' | 'resolved' | 'dismissed';
@@ -69,7 +69,7 @@ export default function UnifiedAlertCenter() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [selectedFilter, setSelectedFilter] = useState<'all' | 'active' | 'critical' | 'emergency'>('all');
-  const [selectedSystem, setSelectedSystem] = useState<'all' | 'cydef' | 'live-location' | 'cypherhum' | 'acds'>('all');
+  const [selectedSystem, setSelectedSystem] = useState<'all' | 'pulse' | 'live-location' | 'echo' | 'surge'>('all');
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [expandedAlert, setExpandedAlert] = useState<string | null>(null);
 
@@ -212,10 +212,10 @@ export default function UnifiedAlertCenter() {
 
   const getSystemIcon = (system: string) => {
     switch (system) {
-      case 'cydef': return <Brain className="w-4 h-4 text-purple-400" />;
+      case 'pulse': return <Brain className="w-4 h-4 text-purple-400" />;
       case 'live-location': return <MapPin className="w-4 h-4 text-blue-400" />;
-      case 'cypherhum': return <Eye className="w-4 h-4 text-green-400" />;
-      case 'acds': return <Drone className="w-4 h-4 text-orange-400" />;
+      case 'echo': return <Eye className="w-4 h-4 text-green-400" />;
+      case 'surge': return <Drone className="w-4 h-4 text-orange-400" />;
       default: return <Bell className="w-4 h-4 text-gray-400" />;
     }
   };
@@ -322,10 +322,10 @@ export default function UnifiedAlertCenter() {
             data-testid="select-system-filter"
           >
             <option value="all">All Systems</option>
-            <option value="cydef">CyDEF Only</option>
+            <option value="pulse">PULSE Only</option>
             <option value="live-location">Live Location Only</option>
-            <option value="cypherhum">CypherHUM Only</option>
-            <option value="acds">ACDS Only</option>
+            <option value="echo">ECHO Only</option>
+            <option value="surge">SURGE Only</option>
           </select>
         </div>
 

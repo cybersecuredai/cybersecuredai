@@ -2,10 +2,10 @@
  * Unified System Status Component
  * 
  * Displays real-time operational status of all four revolutionary cybersecurity systems:
- * - CyDEF (Genetic AI Defense)
+ * - PULSE (Genetic AI Defense)
  * - Live Location (Asset Tracking)  
- * - CypherHUM (3D Holographic Interface)
- * - ACDS (Autonomous Cyber Defense Swarm)
+ * - ECHO (3D Holographic Interface)
+ * - SURGE (Autonomous Cyber Defense Swarm)
  */
 
 import { useState, useEffect } from 'react';
@@ -47,7 +47,7 @@ interface SystemStatus {
 }
 
 interface UnifiedSystemData {
-  cydef: {
+  pulse: {
     status: 'active' | 'paused' | 'error';
     geneticAlgorithmStatus: string;
     currentGeneration: number;
@@ -63,14 +63,14 @@ interface UnifiedSystemData {
     geofences: number;
     averageResponseTime: number;
   };
-  cypherHum: {
+  echo: {
     activeSessions: number;
     threatsVisualized: number;
     aiInteractions: number;
     holographicEffects: boolean;
     renderQuality: string;
   };
-  acds: {
+  surge: {
     totalDrones: number;
     activeDrones: number;
     activeDeployments: number;
@@ -97,7 +97,7 @@ export default function UnifiedSystemStatus() {
 
   // Monitor WebSocket connections for all systems
   useEffect(() => {
-    const systems = ['cydef', 'live-location', 'cypherhum', 'acds'];
+    const systems = ['pulse', 'live-location', 'echo', 'surge'];
     const wsConnections: Record<string, WebSocket> = {};
 
     systems.forEach(system => {
@@ -185,12 +185,12 @@ export default function UnifiedSystemStatus() {
 
   const systemConfigs = [
     {
-      id: 'cydef',
-      name: 'CyDEF Genetic AI',
+      id: 'pulse',
+      name: 'PULSE Genetic AI',
       icon: Brain,
       description: 'Autonomous Cyber Defense with Genetic Algorithms',
       color: 'from-purple-500 to-violet-600',
-      data: unifiedData?.cydef
+      data: unifiedData?.pulse
     },
     {
       id: 'live-location',
@@ -201,20 +201,20 @@ export default function UnifiedSystemStatus() {
       data: unifiedData?.liveLocation
     },
     {
-      id: 'cypherhum',
-      name: 'CypherHUM Interface',
+      id: 'echo',
+      name: 'ECHO Interface',
       icon: Eye,
       description: '3D Holographic Threat Visualization',
       color: 'from-green-500 to-teal-600',
-      data: unifiedData?.cypherHum
+      data: unifiedData?.echo
     },
     {
-      id: 'acds',
-      name: 'ACDS Drone Swarm',
+      id: 'surge',
+      name: 'SURGE Drone Swarm',
       icon: Drone,
       description: 'Autonomous Cyber Defense Swarm',
       color: 'from-orange-500 to-red-600',
-      data: unifiedData?.acds
+      data: unifiedData?.surge
     }
   ];
 
@@ -288,7 +288,7 @@ export default function UnifiedSystemStatus() {
 
               {/* System Metrics */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {system.id === 'cydef' && system.data && (
+                {system.id === 'pulse' && system.data && (
                   <>
                     <div className="text-center">
                       <div className="text-lg font-bold text-white">{system.data.currentGeneration}</div>
@@ -331,7 +331,7 @@ export default function UnifiedSystemStatus() {
                   </>
                 )}
 
-                {system.id === 'cypherhum' && system.data && (
+                {system.id === 'echo' && system.data && (
                   <>
                     <div className="text-center">
                       <div className="text-lg font-bold text-white">{system.data.activeSessions}</div>
@@ -353,7 +353,7 @@ export default function UnifiedSystemStatus() {
                   </>
                 )}
 
-                {system.id === 'acds' && system.data && (
+                {system.id === 'surge' && system.data && (
                   <>
                     <div className="text-center">
                       <div className="text-lg font-bold text-white">{system.data.totalDrones}</div>

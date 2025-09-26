@@ -88,7 +88,7 @@ export class PulseService extends EventEmitter {
   }
 
   /**
-   * Initialize the CyDEF service with all subsystems
+   * Initialize the PULSE service with all subsystems
    */
   async initialize(): Promise<void> {
     if (this.initPromise) {
@@ -107,7 +107,7 @@ export class PulseService extends EventEmitter {
     console.log('🚀 Initializing PULSE Service...');
     
     try {
-      // Create or load CyDEF system instance
+      // Create or load PULSE system instance
       await this.createOrLoadPulseSystem();
       
       // Initialize genetic algorithm engines
@@ -292,7 +292,7 @@ export class PulseService extends EventEmitter {
         eventCategory: 'threat_response',
         severity: threat.severity as any,
         title: `Autonomous Threat Response: ${threat.type}`,
-        message: `CyDEF processed ${threat.type} with ${decision.confidenceScore}% confidence`,
+        message: `PULSE processed ${threat.type} with ${decision.confidenceScore}% confidence`,
         eventData: {
           threatId: threat.id,
           responseType: decision.responseType,
@@ -311,7 +311,7 @@ export class PulseService extends EventEmitter {
   }
 
   /**
-   * Get current status of all CyDEF systems
+   * Get current status of all PULSE systems
    */
   async getSystemStatus(): Promise<CydefSystemStatus[]> {
     await this.ensureInitialized();
@@ -429,7 +429,7 @@ export class PulseService extends EventEmitter {
     
     // Create autonomous response record
     const response: Omit<CydefAutonomousResponse, 'id' | 'createdAt'> = {
-      cydefSystemId: Array.from(this.systems.keys())[0], // Use first system
+      pulseSystemId: Array.from(this.systems.keys())[0], // Use first system
       threatId: threat.id,
       responseType: decision.responseType,
       triggerEvent: decision.triggerEvent,
@@ -487,7 +487,7 @@ export class PulseService extends EventEmitter {
     // Add new performance metrics
     metrics.push({
       id: `metric-${Date.now()}-${Math.random()}`,
-      cydefSystemId: systemId,
+      pulseSystemId: systemId,
       metricType: 'threat_detection',
       metricCategory: 'real_time',
       value: Math.floor(decision.confidenceScore * 100), // Convert to basis points
@@ -520,7 +520,7 @@ export class PulseService extends EventEmitter {
     
     const event: CydefRealTimeEvent = {
       id: `event-${Date.now()}-${Math.random()}`,
-      cydefSystemId: systemId,
+      pulseSystemId: systemId,
       eventType: eventData.eventType!,
       eventCategory: eventData.eventCategory!,
       severity: eventData.severity!,
@@ -599,7 +599,7 @@ export class PulseService extends EventEmitter {
     // Collect various system metrics
     metrics.push({
       id: `metric-accuracy-${Date.now()}`,
-      cydefSystemId: systemId,
+      pulseSystemId: systemId,
       metricType: 'accuracy',
       metricCategory: 'hourly',
       value: system.actualAccuracy,
@@ -650,7 +650,7 @@ export class PulseService extends EventEmitter {
       eventCategory: 'genetic_algorithm',
       severity: 'info',
       title: 'Target Accuracy Reached!',
-      message: `CyDEF achieved ${data.accuracy}% accuracy in ${data.sector}`,
+      message: `PULSE achieved ${data.accuracy}% accuracy in ${data.sector}`,
       eventData: data
     });
   }

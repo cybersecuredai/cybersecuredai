@@ -2,8 +2,8 @@
  * Cross-System Analytics Component
  * 
  * Provides unified analytics and correlation analysis across all four systems:
- * - Threat correlation between CyDEF genetic insights and ACDS drone deployments
- * - Integration of Live Location threat geolocation with CypherHUM 3D visualization
+ * - Threat correlation between PULSE genetic insights and SURGE drone deployments
+ * - Integration of Live Location threat geolocation with ECHO 3D visualization
  * - Unified threat scoring that considers all four system inputs
  * - Executive reporting features for federal compliance requirements
  */
@@ -38,7 +38,7 @@ interface ThreatCorrelation {
   threatId: string;
   correlationScore: number;
   involvedSystems: string[];
-  cydefInsights: {
+  pulseInsights: {
     geneticAlgorithmConfidence: number;
     threatClassification: string;
     evolutionGeneration: number;
@@ -48,12 +48,12 @@ interface ThreatCorrelation {
     highRiskAreas: string[];
     affectedDevices: number;
   };
-  cypherhumVisualization: {
+  echoVisualization: {
     threeDModelingAccuracy: number;
     holographicComplexity: string;
     visualizationScore: number;
   };
-  acdsResponse: {
+  surgeResponse: {
     dronesDeployed: number;
     missionSuccess: boolean;
     responseTime: number;
@@ -64,12 +64,12 @@ interface ThreatCorrelation {
 }
 
 interface SystemCorrelationMetrics {
-  cydefToAcds: {
+  pulseToSurge: {
     correlationStrength: number;
     successfulCoordinations: number;
     averageResponseTime: number;
   };
-  liveLocationToCypherHum: {
+  liveLocationToEcho: {
     visualizationAccuracy: number;
     geospatialIntegration: number;
     realTimeSync: number;
@@ -134,10 +134,10 @@ export default function CrossSystemAnalytics() {
 
   const getSystemIcon = (systemName: string) => {
     switch (systemName) {
-      case 'cydef': return <Brain className="w-4 h-4 text-purple-400" />;
+      case 'pulse': return <Brain className="w-4 h-4 text-purple-400" />;
       case 'live-location': return <MapPin className="w-4 h-4 text-blue-400" />;
-      case 'cypherhum': return <Eye className="w-4 h-4 text-green-400" />;
-      case 'acds': return <Drone className="w-4 h-4 text-orange-400" />;
+      case 'echo': return <Eye className="w-4 h-4 text-green-400" />;
+      case 'surge': return <Drone className="w-4 h-4 text-orange-400" />;
       default: return <Shield className="w-4 h-4 text-gray-400" />;
     }
   };
@@ -218,17 +218,17 @@ export default function CrossSystemAnalytics() {
                       </div>
 
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-3">
-                        {/* CyDEF Insights */}
+                        {/* PULSE Insights */}
                         <div className="space-y-1">
                           <div className="flex items-center space-x-1">
-                            {getSystemIcon('cydef')}
-                            <span className="text-xs font-medium text-purple-400">CyDEF</span>
+                            {getSystemIcon('pulse')}
+                            <span className="text-xs font-medium text-purple-400">PULSE</span>
                           </div>
                           <div className="text-xs text-gray-300">
-                            Confidence: {Math.round(correlation.cydefInsights.geneticAlgorithmConfidence)}%
+                            Confidence: {Math.round(correlation.pulseInsights.geneticAlgorithmConfidence)}%
                           </div>
                           <div className="text-xs text-gray-400">
-                            Gen: {correlation.cydefInsights.evolutionGeneration}
+                            Gen: {correlation.pulseInsights.evolutionGeneration}
                           </div>
                         </div>
 
@@ -246,31 +246,31 @@ export default function CrossSystemAnalytics() {
                           </div>
                         </div>
 
-                        {/* CypherHUM Visualization */}
+                        {/* ECHO Visualization */}
                         <div className="space-y-1">
                           <div className="flex items-center space-x-1">
-                            {getSystemIcon('cypherhum')}
-                            <span className="text-xs font-medium text-green-400">CypherHUM</span>
+                            {getSystemIcon('echo')}
+                            <span className="text-xs font-medium text-green-400">ECHO</span>
                           </div>
                           <div className="text-xs text-gray-300">
-                            3D Accuracy: {Math.round(correlation.cypherhumVisualization.threeDModelingAccuracy)}%
+                            3D Accuracy: {Math.round(correlation.echoVisualization.threeDModelingAccuracy)}%
                           </div>
                           <div className="text-xs text-gray-400">
-                            Complexity: {correlation.cypherhumVisualization.holographicComplexity}
+                            Complexity: {correlation.echoVisualization.holographicComplexity}
                           </div>
                         </div>
 
-                        {/* ACDS Response */}
+                        {/* SURGE Response */}
                         <div className="space-y-1">
                           <div className="flex items-center space-x-1">
-                            {getSystemIcon('acds')}
-                            <span className="text-xs font-medium text-orange-400">ACDS</span>
+                            {getSystemIcon('surge')}
+                            <span className="text-xs font-medium text-orange-400">SURGE</span>
                           </div>
                           <div className="text-xs text-gray-300">
-                            Drones: {correlation.acdsResponse.dronesDeployed}
+                            Drones: {correlation.surgeResponse.dronesDeployed}
                           </div>
                           <div className="text-xs text-gray-400">
-                            Response: {correlation.acdsResponse.responseTime}s
+                            Response: {correlation.surgeResponse.responseTime}s
                           </div>
                         </div>
                       </div>
@@ -303,69 +303,69 @@ export default function CrossSystemAnalytics() {
               
               {correlationMetrics && (
                 <div className="grid gap-4">
-                  {/* CyDEF to ACDS Correlation */}
+                  {/* PULSE to SURGE Correlation */}
                   <div className="bg-gray-900/50 border border-gray-700 rounded-lg p-4">
                     <div className="flex items-center space-x-2 mb-3">
                       <Brain className="w-4 h-4 text-purple-400" />
                       <Zap className="w-3 h-3 text-gray-400" />
                       <Drone className="w-4 h-4 text-orange-400" />
-                      <span className="font-medium text-white">CyDEF ↔ ACDS Integration</span>
+                      <span className="font-medium text-white">PULSE ↔ SURGE Integration</span>
                     </div>
                     <div className="grid grid-cols-3 gap-4">
                       <div>
                         <div className="text-xs text-gray-400 mb-1">Correlation Strength</div>
                         <div className="text-lg font-bold text-white">
-                          {Math.round(correlationMetrics.cydefToAcds.correlationStrength * 100)}%
+                          {Math.round(correlationMetrics.pulseToSurge.correlationStrength * 100)}%
                         </div>
                         <Progress 
-                          value={correlationMetrics.cydefToAcds.correlationStrength * 100} 
+                          value={correlationMetrics.pulseToSurge.correlationStrength * 100} 
                           className="h-2 mt-1"
                         />
                       </div>
                       <div>
                         <div className="text-xs text-gray-400 mb-1">Successful Coordinations</div>
                         <div className="text-lg font-bold text-green-400">
-                          {correlationMetrics.cydefToAcds.successfulCoordinations}
+                          {correlationMetrics.pulseToSurge.successfulCoordinations}
                         </div>
                       </div>
                       <div>
                         <div className="text-xs text-gray-400 mb-1">Avg Response Time</div>
                         <div className="text-lg font-bold text-white">
-                          {correlationMetrics.cydefToAcds.averageResponseTime}s
+                          {correlationMetrics.pulseToSurge.averageResponseTime}s
                         </div>
                       </div>
                     </div>
                   </div>
 
-                  {/* Live Location to CypherHUM Integration */}
+                  {/* Live Location to ECHO Integration */}
                   <div className="bg-gray-900/50 border border-gray-700 rounded-lg p-4">
                     <div className="flex items-center space-x-2 mb-3">
                       <MapPin className="w-4 h-4 text-blue-400" />
                       <Zap className="w-3 h-3 text-gray-400" />
                       <Eye className="w-4 h-4 text-green-400" />
-                      <span className="font-medium text-white">Live Location ↔ CypherHUM Integration</span>
+                      <span className="font-medium text-white">Live Location ↔ ECHO Integration</span>
                     </div>
                     <div className="grid grid-cols-3 gap-4">
                       <div>
                         <div className="text-xs text-gray-400 mb-1">Visualization Accuracy</div>
                         <div className="text-lg font-bold text-white">
-                          {Math.round(correlationMetrics.liveLocationToCypherHum.visualizationAccuracy * 100)}%
+                          {Math.round(correlationMetrics.liveLocationToEcho.visualizationAccuracy * 100)}%
                         </div>
                         <Progress 
-                          value={correlationMetrics.liveLocationToCypherHum.visualizationAccuracy * 100} 
+                          value={correlationMetrics.liveLocationToEcho.visualizationAccuracy * 100} 
                           className="h-2 mt-1"
                         />
                       </div>
                       <div>
                         <div className="text-xs text-gray-400 mb-1">Geospatial Integration</div>
                         <div className="text-lg font-bold text-white">
-                          {Math.round(correlationMetrics.liveLocationToCypherHum.geospatialIntegration * 100)}%
+                          {Math.round(correlationMetrics.liveLocationToEcho.geospatialIntegration * 100)}%
                         </div>
                       </div>
                       <div>
                         <div className="text-xs text-gray-400 mb-1">Real-Time Sync</div>
                         <div className="text-lg font-bold text-green-400">
-                          {Math.round(correlationMetrics.liveLocationToCypherHum.realTimeSync * 100)}%
+                          {Math.round(correlationMetrics.liveLocationToEcho.realTimeSync * 100)}%
                         </div>
                       </div>
                     </div>
