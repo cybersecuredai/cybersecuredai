@@ -28,6 +28,7 @@ import {
   hipaaTimeBasedAccess,
   hipaaAccessRequests,
   hipaaEncryptionKeys,
+  contactTracingLocationHistory,
   type User, 
   type InsertUser,
   type Threat,
@@ -1152,4 +1153,20 @@ export class DbStorage implements IStorage {
   async updateEncryptionKey(id: string, updates: Partial<HipaaEncryptionKey>): Promise<HipaaEncryptionKey> { throw new Error('Not implemented yet'); }
   async deleteEncryptionKey(id: string): Promise<void> { }
   async rotateEncryptionKey(id: string, newKeyData: any): Promise<HipaaEncryptionKey> { throw new Error('Not implemented yet'); }
+
+  // Contact Tracing Location History cleanup method
+  async cleanupExpiredLocationHistory(beforeDate?: Date): Promise<number> {
+    try {
+      const cutoffDate = beforeDate || new Date();
+      
+      const result = await this.database
+        .delete(contactTracingLocationHistory)
+        .where(sql`${contactTracingLocationHistory.createdAt} < ${cutoffDate}`);
+      
+      return result.rowCount || 0;
+    } catch (error) {
+      console.error('Failed to cleanup expired location history:', error);
+      throw error;
+    }
+  }
 }
