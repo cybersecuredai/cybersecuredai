@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "ORCA Federal - Security Assistant",
+  "name": "CyberSecured AI - Security Assistant",
   "version": "3.0.0",
-  "description": "Revolutionary dual AI security assistant with genetic algorithms, meeting intelligence, and real-time threat monitoring.",
+  "description": "CyberSecured AI's revolutionary dual AI security assistant powered by the ORCA platform with genetic algorithms, meeting intelligence, and real-time threat monitoring.",
   "permissions": [
     "activeTab",
     "storage",
@@ -14,7 +14,7 @@
     "alarms"
   ],
   "host_permissions": [
-    "https://*.orcafederal.com/*",
+    "https://*.cybersecuredai.com/*",
     "https://*.linkedin.com/*",
     "https://*.twitter.com/*",
     "https://*.github.com/*",
@@ -44,7 +44,7 @@
   ],
   "action": {
     "default_popup": "popup.html",
-    "default_title": "ORCA Federal Security Assistant",
+    "default_title": "CyberSecured AI Security Assistant",
     "default_icon": {
       "16": "icons/icon-16.png",
       "32": "icons/icon-32.png",
