@@ -65,7 +65,7 @@ async function validateContactTracingSchemas() {
     
     for (const tableName of requiredTables) {
       try {
-        const result = await db().execute(sql`
+        const result = await db.execute(sql`
           SELECT 1 FROM information_schema.tables 
           WHERE table_schema = 'public' AND table_name = ${tableName}
         `);
