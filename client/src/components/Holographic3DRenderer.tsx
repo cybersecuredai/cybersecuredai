@@ -9,7 +9,6 @@
  */
 
 import { useEffect, useRef, useState } from 'react';
-import * as THREE from 'three';
 
 interface ThreatVisualization3D {
   threatId: string;
@@ -63,16 +62,19 @@ export const Holographic3DRenderer: React.FC<Holographic3DRendererProps> = ({
   realTimeUpdates = true
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
-  const sceneRef = useRef<THREE.Scene | null>(null);
-  const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
-  const threatObjectsRef = useRef<Map<string, THREE.Group>>(new Map());
+  const rendererRef = useRef<any>(null);
+  const sceneRef = useRef<any>(null);
+  const cameraRef = useRef<any>(null);
+  const threatObjectsRef = useRef<Map<string, any>>(new Map());
   const animationIdRef = useRef<number | null>(null);
-  const mouseRef = useRef<THREE.Vector2>(new THREE.Vector2());
-  const raycasterRef = useRef<THREE.Raycaster>(new THREE.Raycaster());
-  const clockRef = useRef<THREE.Clock>(new THREE.Clock());
+  const mouseRef = useRef<any>(null);
+  const raycasterRef = useRef<any>(null);
+  const clockRef = useRef<any>(null);
+  const threeRef = useRef<any>(null);
   
   const [isInitialized, setIsInitialized] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [hoveredThreat, setHoveredThreat] = useState<ThreatVisualization3D | null>(null);
   const [performanceStats, setPerformanceStats] = useState({
     fps: 0,
@@ -80,70 +82,105 @@ export const Holographic3DRenderer: React.FC<Holographic3DRendererProps> = ({
     triangleCount: 0
   });
 
-  // Initialize Three.js scene
+  // Load Three.js dynamically and initialize scene
   useEffect(() => {
-    if (!canvasRef.current) return;
+    let isMounted = true;
+    
+    const loadThreeJS = async () => {
+      try {
+        setIsLoading(true);
+        setLoadError(null);
+        
+        // Dynamically import Three.js
+        const THREE = await import('three');
+        
+        if (!isMounted) return;
+        
+        // Store THREE reference for use in other functions
+        threeRef.current = THREE;
+        
+        if (!canvasRef.current) return;
 
-    const canvas = canvasRef.current;
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, canvas.clientWidth / canvas.clientHeight, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer({ 
-      canvas, 
-      antialias: renderQuality !== 'low',
-      alpha: true,
-      powerPreference: renderQuality === 'ultra' ? 'high-performance' : 'default'
-    });
+        const canvas = canvasRef.current;
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, canvas.clientWidth / canvas.clientHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ 
+          canvas, 
+          antialias: renderQuality !== 'low',
+          alpha: true,
+          powerPreference: renderQuality === 'ultra' ? 'high-performance' : 'default'
+        });
 
-    // Configure renderer for holographic effects
-    renderer.setSize(canvas.clientWidth, canvas.clientHeight);
-    renderer.setPixelRatio(window.devicePixelRatio);
-    renderer.shadowMap.enabled = renderQuality !== 'low';
-    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-    renderer.outputColorSpace = THREE.SRGBColorSpace;
-    renderer.toneMapping = THREE.ReinhardToneMapping;
-    renderer.toneMappingExposure = 1.2;
+        // Initialize mouse and raycaster references
+        mouseRef.current = new THREE.Vector2();
+        raycasterRef.current = new THREE.Raycaster();
+        clockRef.current = new THREE.Clock();
 
-    // Set holographic background
-    scene.background = new THREE.Color(0x000011);
-    scene.fog = new THREE.Fog(0x000011, 50, 100);
+        // Configure renderer for holographic effects
+        renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.shadowMap.enabled = renderQuality !== 'low';
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        renderer.outputColorSpace = THREE.SRGBColorSpace;
+        renderer.toneMapping = THREE.ReinhardToneMapping;
+        renderer.toneMappingExposure = 1.2;
 
-    // Initialize camera
-    camera.position.set(...cameraPosition);
-    camera.lookAt(0, 0, 0);
+        // Set holographic background
+        scene.background = new THREE.Color(0x000011);
+        scene.fog = new THREE.Fog(0x000011, 50, 100);
 
-    // Add holographic lighting system
-    setupHolographicLighting(scene);
+        // Initialize camera
+        camera.position.set(...cameraPosition);
+        camera.lookAt(0, 0, 0);
 
-    // Add grid and reference objects
-    setupSceneEnvironment(scene);
+        // Add holographic lighting system
+        setupHolographicLighting(scene, THREE);
 
-    // Store references
-    rendererRef.current = renderer;
-    sceneRef.current = scene;
-    cameraRef.current = camera;
+        // Add grid and reference objects
+        setupSceneEnvironment(scene, THREE);
 
-    setIsInitialized(true);
+        // Store references
+        rendererRef.current = renderer;
+        sceneRef.current = scene;
+        cameraRef.current = camera;
 
-    // Handle window resize
-    const handleResize = () => {
-      if (!canvas || !camera || !renderer) return;
-      
-      const width = canvas.clientWidth;
-      const height = canvas.clientHeight;
-      
-      camera.aspect = width / height;
-      camera.updateProjectionMatrix();
-      renderer.setSize(width, height);
-    };
+        setIsLoading(false);
+        setIsInitialized(true);
 
-    window.addEventListener('resize', handleResize);
+        // Handle window resize
+        const handleResize = () => {
+          if (!canvas || !camera || !renderer) return;
+          
+          const width = canvas.clientWidth;
+          const height = canvas.clientHeight;
+          
+          camera.aspect = width / height;
+          camera.updateProjectionMatrix();
+          renderer.setSize(width, height);
+        };
 
-    return () => {
-      window.removeEventListener('resize', handleResize);
-      if (animationIdRef.current) {
-        cancelAnimationFrame(animationIdRef.current);
+        window.addEventListener('resize', handleResize);
+
+        return () => {
+          window.removeEventListener('resize', handleResize);
+          if (animationIdRef.current) {
+            cancelAnimationFrame(animationIdRef.current);
+          }
+          renderer.dispose();
+        };
+      } catch (error) {
+        if (isMounted) {
+          console.error('Failed to load Three.js:', error);
+          setLoadError('Failed to load 3D rendering library. Please refresh the page.');
+          setIsLoading(false);
+        }
       }
-      renderer.dispose();
+    };
+    
+    loadThreeJS();
+    
+    return () => {
+      isMounted = false;
     };
   }, [renderQuality]);
 
@@ -283,7 +320,7 @@ export const Holographic3DRenderer: React.FC<Holographic3DRendererProps> = ({
   }, [hoveredThreat, onThreatClick, onThreatHover]);
 
   // Helper functions
-  const setupHolographicLighting = (scene: THREE.Scene) => {
+  const setupHolographicLighting = (scene: any, THREE: any) => {
     // Ambient light for base illumination
     const ambientLight = new THREE.AmbientLight(0x404040, 0.3);
     scene.add(ambientLight);
@@ -306,7 +343,7 @@ export const Holographic3DRenderer: React.FC<Holographic3DRendererProps> = ({
     scene.add(accentLight2);
   };
 
-  const setupSceneEnvironment = (scene: THREE.Scene) => {
+  const setupSceneEnvironment = (scene: any, THREE: any) => {
     // Holographic grid
     const gridHelper = new THREE.GridHelper(100, 100, 0x00ffff, 0x004444);
     gridHelper.position.y = -5;
@@ -317,7 +354,10 @@ export const Holographic3DRenderer: React.FC<Holographic3DRendererProps> = ({
     scene.add(axesHelper);
   };
 
-  const createThreatVisualization = (threat: ThreatVisualization3D): THREE.Group => {
+  const createThreatVisualization = (threat: ThreatVisualization3D): any => {
+    const THREE = threeRef.current;
+    if (!THREE) return null;
+    
     const threatGroup = new THREE.Group();
     threatGroup.position.set(...threat.position);
     threatGroup.scale.set(...threat.scale);
@@ -363,7 +403,10 @@ export const Holographic3DRenderer: React.FC<Holographic3DRendererProps> = ({
     return threatGroup;
   };
 
-  const createParticleSystem = (threat: ThreatVisualization3D): THREE.Points => {
+  const createParticleSystem = (threat: ThreatVisualization3D): any => {
+    const THREE = threeRef.current;
+    if (!THREE) return null;
+    
     const particleCount = threat.animationData.particles?.count || 100;
     const geometry = new THREE.BufferGeometry();
     const positions = new Float32Array(particleCount * 3);
@@ -402,13 +445,16 @@ export const Holographic3DRenderer: React.FC<Holographic3DRendererProps> = ({
     return new THREE.Points(geometry, material);
   };
 
-  const updateThreatVisualization = (threatGroup: THREE.Group, threat: ThreatVisualization3D) => {
+  const updateThreatVisualization = (threatGroup: any, threat: ThreatVisualization3D) => {
+    const THREE = threeRef.current;
+    if (!THREE) return;
+    
     threatGroup.position.set(...threat.position);
     threatGroup.scale.set(...threat.scale);
     threatGroup.rotation.set(...threat.rotation);
 
     // Update materials if needed
-    const mesh = threatGroup.children.find(child => child instanceof THREE.Mesh) as THREE.Mesh;
+    const mesh = threatGroup.children.find((child: any) => child instanceof THREE.Mesh);
     if (mesh && mesh.material instanceof THREE.MeshPhongMaterial) {
       mesh.material.color.setStyle(threat.materialProperties.color);
       mesh.material.emissive.setStyle(threat.materialProperties.emissive);
@@ -417,6 +463,9 @@ export const Holographic3DRenderer: React.FC<Holographic3DRendererProps> = ({
   };
 
   const updateThreatAnimations = (elapsedTime: number, deltaTime: number) => {
+    const THREE = threeRef.current;
+    if (!THREE) return;
+    
     threatObjectsRef.current.forEach((threatGroup, threatId) => {
       const threat = (threatGroup as any).threatData as ThreatVisualization3D;
       if (!threat) return;
@@ -437,7 +486,7 @@ export const Holographic3DRenderer: React.FC<Holographic3DRendererProps> = ({
       }
 
       // Particle animation
-      const particles = threatGroup.children.find(child => child instanceof THREE.Points) as THREE.Points;
+      const particles = threatGroup.children.find((child: any) => child instanceof THREE.Points);
       if (particles) {
         particles.rotation.y = elapsedTime * 0.5;
         particles.rotation.x = elapsedTime * 0.2;
@@ -468,18 +517,64 @@ export const Holographic3DRenderer: React.FC<Holographic3DRendererProps> = ({
     return null;
   };
 
-  const disposeThreatObject = (threatGroup: THREE.Group) => {
-    threatGroup.traverse((child) => {
+  const disposeThreatObject = (threatGroup: any) => {
+    const THREE = threeRef.current;
+    if (!THREE) return;
+    
+    threatGroup.traverse((child: any) => {
       if (child instanceof THREE.Mesh) {
         child.geometry.dispose();
         if (Array.isArray(child.material)) {
-          child.material.forEach(material => material.dispose());
+          child.material.forEach((material: any) => material.dispose());
         } else {
           child.material.dispose();
         }
       }
     });
   };
+
+  // Loading and error states
+  if (isLoading) {
+    return (
+      <div className={`relative w-full h-full ${className} flex items-center justify-center bg-gradient-to-br from-slate-900 to-black`} data-testid="holographic-3d-renderer-loading">
+        <div className="text-center space-y-4">
+          <div className="relative w-16 h-16 mx-auto">
+            <div className="absolute inset-0 border-4 border-cyan-400/30 rounded-full"></div>
+            <div className="absolute inset-0 border-4 border-transparent border-t-cyan-400 rounded-full animate-spin"></div>
+          </div>
+          <div className="text-cyan-400 font-mono text-sm">
+            Loading 3D Renderer...
+          </div>
+          <div className="text-cyan-400/60 font-mono text-xs">
+            Initializing Three.js holographic engine
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (loadError) {
+    return (
+      <div className={`relative w-full h-full ${className} flex items-center justify-center bg-gradient-to-br from-slate-900 to-black`} data-testid="holographic-3d-renderer-error">
+        <div className="text-center space-y-4 p-8">
+          <div className="text-red-400 text-4xl mb-4">⚠️</div>
+          <div className="text-red-400 font-mono text-lg font-semibold">
+            3D Renderer Error
+          </div>
+          <div className="text-red-400/80 font-mono text-sm max-w-md">
+            {loadError}
+          </div>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="px-4 py-2 bg-red-500/20 border border-red-500/50 text-red-400 rounded hover:bg-red-500/30 transition-colors font-mono text-sm"
+            data-testid="retry-button"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={`relative w-full h-full ${className}`} data-testid="holographic-3d-renderer">
