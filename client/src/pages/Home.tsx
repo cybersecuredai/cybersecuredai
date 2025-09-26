@@ -150,9 +150,9 @@ export default function Home() {
                 Featuring Cypher AI Assistant - 95% Accuracy, 24/7 Support
               </Badge>
               <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-4 md:mb-8 leading-tight px-2">
-                Enhanced with Cypher AI,<br className="hidden sm:block" />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">
-                  Intelligent Cyber Operations.
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-500">CyberSecured AI</span><br className="hidden sm:block" />
+                <span className="text-white">Enhanced with </span><span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">
+                  ORCA Intelligence.
                 </span>
               </h1>
               <div className="flex justify-center mb-6 md:mb-12">
@@ -178,7 +178,7 @@ export default function Home() {
                           <div className="w-3 h-3 bg-yellow-400 rounded-full"></div>
                           <div className="w-3 h-3 bg-green-400 rounded-full"></div>
                         </div>
-                        <div className="text-xs text-gray-400 ml-4">https://dashboard.cybersecure.ai</div>
+                        <div className="text-xs text-gray-400 ml-4">https://dashboard.cybersecuredai.com</div>
                       </div>
                       <Badge className="bg-cyan-500/20 text-cyan-300 text-xs">LIVE PLATFORM</Badge>
                     </div>
@@ -190,7 +190,7 @@ export default function Home() {
                       <div className="flex items-center space-x-3">
                         <Enhanced4DShieldIcon className="w-5 h-5 md:w-6 md:h-6 text-cyan-400" size={24} />
                         <div>
-                          <h3 className="text-white font-bold text-base md:text-lg">ORCA Federal Platform</h3>
+                          <h3 className="text-white font-bold text-base md:text-lg">CyberSecured AI - ORCA Platform</h3>
                           <p className="text-gray-400 text-xs md:text-sm">Converged Intelligence Dashboard</p>
                         </div>
                       </div>
@@ -391,13 +391,13 @@ export default function Home() {
                 FEDERAL DEPLOYMENT READY
               </Badge>
               <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-bold text-white mb-8 leading-tight">
-                Five Revolutionary<br />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-500">CyberSecured AI's</span><br />
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-cyan-400 to-blue-500">
-                  ORCA AI Systems
+                  Five ORCA Systems
                 </span>
               </h1>
               <p className="text-xl md:text-2xl text-gray-200 max-w-5xl mx-auto mb-12 leading-relaxed">
-                Production-ready federal-grade cybersecurity with genetic AI evolution, holographic interfaces, 
+                CyberSecured AI's production-ready federal-grade ORCA cybersecurity platform featuring genetic AI evolution, holographic interfaces, 
                 autonomous drone coordination, and real-time geospatial intelligence
               </p>
               
