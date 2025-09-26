@@ -291,13 +291,205 @@ export default function Solutions() {
           </div>
         </section>
 
-        {/* POD Intelligence Solutions Portfolio */}
+        {/* ORCA Solution Offerings */}
         <section className="py-20 px-6 bg-gradient-to-br from-midnight-900 via-spring-900/30 to-midnight-900">
           <div className="container mx-auto max-w-7xl">
+            
+            {/* ORCA Complete Platform Solution */}
+            <div className="text-center mb-20">
+              <Badge className="mb-8 bg-spring-500/20 text-spring-300 border-spring-500/30 text-xl px-8 py-4 flex items-center justify-center w-fit mx-auto">
+                <img src={orcaLogoImg} alt="ORCA" className="h-6 w-6 mr-3" />
+                ORCA CYBERSECURITY SOLUTIONS
+              </Badge>
+              <h2 className="text-5xl md:text-7xl font-bold text-white mb-8 leading-tight">
+                Choose Your<br />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-spring-400 via-cyan-400 to-blue-500">
+                  ORCA Solution
+                </span>
+              </h2>
+              <p className="text-xl md:text-2xl text-gray-200 max-w-5xl mx-auto mb-12 leading-relaxed">
+                Deploy ORCA as a complete cybersecurity platform or select individual POD Intelligence systems 
+                tailored to your organization's specific needs.
+              </p>
+            </div>
+
+            {/* ORCA Solution Options Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-20">
+              
+              {/* ORCA Complete Platform */}
+              <Card className="bg-gradient-to-br from-spring-900/50 to-cyan-900/50 border-4 border-spring-500/50 hover:scale-105 transition-all duration-500 group relative">
+                <div className="absolute top-4 right-4">
+                  <Badge className="bg-spring-500 text-white font-bold">RECOMMENDED</Badge>
+                </div>
+                <CardContent className="p-10">
+                  <div className="flex items-center mb-8">
+                    <img src={orcaLogoImg} alt="ORCA Complete" className="w-16 h-16 mr-6" />
+                    <div>
+                      <h3 className="text-3xl font-bold text-white">ORCA Complete Platform</h3>
+                      <p className="text-lg text-spring-300">Full POD Intelligence Ecosystem</p>
+                    </div>
+                  </div>
+                  
+                  <p className="text-gray-200 text-lg mb-8 leading-relaxed">
+                    The comprehensive cybersecurity solution integrating all five POD Intelligence systems: 
+                    APEX genetic AI, ECHO holographic interfaces, PULSE location intelligence, SURGE autonomous defense, 
+                    and FLOW operations automation.
+                  </p>
+
+                  <div className="space-y-4 mb-8">
+                    <h4 className="text-xl font-bold text-white">Complete Platform Includes:</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      <div className="flex items-center space-x-3">
+                        <img src={apexLogoImg} alt="APEX" className="w-6 h-6" />
+                        <span className="text-purple-300 text-sm">APEX Genetic AI</span>
+                      </div>
+                      <div className="flex items-center space-x-3">
+                        <img src={echoLogoImg} alt="ECHO" className="w-6 h-6" />
+                        <span className="text-cyan-300 text-sm">ECHO Holographic</span>
+                      </div>
+                      <div className="flex items-center space-x-3">
+                        <Enhanced4DTargetIcon className="w-6 h-6 text-green-400" size={24} />
+                        <span className="text-green-300 text-sm">PULSE Location Intelligence</span>
+                      </div>
+                      <div className="flex items-center space-x-3">
+                        <Enhanced4DZapIcon className="w-6 h-6 text-orange-400" size={24} />
+                        <span className="text-orange-300 text-sm">SURGE Autonomous Defense</span>
+                      </div>
+                      <div className="flex items-center space-x-3">
+                        <Enhanced4DActivityIcon className="w-6 h-6 text-blue-400" size={24} />
+                        <span className="text-blue-300 text-sm">FLOW Operations Automation</span>
+                      </div>
+                      <div className="flex items-center space-x-3">
+                        <Enhanced4DCheckCircleIcon className="w-6 h-6 text-spring-400" size={24} />
+                        <span className="text-spring-300 text-sm">Unified Integration Platform</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                    <div className="bg-black/30 rounded-lg p-3 text-center border border-spring-500/30">
+                      <div className="text-lg font-bold text-spring-400 mb-1">99.2%</div>
+                      <div className="text-xs text-spring-300">Combined Accuracy</div>
+                    </div>
+                    <div className="bg-black/30 rounded-lg p-3 text-center border border-spring-500/30">
+                      <div className="text-lg font-bold text-spring-400 mb-1">5</div>
+                      <div className="text-xs text-spring-300">AI Systems</div>
+                    </div>
+                    <div className="bg-black/30 rounded-lg p-3 text-center border border-spring-500/30">
+                      <div className="text-lg font-bold text-spring-400 mb-1">24/7</div>
+                      <div className="text-xs text-spring-300">Protection</div>
+                    </div>
+                    <div className="bg-black/30 rounded-lg p-3 text-center border border-spring-500/30">
+                      <div className="text-lg font-bold text-spring-400 mb-1">Federal</div>
+                      <div className="text-xs text-spring-300">Grade</div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-3">
+                    <Button 
+                      className="w-full bg-gradient-to-r from-spring-500 to-cyan-500 hover:from-spring-600 hover:to-cyan-600 text-white font-bold py-4 text-lg" 
+                      data-testid="button-orca-complete-platform"
+                      onClick={() => { window.location.href = '/contact'; setTimeout(() => window.scrollTo(0, 0), 100); }}
+                    >
+                      Deploy ORCA Complete Platform
+                      <Enhanced4DArrowRightIcon className="ml-2 w-5 h-5" size={20} />
+                    </Button>
+                    <Button 
+                      className="w-full group-hover:bg-spring-500 transition-colors" 
+                      data-testid="button-orca-platform-demo"
+                      onClick={() => { window.location.href = '/contact'; setTimeout(() => window.scrollTo(0, 0), 100); }}
+                    >
+                      Schedule Platform Demo
+                      <Enhanced4DExternalLinkIcon className="ml-2 w-4 h-4" size={16} />
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Individual ORCA Solutions */}
+              <Card className="bg-gradient-to-br from-slate-900/50 to-midnight-900/50 border-2 border-cyan-500/50 hover:scale-105 transition-all duration-500 group">
+                <CardContent className="p-10">
+                  <div className="flex items-center mb-8">
+                    <Enhanced4DServerIcon className="w-16 h-16 text-cyan-400 mr-6" size={64} />
+                    <div>
+                      <h3 className="text-3xl font-bold text-white">Individual ORCA Solutions</h3>
+                      <p className="text-lg text-cyan-300">Modular POD Intelligence Systems</p>
+                    </div>
+                  </div>
+                  
+                  <p className="text-gray-200 text-lg mb-8 leading-relaxed">
+                    Deploy specific POD Intelligence systems independently based on your immediate security needs. 
+                    Each system integrates seamlessly and can be expanded to the complete platform later.
+                  </p>
+
+                  <div className="space-y-4 mb-8">
+                    <h4 className="text-xl font-bold text-white">Available Individual Solutions:</h4>
+                    <div className="space-y-3">
+                      <div className="bg-black/30 rounded-lg p-4 border border-purple-500/30">
+                        <div className="flex items-center space-x-3 mb-2">
+                          <img src={apexLogoImg} alt="APEX" className="w-8 h-8" />
+                          <span className="font-bold text-purple-300">ORCA APEX Solution</span>
+                        </div>
+                        <p className="text-sm text-gray-400">Self-evolving genetic AI for threat detection</p>
+                      </div>
+                      <div className="bg-black/30 rounded-lg p-4 border border-cyan-500/30">
+                        <div className="flex items-center space-x-3 mb-2">
+                          <img src={echoLogoImg} alt="ECHO" className="w-8 h-8" />
+                          <span className="font-bold text-cyan-300">ORCA ECHO Solution</span>
+                        </div>
+                        <p className="text-sm text-gray-400">5D holographic interfaces with AI avatars</p>
+                      </div>
+                      <div className="bg-black/30 rounded-lg p-4 border border-green-500/30">
+                        <div className="flex items-center space-x-3 mb-2">
+                          <Enhanced4DTargetIcon className="w-8 h-8 text-green-400" size={32} />
+                          <span className="font-bold text-green-300">ORCA PULSE Solution</span>
+                        </div>
+                        <p className="text-sm text-gray-400">Location intelligence and geospatial tracking</p>
+                      </div>
+                      <div className="bg-black/30 rounded-lg p-4 border border-orange-500/30">
+                        <div className="flex items-center space-x-3 mb-2">
+                          <Enhanced4DZapIcon className="w-8 h-8 text-orange-400" size={32} />
+                          <span className="font-bold text-orange-300">ORCA SURGE Solution</span>
+                        </div>
+                        <p className="text-sm text-gray-400">Autonomous defense with drone coordination</p>
+                      </div>
+                      <div className="bg-black/30 rounded-lg p-4 border border-blue-500/30">
+                        <div className="flex items-center space-x-3 mb-2">
+                          <Enhanced4DActivityIcon className="w-8 h-8 text-blue-400" size={32} />
+                          <span className="font-bold text-blue-300">ORCA FLOW Solution</span>
+                        </div>
+                        <p className="text-sm text-gray-400">Operations automation and meeting intelligence</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-3">
+                    <Button 
+                      className="w-full bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white font-bold py-4 text-lg" 
+                      data-testid="button-orca-individual-solutions"
+                      onClick={() => { window.location.href = '/contact'; setTimeout(() => window.scrollTo(0, 0), 100); }}
+                    >
+                      Configure Individual Solutions
+                      <Enhanced4DArrowRightIcon className="ml-2 w-5 h-5" size={20} />
+                    </Button>
+                    <Button 
+                      className="w-full group-hover:bg-cyan-500 transition-colors" 
+                      data-testid="button-orca-solutions-comparison"
+                      onClick={() => { window.location.href = '/contact'; setTimeout(() => window.scrollTo(0, 0), 100); }}
+                    >
+                      Compare Solutions
+                      <Enhanced4DExternalLinkIcon className="ml-2 w-4 h-4" size={16} />
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* POD Intelligence Technical Categories */}
             <div className="text-center mb-16">
               <Badge className="mb-8 bg-spring-500/20 text-spring-300 border-spring-500/30 text-xl px-8 py-4 flex items-center justify-center w-fit mx-auto">
                 <img src={orcaLogoImg} alt="ORCA" className="h-6 w-6 mr-3" />
-                POD INTELLIGENCE SOLUTION CATEGORIES
+                POD INTELLIGENCE TECHNICAL CAPABILITIES
               </Badge>
               <h2 className="text-5xl md:text-7xl font-bold text-white mb-8 leading-tight">
                 Complete POD Intelligence<br />
@@ -898,7 +1090,7 @@ export default function Solutions() {
                     </p>
                     <div className="grid grid-cols-2 gap-4 mt-4">
                       <div className="text-center">
-                        <div className="text-2xl font-bold text-cyan-400">< 30s</div>
+                        <div className="text-2xl font-bold text-cyan-400">&lt; 30s</div>
                         <div className="text-xs text-cyan-300">Response Time</div>
                       </div>
                       <div className="text-center">
