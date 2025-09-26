@@ -53,7 +53,7 @@ import echoLogoImg from "@assets/ECHO_1758557621209.png";
 export default function Solutions() {
   const [, setLocation] = useLocation();
   
-  // POD Intelligence Solution Categories
+  // POD Intelligence Solution Categories with Platform Page Mappings
   const podIntelligenceSolutions = [
     {
       category: "APEX Genetic AI Solutions",
@@ -61,6 +61,7 @@ export default function Solutions() {
       description: "Self-evolving threat detection powered by genetic algorithms",
       color: "border-purple-500/50",
       gradient: "from-purple-900/50 to-slate-800/50",
+      platformLink: "/platform/apex-genetic-ai",
       solutions: [
         {
           title: "Adaptive Threat Evolution",
@@ -85,6 +86,7 @@ export default function Solutions() {
       description: "5D holographic interfaces with live AI avatars",
       color: "border-cyan-500/50",
       gradient: "from-cyan-900/50 to-slate-800/50",
+      platformLink: "/platform/echo-holographic",
       solutions: [
         {
           title: "5D Threat Visualization",
@@ -109,6 +111,7 @@ export default function Solutions() {
       description: "Real-time geospatial threat tracking and prediction",
       color: "border-green-500/50",
       gradient: "from-green-900/50 to-slate-800/50",
+      platformLink: "/platform/pulse-predictive",
       solutions: [
         {
           title: "Geospatial Threat Tracking",
@@ -133,6 +136,7 @@ export default function Solutions() {
       description: "Automated incident response with drone coordination",
       color: "border-orange-500/50",
       gradient: "from-orange-900/50 to-slate-800/50",
+      platformLink: "/platform/surge-unified-response",
       solutions: [
         {
           title: "Drone Swarm Coordination",
@@ -157,6 +161,7 @@ export default function Solutions() {
       description: "Workflow automation with meeting intelligence",
       color: "border-blue-500/50",
       gradient: "from-blue-900/50 to-slate-800/50",
+      platformLink: "/platform/flow-federated-learning",
       solutions: [
         {
           title: "Meeting Intelligence",
@@ -337,8 +342,14 @@ export default function Solutions() {
                       ))}
                     </div>
                     
-                    <div className="mt-6">
-                      <Button className="w-full group-hover:bg-spring-500 transition-colors">
+                    <div className="mt-6 space-y-3">
+                      <Link href={category.platformLink}>
+                        <Button className="w-full bg-gradient-to-r from-spring-500 to-cyan-500 hover:from-spring-600 hover:to-cyan-600 transition-colors" data-testid={`button-platform-${category.category.toLowerCase().replace(/\s+/g, '-')}`}>
+                          Technical Details
+                          <Enhanced4DExternalLinkIcon className="ml-2 w-4 h-4" size={16} />
+                        </Button>
+                      </Link>
+                      <Button className="w-full group-hover:bg-spring-500 transition-colors" data-testid={`button-explore-${category.category.toLowerCase().replace(/\s+/g, '-')}`}>
                         Explore Solutions
                         <Enhanced4DArrowRightIcon className="ml-2 w-4 h-4" size={16} />
                       </Button>
@@ -825,6 +836,503 @@ export default function Solutions() {
                     Executive dashboards provide situational awareness.
                   </p>
                 </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Platform Integration Section */}
+        <section className="py-24 px-6 bg-gradient-to-br from-slate-900 via-purple-900/20 to-slate-900">
+          <div className="container mx-auto max-w-7xl">
+            <div className="text-center mb-20">
+              <Badge className="mb-8 bg-spring-500/20 text-spring-300 border-spring-500/30 text-xl px-8 py-4 flex items-center justify-center w-fit mx-auto">
+                <img src={orcaLogoImg} alt="ORCA" className="h-6 w-6 mr-3" />
+                UNIFIED PLATFORM INTEGRATION
+              </Badge>
+              <h2 className="text-5xl md:text-7xl font-bold text-white mb-8 leading-tight">
+                All POD Intelligence Systems<br />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-spring-400 via-cyan-400 to-purple-500">
+                  Working as One
+                </span>
+              </h2>
+              <p className="text-xl md:text-2xl text-gray-200 max-w-5xl mx-auto mb-12 leading-relaxed">
+                Experience the revolutionary power of APEX, ECHO, PULSE, SURGE, and FLOW working together 
+                on the unified ORCA platform. Cross-system correlation and intelligent automation deliver 
+                unprecedented cybersecurity capabilities.
+              </p>
+            </div>
+
+            {/* Platform Integration Architecture */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center mb-20">
+              <div>
+                <h3 className="text-4xl font-bold text-white mb-8">
+                  Unified Intelligence Architecture
+                </h3>
+                <div className="space-y-6">
+                  <div className="bg-slate-800/60 rounded-lg p-6 border border-spring-500/30">
+                    <div className="flex items-center mb-4">
+                      <Enhanced4DNetworkIcon className="w-8 h-8 text-spring-400 mr-3" size={32} />
+                      <h4 className="text-xl font-semibold text-white">Cross-System Correlation</h4>
+                    </div>
+                    <p className="text-gray-300 mb-4">
+                      All five POD Intelligence systems share real-time threat intelligence, creating 
+                      a unified defense matrix that adapts and responds to threats instantly.
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      <Badge className="bg-purple-500/20 text-purple-300">APEX Genetics</Badge>
+                      <Badge className="bg-cyan-500/20 text-cyan-300">ECHO Holographic</Badge>
+                      <Badge className="bg-green-500/20 text-green-300">PULSE Location</Badge>
+                      <Badge className="bg-orange-500/20 text-orange-300">SURGE Autonomous</Badge>
+                      <Badge className="bg-blue-500/20 text-blue-300">FLOW Operations</Badge>
+                    </div>
+                  </div>
+
+                  <div className="bg-slate-800/60 rounded-lg p-6 border border-cyan-500/30">
+                    <div className="flex items-center mb-4">
+                      <Enhanced4DBrainIcon className="w-8 h-8 text-cyan-400 mr-3" size={32} />
+                      <h4 className="text-xl font-semibold text-white">Intelligent Automation</h4>
+                    </div>
+                    <p className="text-gray-300 mb-4">
+                      Advanced AI orchestration automatically routes threats to the most effective 
+                      response system while maintaining complete situational awareness.
+                    </p>
+                    <div className="grid grid-cols-2 gap-4 mt-4">
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-cyan-400">< 30s</div>
+                        <div className="text-xs text-cyan-300">Response Time</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-cyan-400">99.8%</div>
+                        <div className="text-xs text-cyan-300">Coordination Success</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-slate-800/60 rounded-lg p-6 border border-green-500/30">
+                    <div className="flex items-center mb-4">
+                      <Enhanced4DShieldIcon className="w-8 h-8 text-green-400 mr-3" size={32} />
+                      <h4 className="text-xl font-semibold text-white">Federal-Grade Integration</h4>
+                    </div>
+                    <p className="text-gray-300 mb-4">
+                      Complete platform meets all federal compliance requirements while providing 
+                      seamless integration with existing government and educational infrastructure.
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      <Badge className="bg-green-500/20 text-green-300">FedRAMP</Badge>
+                      <Badge className="bg-green-500/20 text-green-300">FISMA</Badge>
+                      <Badge className="bg-green-500/20 text-green-300">FERPA</Badge>
+                      <Badge className="bg-green-500/20 text-green-300">NIST</Badge>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="relative">
+                <img 
+                  src={platformImg}
+                  alt="ORCA Platform Integration Architecture"
+                  className="w-full rounded-xl border border-spring-500/30 shadow-2xl"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-spring-900/60 to-transparent rounded-xl"></div>
+                <div className="absolute bottom-6 left-6 right-6">
+                  <h4 className="text-xl font-bold text-white mb-2">Unified Command Center</h4>
+                  <p className="text-spring-200 text-sm">All POD Intelligence systems accessible from a single interface</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Platform Benefits Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+              <Card className="bg-gradient-to-br from-purple-900/50 to-slate-800/50 border-2 border-purple-500/50">
+                <CardContent className="p-8">
+                  <div className="flex items-center mb-6">
+                    <img src={apexLogoImg} alt="APEX" className="w-10 h-10 mr-4" />
+                    <div>
+                      <h4 className="text-lg font-bold text-white">APEX Integration</h4>
+                      <p className="text-purple-300 text-sm">Genetic AI Evolution</p>
+                    </div>
+                  </div>
+                  <p className="text-gray-300 text-sm mb-4">
+                    Genetic algorithms continuously evolve threat detection patterns, sharing 
+                    intelligence with all platform systems for comprehensive protection.
+                  </p>
+                  <Link href="/platform/apex-genetic-ai">
+                    <Button size="sm" className="w-full bg-purple-600 hover:bg-purple-700" data-testid="button-apex-platform">
+                      Explore APEX Platform
+                      <Enhanced4DExternalLinkIcon className="ml-2 w-4 h-4" size={16} />
+                    </Button>
+                  </Link>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-gradient-to-br from-cyan-900/50 to-slate-800/50 border-2 border-cyan-500/50">
+                <CardContent className="p-8">
+                  <div className="flex items-center mb-6">
+                    <img src={echoLogoImg} alt="ECHO" className="w-10 h-10 mr-4" />
+                    <div>
+                      <h4 className="text-lg font-bold text-white">ECHO Integration</h4>
+                      <p className="text-cyan-300 text-sm">5D Holographic Interface</p>
+                    </div>
+                  </div>
+                  <p className="text-gray-300 text-sm mb-4">
+                    Immersive 5D visualization with live AI avatars provides intuitive access 
+                    to all platform capabilities with natural language interaction.
+                  </p>
+                  <Link href="/platform/echo-holographic">
+                    <Button size="sm" className="w-full bg-cyan-600 hover:bg-cyan-700" data-testid="button-echo-platform">
+                      Explore ECHO Platform
+                      <Enhanced4DExternalLinkIcon className="ml-2 w-4 h-4" size={16} />
+                    </Button>
+                  </Link>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-gradient-to-br from-green-900/50 to-slate-800/50 border-2 border-green-500/50">
+                <CardContent className="p-8">
+                  <div className="flex items-center mb-6">
+                    <Enhanced4DTargetIcon className="w-10 h-10 text-green-400 mr-4" size={40} />
+                    <div>
+                      <h4 className="text-lg font-bold text-white">PULSE Integration</h4>
+                      <p className="text-green-300 text-sm">Location Intelligence</p>
+                    </div>
+                  </div>
+                  <p className="text-gray-300 text-sm mb-4">
+                    Real-time geospatial tracking provides location context for all platform 
+                    systems, enabling coordinated physical and digital security responses.
+                  </p>
+                  <Link href="/platform/pulse-predictive">
+                    <Button size="sm" className="w-full bg-green-600 hover:bg-green-700" data-testid="button-pulse-platform">
+                      Explore PULSE Platform
+                      <Enhanced4DExternalLinkIcon className="ml-2 w-4 h-4" size={16} />
+                    </Button>
+                  </Link>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Call-to-Action */}
+            <div className="text-center">
+              <h3 className="text-3xl font-bold text-white mb-6">
+                Experience the Complete ORCA Platform
+              </h3>
+              <p className="text-xl text-gray-300 mb-8 max-w-3xl mx-auto">
+                See how all five POD Intelligence systems work together to provide 
+                the most comprehensive cybersecurity solution available.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Link href="/platform">
+                  <Button size="lg" className="button-4d px-10 py-4" data-testid="button-platform-overview">
+                    <Enhanced4DServerIcon className="mr-2 w-5 h-5" size={20} />
+                    Platform Overview
+                  </Button>
+                </Link>
+                <Button 
+                  size="lg" 
+                  className="button-4d px-10 py-4"
+                  onClick={() => { window.location.href = '/contact'; setTimeout(() => window.scrollTo(0, 0), 100); }}
+                  data-testid="button-schedule-demo"
+                >
+                  Schedule Integration Demo
+                  <Enhanced4DArrowRightIcon className="ml-2 w-5 h-5" size={20} />
+                </Button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Technical Specifications Section */}
+        <section className="py-24 px-6 bg-gradient-to-br from-slate-800 via-purple-800/20 to-slate-800">
+          <div className="container mx-auto max-w-7xl">
+            <div className="text-center mb-20">
+              <Badge className="mb-8 bg-purple-500/20 text-purple-300 border-purple-500/30 text-xl px-8 py-4">
+                TECHNICAL SPECIFICATIONS
+              </Badge>
+              <h2 className="text-5xl md:text-7xl font-bold text-white mb-8 leading-tight">
+                Platform Technical<br />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-cyan-400 to-green-500">
+                  Architecture
+                </span>
+              </h2>
+              <p className="text-xl md:text-2xl text-gray-200 max-w-5xl mx-auto mb-12 leading-relaxed">
+                Deep dive into the technical capabilities powering each POD Intelligence system. 
+                From genetic algorithms to holographic interfaces, explore the cutting-edge technology 
+                behind the ORCA platform.
+              </p>
+            </div>
+
+            {/* Technical Specs Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-20">
+              {/* APEX Technical Specs */}
+              <Card className="bg-gradient-to-br from-purple-900/50 to-slate-800/50 border-2 border-purple-500/50">
+                <CardHeader className="p-8">
+                  <div className="flex items-center mb-6">
+                    <img src={apexLogoImg} alt="APEX" className="w-12 h-12 mr-4" />
+                    <div>
+                      <h3 className="text-2xl font-bold text-white">APEX Genetic AI</h3>
+                      <p className="text-purple-300">Self-Evolving Threat Detection</p>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="p-8 pt-0">
+                  <div className="space-y-6">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="bg-black/30 rounded-lg p-4 text-center">
+                        <div className="text-2xl font-bold text-purple-400 mb-1">PyTorch</div>
+                        <div className="text-xs text-purple-300">ML Framework</div>
+                      </div>
+                      <div className="bg-black/30 rounded-lg p-4 text-center">
+                        <div className="text-2xl font-bold text-purple-400 mb-1">DEAP</div>
+                        <div className="text-xs text-purple-300">Genetic Algorithms</div>
+                      </div>
+                      <div className="bg-black/30 rounded-lg p-4 text-center">
+                        <div className="text-2xl font-bold text-purple-400 mb-1">NAS</div>
+                        <div className="text-xs text-purple-300">Neural Architecture</div>
+                      </div>
+                      <div className="bg-black/30 rounded-lg p-4 text-center">
+                        <div className="text-2xl font-bold text-purple-400 mb-1">99.2%</div>
+                        <div className="text-xs text-purple-300">Detection Rate</div>
+                      </div>
+                    </div>
+                    <ul className="space-y-2 text-sm text-gray-300">
+                      <li>• Multi-generational learning algorithms</li>
+                      <li>• Federated genetic optimization</li>
+                      <li>• FERPA/FISMA compliance genetics</li>
+                      <li>• Autonomous policy generation</li>
+                    </ul>
+                    <Link href="/platform/apex-genetic-ai">
+                      <Button className="w-full bg-purple-600 hover:bg-purple-700" data-testid="button-apex-technical">
+                        View APEX Technical Details
+                        <Enhanced4DExternalLinkIcon className="ml-2 w-4 h-4" size={16} />
+                      </Button>
+                    </Link>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* ECHO Technical Specs */}
+              <Card className="bg-gradient-to-br from-cyan-900/50 to-slate-800/50 border-2 border-cyan-500/50">
+                <CardHeader className="p-8">
+                  <div className="flex items-center mb-6">
+                    <img src={echoLogoImg} alt="ECHO" className="w-12 h-12 mr-4" />
+                    <div>
+                      <h3 className="text-2xl font-bold text-white">ECHO Holographic</h3>
+                      <p className="text-cyan-300">5D Interface with Live Avatars</p>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="p-8 pt-0">
+                  <div className="space-y-6">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="bg-black/30 rounded-lg p-4 text-center">
+                        <div className="text-2xl font-bold text-cyan-400 mb-1">Three.js</div>
+                        <div className="text-xs text-cyan-300">3D Rendering</div>
+                      </div>
+                      <div className="bg-black/30 rounded-lg p-4 text-center">
+                        <div className="text-2xl font-bold text-cyan-400 mb-1">WebGL</div>
+                        <div className="text-xs text-cyan-300">GPU Acceleration</div>
+                      </div>
+                      <div className="bg-black/30 rounded-lg p-4 text-center">
+                        <div className="text-2xl font-bold text-cyan-400 mb-1">NLP</div>
+                        <div className="text-xs text-cyan-300">Natural Language</div>
+                      </div>
+                      <div className="bg-black/30 rounded-lg p-4 text-center">
+                        <div className="text-2xl font-bold text-cyan-400 mb-1">5D</div>
+                        <div className="text-xs text-cyan-300">Dimensions</div>
+                      </div>
+                    </div>
+                    <ul className="space-y-2 text-sm text-gray-300">
+                      <li>• Live facial expression avatars</li>
+                      <li>• Spatial computing interface</li>
+                      <li>• Voice-activated holographic controls</li>
+                      <li>• Real-time data projection</li>
+                    </ul>
+                    <Link href="/platform/echo-holographic">
+                      <Button className="w-full bg-cyan-600 hover:bg-cyan-700" data-testid="button-echo-technical">
+                        View ECHO Technical Details
+                        <Enhanced4DExternalLinkIcon className="ml-2 w-4 h-4" size={16} />
+                      </Button>
+                    </Link>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* PULSE Technical Specs */}
+              <Card className="bg-gradient-to-br from-green-900/50 to-slate-800/50 border-2 border-green-500/50">
+                <CardHeader className="p-8">
+                  <div className="flex items-center mb-6">
+                    <Enhanced4DTargetIcon className="w-12 h-12 text-green-400 mr-4" size={48} />
+                    <div>
+                      <h3 className="text-2xl font-bold text-white">PULSE Location Intelligence</h3>
+                      <p className="text-green-300">Geospatial Threat Tracking</p>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="p-8 pt-0">
+                  <div className="space-y-6">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="bg-black/30 rounded-lg p-4 text-center">
+                        <div className="text-2xl font-bold text-green-400 mb-1">GIS</div>
+                        <div className="text-xs text-green-300">Geographic Systems</div>
+                      </div>
+                      <div className="bg-black/30 rounded-lg p-4 text-center">
+                        <div className="text-2xl font-bold text-green-400 mb-1">GPS</div>
+                        <div className="text-xs text-green-300">Real-time Tracking</div>
+                      </div>
+                      <div className="bg-black/30 rounded-lg p-4 text-center">
+                        <div className="text-2xl font-bold text-green-400 mb-1">ML</div>
+                        <div className="text-xs text-green-300">Predictive Analytics</div>
+                      </div>
+                      <div className="bg-black/30 rounded-lg p-4 text-center">
+                        <div className="text-2xl font-bold text-green-400 mb-1">15s</div>
+                        <div className="text-xs text-green-300">Response Time</div>
+                      </div>
+                    </div>
+                    <ul className="space-y-2 text-sm text-gray-300">
+                      <li>• Global asset movement tracking</li>
+                      <li>• Geospatial threat correlation</li>
+                      <li>• Campus security integration</li>
+                      <li>• Risk zone prediction</li>
+                    </ul>
+                    <Link href="/platform/pulse-predictive">
+                      <Button className="w-full bg-green-600 hover:bg-green-700" data-testid="button-pulse-technical">
+                        View PULSE Technical Details
+                        <Enhanced4DExternalLinkIcon className="ml-2 w-4 h-4" size={16} />
+                      </Button>
+                    </Link>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* SURGE Technical Specs */}
+              <Card className="bg-gradient-to-br from-orange-900/50 to-slate-800/50 border-2 border-orange-500/50">
+                <CardHeader className="p-8">
+                  <div className="flex items-center mb-6">
+                    <Enhanced4DZapIcon className="w-12 h-12 text-orange-400 mr-4" size={48} />
+                    <div>
+                      <h3 className="text-2xl font-bold text-white">SURGE Autonomous Defense</h3>
+                      <p className="text-orange-300">Drone Swarm Coordination</p>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="p-8 pt-0">
+                  <div className="space-y-6">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="bg-black/30 rounded-lg p-4 text-center">
+                        <div className="text-2xl font-bold text-orange-400 mb-1">AI</div>
+                        <div className="text-xs text-orange-300">Swarm Intelligence</div>
+                      </div>
+                      <div className="bg-black/30 rounded-lg p-4 text-center">
+                        <div className="text-2xl font-bold text-orange-400 mb-1">IoT</div>
+                        <div className="text-xs text-orange-300">Device Networks</div>
+                      </div>
+                      <div className="bg-black/30 rounded-lg p-4 text-center">
+                        <div className="text-2xl font-bold text-orange-400 mb-1">ROS</div>
+                        <div className="text-xs text-orange-300">Robot Operating</div>
+                      </div>
+                      <div className="bg-black/30 rounded-lg p-4 text-center">
+                        <div className="text-2xl font-bold text-orange-400 mb-1">8m</div>
+                        <div className="text-xs text-orange-300">Response Time</div>
+                      </div>
+                    </div>
+                    <ul className="space-y-2 text-sm text-gray-300">
+                      <li>• Autonomous drone coordination</li>
+                      <li>• Strategic defense generation</li>
+                      <li>• Cyber-physical security</li>
+                      <li>• Critical infrastructure protection</li>
+                    </ul>
+                    <Link href="/platform/surge-unified-response">
+                      <Button className="w-full bg-orange-600 hover:bg-orange-700" data-testid="button-surge-technical">
+                        View SURGE Technical Details
+                        <Enhanced4DExternalLinkIcon className="ml-2 w-4 h-4" size={16} />
+                      </Button>
+                    </Link>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* FLOW Technical Specs */}
+            <div className="max-w-4xl mx-auto mb-16">
+              <Card className="bg-gradient-to-br from-blue-900/50 to-slate-800/50 border-2 border-blue-500/50">
+                <CardHeader className="p-8">
+                  <div className="flex items-center justify-center mb-6">
+                    <Enhanced4DActivityIcon className="w-12 h-12 text-blue-400 mr-4" size={48} />
+                    <div className="text-center">
+                      <h3 className="text-2xl font-bold text-white">FLOW Operations Automation</h3>
+                      <p className="text-blue-300">Federated Learning & Meeting Intelligence</p>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="p-8 pt-0">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="bg-black/30 rounded-lg p-4 text-center">
+                          <div className="text-2xl font-bold text-blue-400 mb-1">TensorFlow</div>
+                          <div className="text-xs text-blue-300">Federated Learning</div>
+                        </div>
+                        <div className="bg-black/30 rounded-lg p-4 text-center">
+                          <div className="text-2xl font-bold text-blue-400 mb-1">WebRTC</div>
+                          <div className="text-xs text-blue-300">Meeting Capture</div>
+                        </div>
+                        <div className="bg-black/30 rounded-lg p-4 text-center">
+                          <div className="text-2xl font-bold text-blue-400 mb-1">NLP</div>
+                          <div className="text-xs text-blue-300">Text Processing</div>
+                        </div>
+                        <div className="bg-black/30 rounded-lg p-4 text-center">
+                          <div className="text-2xl font-bold text-blue-400 mb-1">87%</div>
+                          <div className="text-xs text-blue-300">Automation Rate</div>
+                        </div>
+                      </div>
+                    </div>
+                    <div>
+                      <ul className="space-y-2 text-sm text-gray-300">
+                        <li>• Multi-platform meeting integration</li>
+                        <li>• Automated workflow optimization</li>
+                        <li>• Cross-organizational learning</li>
+                        <li>• Intelligent resource allocation</li>
+                        <li>• Predictive scheduling systems</li>
+                        <li>• Knowledge retention algorithms</li>
+                      </ul>
+                    </div>
+                  </div>
+                  <div className="mt-6">
+                    <Link href="/platform/flow-federated-learning">
+                      <Button className="w-full bg-blue-600 hover:bg-blue-700" data-testid="button-flow-technical">
+                        View FLOW Technical Details
+                        <Enhanced4DExternalLinkIcon className="ml-2 w-4 h-4" size={16} />
+                      </Button>
+                    </Link>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Platform Access CTA */}
+            <div className="text-center">
+              <h3 className="text-4xl font-bold text-white mb-6">
+                Explore Complete Technical Documentation
+              </h3>
+              <p className="text-xl text-gray-300 mb-8 max-w-3xl mx-auto">
+                Access detailed technical specifications, API documentation, and integration guides 
+                for each POD Intelligence system on the ORCA platform.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Link href="/platform">
+                  <Button size="lg" className="button-4d px-10 py-4" data-testid="button-technical-docs">
+                    <Enhanced4DFileIcon className="mr-2 w-5 h-5" size={20} />
+                    Technical Documentation
+                  </Button>
+                </Link>
+                <Button 
+                  size="lg" 
+                  className="button-4d px-10 py-4"
+                  onClick={() => { window.location.href = '/contact'; setTimeout(() => window.scrollTo(0, 0), 100); }}
+                  data-testid="button-technical-consultation"
+                >
+                  Technical Consultation
+                  <Enhanced4DArrowRightIcon className="ml-2 w-5 h-5" size={20} />
+                </Button>
               </div>
             </div>
           </div>
