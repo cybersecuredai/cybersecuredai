@@ -22,12 +22,20 @@ phases:
           IMAGE_TAG="cb-$(date +%Y%m%d%H%M%S)"
         fi
       - echo "Using IMAGE_TAG=$IMAGE_TAG"
+
   build:
     commands:
       - echo "Building Docker image..."
+      # Option A: build from the directory that contains Dockerfile
+      - cd services/orca-router
       - docker build -t "$REPO_NAME:$IMAGE_TAG" .
+      # Option B (use this instead of cd if you prefer): build from repo root with explicit Dockerfile and context
+      # - docker build -f services/orca-router/Dockerfile -t "$REPO_NAME:$IMAGE_TAG" services/orca-router
+
+      # Tag for ECR so push finds the image
       - docker tag "$REPO_NAME:$IMAGE_TAG" "$ECR_REPO:$IMAGE_TAG"
       - docker tag "$REPO_NAME:$IMAGE_TAG" "$ECR_REPO:latest"
+
   post_build:
     commands:
       - echo "Pushing to ECR..."
