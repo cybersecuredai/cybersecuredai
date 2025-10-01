@@ -1,0 +1,40 @@
+version: 0.2
+
+env:
+  variables:
+    AWS_REGION: "us-gov-west-1"
+    ACCOUNT_ID: "465947697623"
+    REPO_NAME: "orca-router"
+  git-credential-helper: yes
+
+phases:
+  pre_build:
+    commands:
+      - echo "Logging into ECR in $AWS_REGION for $ACCOUNT_ID"
+      - aws --version
+      - aws ecr get-login-password --region "$AWS_REGION" | docker login --username AWS --password-stdin "$ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com"
+      - export ECR_REPO="$ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$REPO_NAME"
+      # IMAGE_TAG = short SHA if available, else timestamp
+      - |
+        if [ -d .git ] && command -v git >/dev/null 2>&1; then
+          IMAGE_TAG="$(git rev-parse --short HEAD)"
+        else
+          IMAGE_TAG="cb-$(date +%Y%m%d%H%M%S)"
+        fi
+      - echo "Using IMAGE_TAG=$IMAGE_TAG"
+  build:
+    commands:
+      - echo "Building Docker image..."
+      - docker build -t "$REPO_NAME:$IMAGE_TAG" .
+      - docker tag "$REPO_NAME:$IMAGE_TAG" "$ECR_REPO:$IMAGE_TAG"
+      - docker tag "$REPO_NAME:$IMAGE_TAG" "$ECR_REPO:latest"
+  post_build:
+    commands:
+      - echo "Pushing to ECR..."
+      - docker push "$ECR_REPO:$IMAGE_TAG"
+      - docker push "$ECR_REPO:latest"
+
+artifacts:
+  files:
+    - "**/*"
+  discard-paths: yes
