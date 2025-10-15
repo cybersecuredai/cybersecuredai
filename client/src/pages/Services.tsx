@@ -29,7 +29,6 @@ import {
   Enhanced4DArrowRightIcon,
   Enhanced4DExternalLinkIcon,
   Enhanced4DBuildingIcon,
-  Enhanced4DSettingsIcon,
   Enhanced4DStarIcon
 } from "@/components/LazyCustomIcons";
 import { 
@@ -50,9 +49,168 @@ import managedServicesImg from "@assets/generated_images/SOC_Dashboard_Managemen
 import professionalImg from "@assets/generated_images/Client_Success_Story_e83fb121.jpg";
 import supportImg from "@assets/generated_images/Success_Kit_Collection_aad5a657.jpg";
 
+// POD Intelligence System Logos
+import orcaLogoImg from "@assets/ORCA logo_1758558742074.png";
+import apexLogoImg from "@assets/APEX logo_1758557596082.png";
+import echoLogoImg from "@assets/ECHO_1758557621209.png";
+
 export default function Services() {
   const [selectedCategory, setSelectedCategory] = useState("managed");
   const [protectionLevel, setProtectionLevel] = useState("education");
+
+  // POD Intelligence Service Categories
+  const podIntelligenceServices = [
+    {
+      category: "APEX Genetic AI Services",
+      icon: <img src={apexLogoImg} alt="APEX" className="w-10 h-10" />,
+      description: "Self-evolving AI security services powered by genetic algorithms",
+      color: "border-purple-500/50",
+      gradient: "from-purple-900/50 to-slate-800/50",
+      services: [
+        {
+          title: "Genetic Algorithm Implementation",
+          description: "Deploy self-evolving threat detection with 99.2% accuracy",
+          deliverables: ["Custom genetic models", "PyTorch integration", "DEAP framework setup", "Performance monitoring"],
+          timeline: "4-6 weeks",
+          price: "$25,000 - $75,000"
+        },
+        {
+          title: "Multi-Generational Learning Setup",
+          description: "Knowledge inheritance across threat detection generations",
+          deliverables: ["Learning architecture", "Knowledge transfer protocols", "Generational analytics", "Continuous evolution"],
+          timeline: "6-8 weeks",
+          price: "$35,000 - $85,000"
+        },
+        {
+          title: "Compliance Genetics Consulting",
+          description: "FERPA/FISMA-optimized genetic algorithm adaptation",
+          deliverables: ["Regulatory compliance", "Policy enforcement", "Audit trails", "Sector-specific tuning"],
+          timeline: "3-5 weeks",
+          price: "$20,000 - $50,000"
+        }
+      ]
+    },
+    {
+      category: "ECHO Holographic Services",
+      icon: <img src={echoLogoImg} alt="ECHO" className="w-10 h-10" />,
+      description: "5D holographic interface deployment and AI avatar integration",
+      color: "border-cyan-500/50",
+      gradient: "from-cyan-900/50 to-slate-800/50",
+      services: [
+        {
+          title: "5D Visualization Deployment",
+          description: "Immersive security operations center setup with spatial computing",
+          deliverables: ["Holographic hardware", "Spatial computing setup", "WebGL integration", "Training programs"],
+          timeline: "8-12 weeks",
+          price: "$50,000 - $150,000"
+        },
+        {
+          title: "AI Avatar Implementation",
+          description: "Live human-like avatars for security communications",
+          deliverables: ["Avatar customization", "NLP integration", "Facial expression engine", "Voice synthesis"],
+          timeline: "6-10 weeks",
+          price: "$40,000 - $120,000"
+        },
+        {
+          title: "Interactive SOC Consulting",
+          description: "Virtual security operations center experience design",
+          deliverables: ["Virtual collaboration", "Remote access", "Immersive training", "Real-time briefings"],
+          timeline: "4-8 weeks",
+          price: "$30,000 - $80,000"
+        }
+      ]
+    },
+    {
+      category: "PULSE Location Intelligence",
+      icon: <Enhanced4DTargetIcon className="w-10 h-10 text-green-400" size={40} />,
+      description: "Real-time geospatial threat tracking and location-based security",
+      color: "border-green-500/50",
+      gradient: "from-green-900/50 to-slate-800/50",
+      services: [
+        {
+          title: "Geospatial Threat Monitoring",
+          description: "Global threat location tracking and prediction with 98.7% accuracy",
+          deliverables: ["Real-time tracking", "Threat mapping", "Location analytics", "Global coverage"],
+          timeline: "3-6 weeks",
+          price: "$20,000 - $60,000"
+        },
+        {
+          title: "Campus Security Integration",
+          description: "Physical and digital security convergence for educational institutions",
+          deliverables: ["Access control", "Emergency response", "Perimeter monitoring", "Unified dashboards"],
+          timeline: "6-10 weeks",
+          price: "$35,000 - $95,000"
+        },
+        {
+          title: "Predictive Location Services",
+          description: "AI-powered location-based risk assessment and prevention",
+          deliverables: ["Risk zone mapping", "Predictive analytics", "Geofencing setup", "Mobile integration"],
+          timeline: "4-7 weeks",
+          price: "$25,000 - $70,000"
+        }
+      ]
+    },
+    {
+      category: "SURGE Autonomous Defense",
+      icon: <Enhanced4DZapIcon className="w-10 h-10 text-orange-400" size={40} />,
+      description: "Automated incident response and drone swarm coordination",
+      color: "border-orange-500/50",
+      gradient: "from-orange-900/50 to-slate-800/50",
+      services: [
+        {
+          title: "Drone Swarm Implementation",
+          description: "Autonomous drone networks for physical security with 8-minute response",
+          deliverables: ["Drone deployment", "Swarm coordination", "AI navigation", "Response protocols"],
+          timeline: "10-16 weeks",
+          price: "$75,000 - $200,000"
+        },
+        {
+          title: "Automated Response Systems",
+          description: "AI-driven threat containment with 99.1% containment rate",
+          deliverables: ["Response automation", "Threat containment", "Multi-vector defense", "Emergency protocols"],
+          timeline: "8-12 weeks",
+          price: "$50,000 - $150,000"
+        },
+        {
+          title: "Strategic Defense Consulting",
+          description: "Dynamic defense pattern generation and deployment strategies",
+          deliverables: ["Defense strategies", "Pattern generation", "Resource optimization", "Tactical planning"],
+          timeline: "6-10 weeks",
+          price: "$40,000 - $100,000"
+        }
+      ]
+    },
+    {
+      category: "FLOW Operations Services",
+      icon: <Enhanced4DActivityIcon className="w-10 h-10 text-blue-400" size={40} />,
+      description: "Workflow automation and meeting intelligence services",
+      color: "border-blue-500/50",
+      gradient: "from-blue-900/50 to-slate-800/50",
+      services: [
+        {
+          title: "Meeting Intelligence Setup",
+          description: "Multi-platform meeting automation with 68% productivity gains",
+          deliverables: ["Platform integration", "Transcription services", "Analytics dashboards", "Speaker recognition"],
+          timeline: "2-4 weeks",
+          price: "$15,000 - $40,000"
+        },
+        {
+          title: "Workflow Automation Consulting",
+          description: "AI-powered process optimization with 87% automation rate",
+          deliverables: ["Process mapping", "Automation scripts", "Workflow optimization", "Performance tracking"],
+          timeline: "4-8 weeks",
+          price: "$25,000 - $75,000"
+        },
+        {
+          title: "Federated Learning Implementation",
+          description: "Cross-organizational knowledge sharing with 92% retention",
+          deliverables: ["Knowledge networks", "Learning protocols", "Collaborative systems", "Data sharing frameworks"],
+          timeline: "6-12 weeks",
+          price: "$40,000 - $110,000"
+        }
+      ]
+    }
+  ];
 
   const enhancedAICapabilities = [
     {
