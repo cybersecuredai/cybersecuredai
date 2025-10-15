@@ -61,8 +61,16 @@ const ThreatIntelligenceDashboard = lazy(() => import("@/pages/ThreatIntelligenc
 const MISPLiveDashboard = lazy(() => import("@/pages/MISPLiveDashboard"));
 const MISPBenefits = lazy(() => import("@/pages/MISPBenefits"));
 const VulnerabilityTrendDashboard = lazy(() => import("@/pages/VulnerabilityTrendDashboard"));
+const PulseDashboard = lazy(() => import("@/pages/PulseDashboard"));
+const LiveLocationDashboard = lazy(() => import("@/pages/LiveLocationDashboard"));
+// Advanced SURGE (Strategic Unified Response Generation Engine) Dashboard - lazy loaded due to heavy 3D/map components
+const SURGEDashboard = lazy(() => import("@/pages/SurgeDashboard"));
 // Heavy 3D visualization component - lazy loaded to reduce initial bundle
 const ThreatMap5D = lazy(() => import("@/pages/ThreatMap5D"));
+// Revolutionary ECHO 5D Holographic AI Interface with Live Avatar - lazy loaded due to heavy dependencies
+const EchoInterface = lazy(() => import("@/pages/EchoInterface"));
+// Public Health Dashboard - comprehensive disease surveillance and outbreak management
+const PublicHealthDashboard = lazy(() => import("@/pages/PublicHealthDashboard"));
 
 // Marketing Website Pages - Lazy loaded
 const Home = lazy(() => import("@/pages/Home"));
@@ -100,6 +108,13 @@ const HigherEducation = lazy(() => import("@/pages/solutions/HigherEducation"));
 const MunicipalGovernment = lazy(() => import("@/pages/solutions/MunicipalGovernment"));
 const FederalAgencies = lazy(() => import("@/pages/solutions/FederalAgencies"));
 
+// POD Intelligence System Pages - Lazy loaded
+const APEXSystem = lazy(() => import("@/pages/APEXSystem"));
+const ECHOSystem = lazy(() => import("@/pages/ECHOSystem"));
+const PULSESystem = lazy(() => import("@/pages/PULSESystem"));
+const SURGESystem = lazy(() => import("@/pages/SURGESystem"));
+const FLOWSystem = lazy(() => import("@/pages/FLOWSystem"));
+
 // Platform Pages - Lazy loaded
 const Platform = lazy(() => import("@/pages/Platform"));
 const AutomatedIncidentResponse = lazy(() => import("@/pages/platform/AutomatedIncidentResponse"));
@@ -115,6 +130,15 @@ const IdentityAccessManagement = lazy(() => import("@/pages/platform/IdentityAcc
 const SystemAdministration = lazy(() => import("@/pages/platform/SystemAdministration"));
 const HardwareSecurityModules = lazy(() => import("@/pages/platform/HardwareSecurityModules"));
 const BiometricAuthentication = lazy(() => import("@/pages/platform/BiometricAuthentication"));
+const APEXGeneticAI = lazy(() => import("@/pages/platform/APEXGeneticAI"));
+const ECHOHolographic = lazy(() => import("@/pages/platform/ECHOHolographic"));
+const PULSELocationIntelligence = lazy(() => import("@/pages/platform/PULSELocationIntelligence"));
+const SURGEAutonomousDefense = lazy(() => import("@/pages/platform/SURGEAutonomousDefense"));
+const FLOWOperationsAutomation = lazy(() => import("@/pages/platform/FLOWOperationsAutomation"));
+const ORCAPlatform = lazy(() => import("@/pages/platform/ORCAPlatform"));
+
+// Catalog Management System - Internal pricing and product management
+const Catalog = lazy(() => import("@/pages/Catalog"));
 const EnhancedThreatIntelligence = lazy(() => import("@/pages/platform/EnhancedThreatIntelligence"));
 const SecurityInfrastructureMonitoring = lazy(() => import("@/pages/platform/SecurityInfrastructureMonitoring"));
 const EnterpriseIAM = lazy(() => import("@/pages/platform/EnterpriseIAM"));
@@ -182,7 +206,12 @@ function Router() {
                           location.startsWith('/training') ||
                           location.startsWith('/threat-') ||
                           location.startsWith('/ai-config') ||
-                          location.startsWith('/support');
+                          location.startsWith('/support') ||
+                          location.startsWith('/pulse-dashboard') ||
+                          location.startsWith('/live-location-dashboard') ||
+                          location.startsWith('/surge-dashboard') ||
+                          location.startsWith('/echo-interface') ||
+                          location.startsWith('/public-health-dashboard');
 
     // Show onboarding if user exists, is on a platform page, and lacks proper auth setup
     if (user && isPlatformPage && !isLoading) {
@@ -270,8 +299,21 @@ function Router() {
       <Route path="/solutions/municipal" component={MunicipalGovernment} />
       <Route path="/solutions/federal" component={FederalAgencies} />
       
+      {/* POD Intelligence System Pages */}
+      <Route path="/pod-intelligence/apex" component={APEXSystem} />
+      <Route path="/pod-intelligence/echo" component={ECHOSystem} />
+      <Route path="/pod-intelligence/pulse" component={PULSESystem} />
+      <Route path="/pod-intelligence/surge" component={SURGESystem} />
+      <Route path="/pod-intelligence/flow" component={FLOWSystem} />
+      
       {/* Platform Pages */}
       <Route path="/platform" component={Platform} />
+      <Route path="/platform/orca" component={ORCAPlatform} />
+      <Route path="/platform/apex-genetic-ai" component={APEXGeneticAI} />
+      <Route path="/platform/echo-holographic" component={ECHOHolographic} />
+      <Route path="/platform/pulse-predictive" component={PULSELocationIntelligence} />
+      <Route path="/platform/surge-unified-response" component={SURGEAutonomousDefense} />
+      <Route path="/platform/flow-federated-learning" component={FLOWOperationsAutomation} />
       <Route path="/platform/automated-incident-response" component={AutomatedIncidentResponse} />
       <Route path="/platform/threat-detection" component={PlatformThreatDetection} />
       <Route path="/platform/predictive-risk-analysis" component={PredictiveRiskAnalysis} />
@@ -329,9 +371,48 @@ function Router() {
           <VulnerabilityTrendDashboard />
         </Layout>
       </Route>
+      <Route path="/pulse-dashboard">
+        <Layout>
+          <PulseDashboard />
+        </Layout>
+      </Route>
+      
+      <Route path="/live-location-dashboard">
+        <Layout>
+          <LiveLocationDashboard />
+        </Layout>
+      </Route>
+      
+      {/* SURGE (Strategic Unified Response Generation Engine) Advanced Dashboard */}
+      <Route path="/surge-dashboard">
+        <Layout>
+          <LazyErrorBoundary>
+            <SURGEDashboard />
+          </LazyErrorBoundary>
+        </Layout>
+      </Route>
+      
       <Route path="/threat-map-5d">
         <Layout>
           <ThreatMap5D />
+        </Layout>
+      </Route>
+      
+      {/* ECHO Revolutionary 3D Holographic AI Interface */}
+      <Route path="/echo-interface">
+        <Layout>
+          <LazyErrorBoundary>
+            <EchoInterface />
+          </LazyErrorBoundary>
+        </Layout>
+      </Route>
+      
+      {/* Public Health Dashboard - Disease Surveillance and Outbreak Management */}
+      <Route path="/public-health-dashboard">
+        <Layout>
+          <LazyErrorBoundary>
+            <PublicHealthDashboard />
+          </LazyErrorBoundary>
         </Layout>
       </Route>
       <Route path="/security-integrations">
@@ -536,6 +617,11 @@ function Router() {
       <Route path="/ai-config">
         <Layout>
           <AIConfiguration />
+        </Layout>
+      </Route>
+      <Route path="/catalog">
+        <Layout>
+          <Catalog />
         </Layout>
       </Route>
       <Route path="/vulnerability-monitoring">
