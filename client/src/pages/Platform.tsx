@@ -42,8 +42,162 @@ import networkSecurityImg from "@assets/generated_images/Network_Security_Demo_f
 import incidentResponseImg from "@assets/generated_images/Automated_Incident_Response_9b65f496.jpg";
 import socDashboardImg from "@assets/generated_images/SOC_Dashboard_Management_23c1af0b.jpg";
 
+// POD Intelligence System Logos
+import orcaLogoImg from "@assets/ORCA logo_1758558742074.png";
+import apexLogoImg from "@assets/APEX logo_1758557596082.png";
+import echoLogoImg from "@assets/ECHO_1758557621209.png";
+
 export default function Platform() {
   const [, setLocation] = useLocation();
+  
+  // POD Intelligence Systems - Five Revolutionary AI Systems
+  const podIntelligenceSystems = [
+    {
+      id: "apex",
+      title: "APEX",
+      fullName: "Advanced Pattern Exchange",
+      description: "Genetic AI Engine with self-evolving threat detection algorithms powered by PyTorch & DEAP",
+      icon: <img src={apexLogoImg} alt="APEX" className="w-10 h-10" />,
+      color: "border-purple-500/50",
+      gradient: "from-purple-900/50 to-slate-800/50",
+      features: [
+        "Genetic Algorithm Engine with PyTorch & DEAP Integration",
+        "Multi-Generational Learning & Knowledge Inheritance",
+        "Autonomous Policy Generation (99.2% accuracy)",
+        "Adaptive Neural Architecture Search (NAS)",
+        "Federated Genetic Learning across environments",
+        "Sector-specific adaptation (FERPA/FISMA genetics)",
+        "Real-time evolution against unknown threats",
+        "Cross-generational threat pattern analysis"
+      ],
+      metrics: [
+        { label: "Detection Accuracy", value: "99.2%", color: "text-purple-400" },
+        { label: "False Positive Reduction", value: "-78%", color: "text-purple-400" },
+        { label: "Threat Response Speed", value: "+65%", color: "text-purple-400" },
+        { label: "Security Gap Reduction", value: "-82%", color: "text-purple-400" }
+      ],
+      technology: "TensorFlow 2.x, PyTorch, DEAP, Neural Architecture Search, Custom Genetic Operators",
+      status: "Fully Operational",
+      compliance: ["FERPA", "FISMA", "NIST"],
+      image: aiThreatImg
+    },
+    {
+      id: "echo",
+      title: "ECHO",
+      fullName: "Enhanced Cybersecurity Holographic Operations",
+      description: "5D Holographic Interface with live human-like avatar for intuitive threat visualization and interaction",
+      icon: <img src={echoLogoImg} alt="ECHO" className="w-10 h-10" />,
+      color: "border-cyan-500/50",
+      gradient: "from-cyan-900/50 to-slate-800/50",
+      features: [
+        "5D Holographic Threat Visualization Environment",
+        "Live Human-like AI Avatar with Natural Language Processing",
+        "Real-time Facial Expression & Gesture Recognition",
+        "Immersive Security Operations Center (SOC) Experience",
+        "Interactive Threat Exploration & Analysis",
+        "Multi-dimensional Data Representation",
+        "Spatial Audio for Threat Severity Indication",
+        "Collaborative Virtual Security Briefings"
+      ],
+      metrics: [
+        { label: "User Engagement", value: "+340%", color: "text-cyan-400" },
+        { label: "Threat Comprehension", value: "+85%", color: "text-cyan-400" },
+        { label: "Response Accuracy", value: "+92%", color: "text-cyan-400" },
+        { label: "Training Efficiency", value: "+150%", color: "text-cyan-400" }
+      ],
+      technology: "WebGL, Three.js, AI Avatar Engine, Spatial Computing, Real-time Rendering",
+      status: "Beta Release",
+      compliance: ["FERPA", "Section 508", "ADA"],
+      image: socDashboardImg
+    },
+    {
+      id: "pulse",
+      title: "PULSE",
+      fullName: "Predictive Universal Learning Security Engine",
+      description: "Location Intelligence with real-time tracking and predictive geospatial threat analysis",
+      icon: <Enhanced4DTargetIcon className="w-10 h-10 text-green-400" size={40} />,
+      color: "border-green-500/50",
+      gradient: "from-green-900/50 to-slate-800/50",
+      features: [
+        "Real-time Global Threat Geolocation Tracking",
+        "Predictive Location-based Risk Assessment",
+        "Multi-source Geographic Intelligence Fusion",
+        "Campus/Facility Physical Security Integration",
+        "Emergency Response Coordination System",
+        "Geofencing for Critical Infrastructure Protection",
+        "Mobile Device Location Analytics",
+        "Weather & Environmental Threat Correlation"
+      ],
+      metrics: [
+        { label: "Location Accuracy", value: "98.7%", color: "text-green-400" },
+        { label: "Prediction Precision", value: "94.3%", color: "text-green-400" },
+        { label: "Response Time", value: "<15s", color: "text-green-400" },
+        { label: "Coverage Area", value: "Global", color: "text-green-400" }
+      ],
+      technology: "GPS/GNSS, GIS Analytics, Machine Learning, Real-time Mapping APIs",
+      status: "Production Ready",
+      compliance: ["FERPA", "CIPA", "Student Privacy"],
+      image: networkSecurityImg
+    },
+    {
+      id: "surge",
+      title: "SURGE",
+      fullName: "Strategic Unified Response Generation Engine",
+      description: "Autonomous Defense with drone swarm coordination and automated incident response",
+      icon: <Enhanced4DZapIcon className="w-10 h-10 text-orange-400" size={40} />,
+      color: "border-orange-500/50",
+      gradient: "from-orange-900/50 to-slate-800/50",
+      features: [
+        "Autonomous Drone Swarm Coordination",
+        "Automated Incident Response & Containment",
+        "Strategic Defense Pattern Generation",
+        "Multi-vector Attack Mitigation",
+        "Coordinated Emergency Response Systems",
+        "Intelligent Resource Allocation",
+        "Threat Neutralization Protocols",
+        "Cross-platform Security Orchestration"
+      ],
+      metrics: [
+        { label: "Response Speed", value: "<8min", color: "text-orange-400" },
+        { label: "Containment Rate", value: "99.1%", color: "text-orange-400" },
+        { label: "Resource Efficiency", value: "+78%", color: "text-orange-400" },
+        { label: "Threat Neutralization", value: "97.8%", color: "text-orange-400" }
+      ],
+      technology: "Drone APIs, IoT Integration, Automated Response Frameworks, ML Orchestration",
+      status: "Advanced Development",
+      compliance: ["FISMA", "NIST", "Federal Security"],
+      image: incidentResponseImg
+    },
+    {
+      id: "flow",
+      title: "FLOW",
+      fullName: "Federated Learning Operations Workflow",
+      description: "Operations automation with meeting intelligence and workflow optimization",
+      icon: <Enhanced4DActivityIcon className="w-10 h-10 text-blue-400" size={40} />,
+      color: "border-blue-500/50",
+      gradient: "from-blue-900/50 to-slate-800/50",
+      features: [
+        "Multi-Platform Meeting Intelligence (Teams, Zoom, Google Meet)",
+        "Automated Workflow Optimization",
+        "Federated Learning across Organizations",
+        "Smart Calendar & Resource Management",
+        "Intelligent Document Processing",
+        "Cross-team Collaboration Enhancement",
+        "Predictive Workload Distribution",
+        "Knowledge Transfer Automation"
+      ],
+      metrics: [
+        { label: "Productivity Gain", value: "+68%", color: "text-blue-400" },
+        { label: "Meeting Efficiency", value: "+45%", color: "text-blue-400" },
+        { label: "Process Automation", value: "87%", color: "text-blue-400" },
+        { label: "Knowledge Retention", value: "+92%", color: "text-blue-400" }
+      ],
+      technology: "Federated Learning, NLP, Workflow Engines, API Orchestration",
+      status: "Production Ready",
+      compliance: ["FERPA", "Privacy Standards", "Data Protection"],
+      image: platformOverviewImg
+    }
+  ];
   
   // Cypher AI Dual Intelligence Models
   const cypherAIModels = [
@@ -240,30 +394,64 @@ export default function Platform() {
     <MarketingLayout>
       <div className="min-h-screen bg-slate-900">
         
-        {/* Bold Hero - Huntress Style */}
-        <section className="relative py-24 px-6 bg-gradient-to-br from-slate-900 via-red-900/20 to-slate-900">
+        {/* Hero Section - ORCA Platform */}
+        <section className="relative py-24 px-6 bg-gradient-to-br from-midnight-900 via-spring-900/20 to-midnight-900">
           <div className="absolute inset-0 bg-grid-white/[0.02]"></div>
           <div className="container mx-auto max-w-7xl relative z-10">
             <div className="text-center mb-20">
-              <Badge className="mb-8 bg-red-500/20 text-red-300 border-red-500/30 text-lg px-6 py-3">
-                Cypher AI Dual Intelligence Platform
-              </Badge>
+              {/* ORCA Platform Branding */}
+              <div className="flex items-center justify-center mb-8">
+                <img src={orcaLogoImg} alt="ORCA Platform" className="h-12 w-auto mr-4" />
+                <Badge className="bg-spring-500/20 text-spring-300 border-spring-500/30 text-lg px-6 py-3">
+                  CyberSecured AI's ORCA Platform
+                </Badge>
+              </div>
               <h1 className="text-6xl md:text-8xl font-bold text-white mb-8 leading-tight">
-                Threats Eliminated.<br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-400 to-orange-500">
-                  Organizations Secured.
-                </span>
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-spring-400 to-cyan-400">
+                  POD Intelligence
+                </span><br />
+                Revolutionizes Cybersecurity
               </h1>
               <p className="text-2xl md:text-3xl text-gray-300 mb-12 max-w-5xl mx-auto leading-relaxed">
-                Purpose-built cybersecurity platform with advanced AI engines, 
-                real-time threat intelligence, and automated compliance management for educational institutions and government agencies.
+                Five revolutionary AI systems working together: APEX genetic algorithms, ECHO holographic interfaces, 
+                PULSE location intelligence, SURGE autonomous defense, and FLOW operations automation. 
+                <strong className="text-spring-400">The world's first comprehensive POD Intelligence platform.</strong>
               </p>
+              
+              {/* POD Intelligence Systems Preview */}
+              <div className="grid grid-cols-5 gap-4 max-w-4xl mx-auto mb-12">
+                <div className="text-center">
+                  <img src={apexLogoImg} alt="APEX" className="h-12 w-12 mx-auto mb-2" />
+                  <span className="text-purple-400 text-sm font-bold">APEX</span>
+                  <p className="text-xs text-gray-400">Genetic AI</p>
+                </div>
+                <div className="text-center">
+                  <img src={echoLogoImg} alt="ECHO" className="h-12 w-12 mx-auto mb-2" />
+                  <span className="text-cyan-400 text-sm font-bold">ECHO</span>
+                  <p className="text-xs text-gray-400">5D Interface</p>
+                </div>
+                <div className="text-center">
+                  <Enhanced4DTargetIcon className="h-12 w-12 mx-auto mb-2 text-green-400" size={48} />
+                  <span className="text-green-400 text-sm font-bold">PULSE</span>
+                  <p className="text-xs text-gray-400">Location Intel</p>
+                </div>
+                <div className="text-center">
+                  <Enhanced4DZapIcon className="h-12 w-12 mx-auto mb-2 text-orange-400" size={48} />
+                  <span className="text-orange-400 text-sm font-bold">SURGE</span>
+                  <p className="text-xs text-gray-400">Auto Defense</p>
+                </div>
+                <div className="text-center">
+                  <Enhanced4DActivityIcon className="h-12 w-12 mx-auto mb-2 text-blue-400" size={48} />
+                  <span className="text-blue-400 text-sm font-bold">FLOW</span>
+                  <p className="text-xs text-gray-400">Operations</p>
+                </div>
+              </div>
               
               <div className="flex items-center justify-center space-x-2 mb-8">
                 {[1, 2, 3, 4, 5].map((star) => (
                   <Enhanced4DStarIcon key={star} className="w-6 h-6 text-yellow-400 fill-yellow-400" size={24} />
                 ))}
-                <span className="ml-4 text-white font-semibold text-lg">4.9/5 from 500+ organizations</span>
+                <span className="ml-4 text-white font-semibold text-lg">4.9/5 from 500+ POD Intelligence Deployments</span>
               </div>
 
               <div className="flex flex-col sm:flex-row gap-6 justify-center">
@@ -289,40 +477,160 @@ export default function Platform() {
               </div>
             </div>
 
-            {/* Platform Overview Visual */}
+            {/* ORCA Platform Overview Visual */}
             <div className="max-w-5xl mx-auto">
-              <img 
-                src={platformOverviewImg}
-                alt="CyberSecured AI Platform Overview"
-                className="w-full rounded-2xl shadow-2xl border border-red-500/30"
-              />
+              <div className="relative">
+                <img 
+                  src={platformOverviewImg}
+                  alt="CyberSecured AI's ORCA Platform with POD Intelligence Systems"
+                  className="w-full rounded-2xl shadow-2xl border border-spring-500/30"
+                />
+                <div className="absolute top-4 right-4 flex items-center space-x-2 bg-black/70 rounded-lg p-3">
+                  <img src={orcaLogoImg} alt="ORCA" className="h-6 w-6" />
+                  <span className="text-spring-400 font-bold text-sm">ORCA Platform</span>
+                </div>
+              </div>
             </div>
           </div>
         </section>
 
-        {/* Cypher AI Dual Intelligence Models */}
-        <section className="py-20 px-6 bg-gradient-to-b from-slate-900 to-slate-800">
+        {/* POD Intelligence Systems - Revolutionary Five-System Architecture */}
+        <section className="py-20 px-6 bg-gradient-to-b from-midnight-900 to-midnight-800">
           <div className="container mx-auto max-w-7xl">
             <div className="text-center mb-16">
-              <Badge className="mb-6 bg-purple-500/20 text-purple-300 border-purple-500/30">
-                🧬 Revolutionary AI Architecture
+              <Badge className="mb-6 bg-spring-500/20 text-spring-300 border-spring-500/30 flex items-center justify-center w-fit mx-auto">
+                <img src={orcaLogoImg} alt="ORCA" className="h-5 w-5 mr-2" />
+                🚀 POD Intelligence Systems
               </Badge>
               <h2 className="text-4xl md:text-5xl font-bold text-white mb-8">
-                Cypher AI Dual Intelligence<br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-cyan-400">Models</span>
+                Five Revolutionary AI Systems<br />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-spring-400 to-cyan-400">Working as One</span>
               </h2>
               <p className="text-xl text-gray-300 max-w-4xl mx-auto mb-12">
-                Revolutionary dual AI architecture featuring self-evolving genetic algorithms and advanced internal operations automation. 
-                The first platform to combine genetic learning with comprehensive workflow intelligence.
+                The world's first comprehensive POD Intelligence architecture. Five specialized AI systems that communicate, 
+                learn, and evolve together to provide unparalleled cybersecurity protection. From genetic algorithms 
+                to holographic interfaces, from location intelligence to autonomous defense - this is the future of AI security.
               </p>
             </div>
 
-            {/* Cypher AI Models Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
-              {cypherAIModels.map((model, index) => (
-                <Card key={index} className={`bg-gradient-to-br ${model.gradient} border-2 ${model.color} hover:scale-105 transition-all duration-500`}>
+            {/* POD Intelligence Systems Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8 mb-16">
+              {podIntelligenceSystems.map((system, index) => (
+                <Card key={system.id} className={`bg-gradient-to-br ${system.gradient} border-2 ${system.color} hover:scale-105 transition-all duration-500 group`}>
                   <CardContent className="p-8">
                     <div className="flex items-center mb-6">
+                      {system.icon}
+                      <div className="ml-4">
+                        <h3 className="text-2xl font-bold text-white">{system.title}</h3>
+                        <p className="text-sm text-gray-400">{system.fullName}</p>
+                        <Badge className={`mt-2 text-xs ${system.status === 'Fully Operational' ? 'bg-green-500/20 text-green-400' : 
+                          system.status === 'Production Ready' ? 'bg-blue-500/20 text-blue-400' : 
+                          system.status === 'Beta Release' ? 'bg-yellow-500/20 text-yellow-400' : 
+                          'bg-orange-500/20 text-orange-400'}`}>
+                          {system.status}
+                        </Badge>
+                      </div>
+                    </div>
+                    <p className="text-gray-300 mb-6 leading-relaxed">{system.description}</p>
+                    
+                    {/* Key Features */}
+                    <div className="mb-6">
+                      <h4 className="text-sm font-bold text-white mb-3 uppercase tracking-wider">Key Capabilities</h4>
+                      <div className="space-y-2">
+                        {system.features.slice(0, 4).map((feature, idx) => (
+                          <div key={idx} className="flex items-start space-x-2">
+                            <Enhanced4DCheckCircleIcon className="w-4 h-4 text-spring-400 mt-0.5 flex-shrink-0" size={16} />
+                            <span className="text-sm text-gray-300">{feature}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Performance Metrics */}
+                    <div className="grid grid-cols-2 gap-4 mb-6">
+                      {system.metrics.slice(0, 2).map((metric, idx) => (
+                        <div key={idx} className="text-center p-3 bg-black/30 rounded-lg">
+                          <div className={`text-lg font-bold ${metric.color}`}>{metric.value}</div>
+                          <div className="text-xs text-gray-400">{metric.label}</div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Compliance Badges */}
+                    <div className="flex flex-wrap gap-2 mb-4">
+                      {system.compliance.map((comp, idx) => (
+                        <Badge key={idx} className="text-xs bg-gray-800/50 text-gray-300">{comp}</Badge>
+                      ))}
+                    </div>
+
+                    <Link href={`/platform/${system.id}`}>
+                      <Button className="w-full group-hover:bg-spring-500 transition-colors">
+                        Explore {system.title}
+                        <Enhanced4DArrowRightIcon className="ml-2 w-4 h-4" size={16} />
+                      </Button>
+                    </Link>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+            
+            {/* Integration Benefits */}
+            <div className="bg-gradient-to-r from-spring-900/30 to-cyan-900/30 rounded-2xl p-8 border border-spring-500/30">
+              <div className="text-center mb-8">
+                <h3 className="text-3xl font-bold text-white mb-4">Unified POD Intelligence Integration</h3>
+                <p className="text-gray-300 max-w-3xl mx-auto">
+                  When all five POD Intelligence systems work together, they create an unprecedented level of cybersecurity protection. 
+                  Each system enhances the others, creating exponential improvements in threat detection, response, and prevention.
+                </p>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div className="text-center">
+                  <Enhanced4DNetworkIcon className="w-12 h-12 text-spring-400 mx-auto mb-4" size={48} />
+                  <h4 className="text-lg font-bold text-white mb-2">Cross-System Learning</h4>
+                  <p className="text-gray-400 text-sm">Each system learns from the others, creating collective intelligence</p>
+                </div>
+                <div className="text-center">
+                  <Enhanced4DZapIcon className="w-12 h-12 text-cyan-400 mx-auto mb-4" size={48} />
+                  <h4 className="text-lg font-bold text-white mb-2">Exponential Performance</h4>
+                  <p className="text-gray-400 text-sm">Combined systems deliver 10x better results than traditional solutions</p>
+                </div>
+                <div className="text-center">
+                  <Enhanced4DShieldIcon className="w-12 h-12 text-orange-400 mx-auto mb-4" size={48} />
+                  <h4 className="text-lg font-bold text-white mb-2">Adaptive Protection</h4>
+                  <p className="text-gray-400 text-sm">Continuous evolution and adaptation to emerging threats</p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="text-center mt-12">
+              <Link href="/platform/pod-intelligence">
+                <Button size="lg" className="bg-spring-500 hover:bg-spring-600 text-midnight-900 font-bold px-8 py-4">
+                  Explore Complete POD Intelligence Architecture
+                  <Enhanced4DArrowRightIcon className="ml-2 w-5 h-5" size={20} />
+                </Button>
+              </Link>
+            </div>
+            </div>
+
+            {/* Legacy Cypher AI Models - Now Part of POD Intelligence */}
+            <div className="mt-20">
+              <div className="text-center mb-12">
+                <Badge className="mb-4 bg-purple-500/20 text-purple-300 border-purple-500/30">
+                  🧬 Foundation Technologies
+                </Badge>
+                <h3 className="text-3xl font-bold text-white mb-4">Cypher AI Foundation Models</h3>
+                <p className="text-gray-300 max-w-3xl mx-auto">
+                  The revolutionary dual AI architecture that powers POD Intelligence systems. These foundational models 
+                  provide the genetic algorithms and operational intelligence that make APEX, ECHO, PULSE, SURGE, and FLOW possible.
+                </p>
+              </div>
+              
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
+                {cypherAIModels.map((model, index) => (
+                  <Card key={index} className={`bg-gradient-to-br ${model.gradient} border-2 ${model.color} hover:scale-105 transition-all duration-500`}>
+                    <CardContent className="p-8">
+                      <div className="flex items-center mb-6">
                       <div className="w-16 h-16 bg-white/10 rounded-xl flex items-center justify-center mr-6">
                         {model.icon}
                       </div>
@@ -392,6 +700,267 @@ export default function Platform() {
                   </div>
                   <h4 className="text-lg font-bold text-green-400 mb-2">Unified Platform</h4>
                   <p className="text-sm text-gray-300">Seamless integration across all security modules with cross-platform learning capabilities</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Revolutionary Systems Integration Dashboard */}
+        <section className="py-20 px-6 bg-gradient-to-br from-slate-900 via-blue-900/30 to-slate-900">
+          <div className="container mx-auto max-w-7xl">
+            <div className="text-center mb-16">
+              <Badge className="mb-8 bg-blue-500/20 text-blue-300 border-blue-500/30 text-xl px-8 py-4">
+                <Enhanced4DGlobeIcon className="w-6 h-6 mr-3" size={24} />
+                UNIFIED DASHBOARD INTEGRATION
+              </Badge>
+              <h2 className="text-5xl md:text-7xl font-bold text-white mb-8 leading-tight">
+                Five Revolutionary Systems<br />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-cyan-400 to-green-500">
+                  One Unified Platform
+                </span>
+              </h2>
+              <p className="text-xl md:text-2xl text-gray-200 max-w-5xl mx-auto mb-12 leading-relaxed">
+                Cross-system analytics and correlation across PULSE, Live Location, ECHO with live avatar, SURGE, 
+                and Unified Integration - all powered by real-time WebSocket architecture
+              </p>
+            </div>
+
+            {/* Unified Dashboard Showcase */}
+            <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 mb-16">
+              
+              {/* PULSE Dashboard */}
+              <Card className="bg-gradient-to-br from-purple-900/60 to-slate-800/60 border border-purple-500/40 hover:border-purple-400/70 transition-all duration-300 group">
+                <CardHeader className="p-6">
+                  <div className="w-12 h-12 bg-purple-500/30 rounded-xl flex items-center justify-center mx-auto mb-4 border border-purple-400/50">
+                    <Enhanced4DBrainIcon className="w-6 h-6 text-purple-300" size={24} />
+                  </div>
+                  <Badge className="bg-purple-500/20 text-purple-300 border-purple-400/30 text-xs w-full justify-center">
+                    🧠 GENETIC AI
+                  </Badge>
+                </CardHeader>
+                <CardContent className="p-6 pt-0 text-center">
+                  <h3 className="text-lg font-bold text-white mb-2">PULSE</h3>
+                  <p className="text-sm text-gray-300 mb-4">Autonomous Cyber Defense</p>
+                  <div className="text-2xl font-bold text-purple-400 mb-1">99.2%</div>
+                  <div className="text-xs text-purple-300">AI Accuracy</div>
+                </CardContent>
+              </Card>
+
+              {/* Live Location Dashboard */}
+              <Card className="bg-gradient-to-br from-cyan-900/60 to-slate-800/60 border border-cyan-500/40 hover:border-cyan-400/70 transition-all duration-300 group">
+                <CardHeader className="p-6">
+                  <div className="w-12 h-12 bg-cyan-500/30 rounded-xl flex items-center justify-center mx-auto mb-4 border border-cyan-400/50">
+                    <Enhanced4DGlobeIcon className="w-6 h-6 text-cyan-300" size={24} />
+                  </div>
+                  <Badge className="bg-cyan-500/20 text-cyan-300 border-cyan-400/30 text-xs w-full justify-center">
+                    📍 GEOSPATIAL
+                  </Badge>
+                </CardHeader>
+                <CardContent className="p-6 pt-0 text-center">
+                  <h3 className="text-lg font-bold text-white mb-2">Live Location</h3>
+                  <p className="text-sm text-gray-300 mb-4">Real-Time Tracking</p>
+                  <div className="text-2xl font-bold text-cyan-400 mb-1">24/7</div>
+                  <div className="text-xs text-cyan-300">Monitoring</div>
+                </CardContent>
+              </Card>
+
+              {/* ECHO Dashboard */}
+              <Card className="bg-gradient-to-br from-blue-900/60 to-slate-800/60 border border-blue-500/40 hover:border-blue-400/70 transition-all duration-300 group">
+                <CardHeader className="p-6">
+                  <div className="w-12 h-12 bg-blue-500/30 rounded-xl flex items-center justify-center mx-auto mb-4 border border-blue-400/50">
+                    <Enhanced4DEyeIcon className="w-6 h-6 text-blue-300" size={24} />
+                  </div>
+                  <Badge className="bg-blue-500/20 text-blue-300 border-blue-400/30 text-xs w-full justify-center">
+                    👁️ HOLOGRAPHIC
+                  </Badge>
+                </CardHeader>
+                <CardContent className="p-6 pt-0 text-center">
+                  <h3 className="text-lg font-bold text-white mb-2">ECHO</h3>
+                  <p className="text-sm text-gray-300 mb-4">5D Avatar Interface</p>
+                  <div className="text-2xl font-bold text-blue-400 mb-1">5D</div>
+                  <div className="text-xs text-blue-300">Live Human-Like Avatar</div>
+                </CardContent>
+              </Card>
+
+              {/* SURGE Dashboard */}
+              <Card className="bg-gradient-to-br from-red-900/60 to-slate-800/60 border border-red-500/40 hover:border-red-400/70 transition-all duration-300 group">
+                <CardHeader className="p-6">
+                  <div className="w-12 h-12 bg-red-500/30 rounded-xl flex items-center justify-center mx-auto mb-4 border border-red-400/50">
+                    <Enhanced4DZapIcon className="w-6 h-6 text-red-300" size={24} />
+                  </div>
+                  <Badge className="bg-red-500/20 text-red-300 border-red-400/30 text-xs w-full justify-center">
+                    🚁 DRONE SWARM
+                  </Badge>
+                </CardHeader>
+                <CardContent className="p-6 pt-0 text-center">
+                  <h3 className="text-lg font-bold text-white mb-2">SURGE</h3>
+                  <p className="text-sm text-gray-300 mb-4">Autonomous Defense</p>
+                  <div className="text-2xl font-bold text-red-400 mb-1">AI</div>
+                  <div className="text-xs text-red-300">Swarm Control</div>
+                </CardContent>
+              </Card>
+
+              {/* Unified Integration Dashboard */}
+              <Card className="bg-gradient-to-br from-green-900/60 to-slate-800/60 border border-green-500/40 hover:border-green-400/70 transition-all duration-300 group">
+                <CardHeader className="p-6">
+                  <div className="w-12 h-12 bg-green-500/30 rounded-xl flex items-center justify-center mx-auto mb-4 border border-green-400/50">
+                    <Enhanced4DNetworkIcon className="w-6 h-6 text-green-300" size={24} />
+                  </div>
+                  <Badge className="bg-green-500/20 text-green-300 border-green-400/30 text-xs w-full justify-center">
+                    🔄 UNIFIED
+                  </Badge>
+                </CardHeader>
+                <CardContent className="p-6 pt-0 text-center">
+                  <h3 className="text-lg font-bold text-white mb-2">Unified</h3>
+                  <p className="text-sm text-gray-300 mb-4">Integration Hub</p>
+                  <div className="text-2xl font-bold text-green-400 mb-1">5</div>
+                  <div className="text-xs text-green-300">Systems</div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Real-Time WebSocket Architecture */}
+            <div className="bg-slate-800/60 rounded-xl border border-cyan-500/30 p-8 md:p-12 mb-16">
+              <h3 className="text-3xl font-bold text-white mb-8 text-center">
+                Real-Time WebSocket Architecture
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6 mb-8">
+                <div className="text-center">
+                  <div className="text-4xl font-bold text-purple-400 mb-2">5</div>
+                  <div className="text-sm text-gray-300">WebSocket Servers</div>
+                  <div className="text-xs text-purple-300 mt-1">Real-Time Communication</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-4xl font-bold text-cyan-400 mb-2">JWT</div>
+                  <div className="text-sm text-gray-300">Role-Based Auth</div>
+                  <div className="text-xs text-cyan-300 mt-1">Multi-System Security</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-4xl font-bold text-blue-400 mb-2">5D</div>
+                  <div className="text-sm text-gray-300">Avatar-Guided Interface</div>
+                  <div className="text-xs text-blue-300 mt-1">Temporal Analysis Matrix</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-4xl font-bold text-red-400 mb-2">AI</div>
+                  <div className="text-sm text-gray-300">Genetic Evolution</div>
+                  <div className="text-xs text-red-300 mt-1">99.2% Accuracy</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-4xl font-bold text-green-400 mb-2">24/7</div>
+                  <div className="text-sm text-gray-300">Cross-Correlation</div>
+                  <div className="text-xs text-green-300 mt-1">Federal Deployment</div>
+                </div>
+              </div>
+              
+              <p className="text-center text-gray-300 mb-8">
+                All five revolutionary systems operate on a unified real-time architecture, 
+                enabling instant cross-system threat correlation and response coordination.
+              </p>
+
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Button 
+                  size="lg" 
+                  className="button-4d px-10 py-4 text-lg"
+                  onClick={() => window.location.href = '/dashboard/unified'}
+                >
+                  <Enhanced4DNetworkIcon className="mr-2 w-6 h-6" size={24} />
+                  Access Unified Dashboard
+                </Button>
+                <Button 
+                  size="lg" 
+                  className="button-4d px-10 py-4 text-lg"
+                  onClick={() => window.location.href = '/contact'}
+                >
+                  Schedule Federal Demo
+                  <Enhanced4DArrowRightIcon className="ml-2 w-6 h-6" size={24} />
+                </Button>
+              </div>
+            </div>
+
+            {/* Holographic Interface Spotlight */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+              <div>
+                <Badge className="mb-6 bg-blue-500/20 text-blue-300 border-blue-500/30">
+                  👁️ REVOLUTIONARY INTERFACE TECHNOLOGY
+                </Badge>
+                <h3 className="text-4xl font-bold text-white mb-6">
+                  ECHO Live Human-Like Avatar Interface
+                </h3>
+                <p className="text-xl text-gray-300 mb-8 leading-relaxed">
+                  The world's first human-like AI avatar cybersecurity interface. Experience threat visualization 
+                  in revolutionary 5D space with a live avatar guide featuring natural movements, facial expressions, 
+                  and contextual gestures that transform how security teams understand and respond to attacks.
+                </p>
+                
+                <div className="space-y-6 mb-8">
+                  <div className="bg-slate-700/40 rounded-lg p-6 border border-blue-500/30">
+                    <h4 className="text-lg font-semibold text-blue-300 mb-4">Immersive Capabilities</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-3">
+                        <div className="flex items-center text-sm text-gray-300">
+                          <Enhanced4DCheckCircleIcon className="w-4 h-4 mr-2 text-blue-400" size={16} />
+                          5D Holographic Display Matrix
+                        </div>
+                        <div className="flex items-center text-sm text-gray-300">
+                          <Enhanced4DCheckCircleIcon className="w-4 h-4 mr-2 text-blue-400" size={16} />
+                          Real-Time Threat Projection
+                        </div>
+                        <div className="flex items-center text-sm text-gray-300">
+                          <Enhanced4DCheckCircleIcon className="w-4 h-4 mr-2 text-blue-400" size={16} />
+                          Voice-Activated Controls
+                        </div>
+                      </div>
+                      <div className="space-y-3">
+                        <div className="flex items-center text-sm text-gray-300">
+                          <Enhanced4DCheckCircleIcon className="w-4 h-4 mr-2 text-blue-400" size={16} />
+                          AI Natural Language Processing
+                        </div>
+                        <div className="flex items-center text-sm text-gray-300">
+                          <Enhanced4DCheckCircleIcon className="w-4 h-4 mr-2 text-blue-400" size={16} />
+                          Multi-Dimensional Data Layers
+                        </div>
+                        <div className="flex items-center text-sm text-gray-300">
+                          <Enhanced4DCheckCircleIcon className="w-4 h-4 mr-2 text-blue-400" size={16} />
+                          Collaborative Security Operations
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <Button 
+                    size="lg" 
+                    className="button-4d px-8 py-3"
+                    onClick={() => window.location.href = '/dashboard/echo'}
+                  >
+                    <Enhanced4DEyeIcon className="mr-2 w-5 h-5" size={20} />
+                    Enter Holographic Interface
+                  </Button>
+                  <Button 
+                    size="lg" 
+                    className="button-4d px-8 py-3"
+                    onClick={() => window.location.href = '/contact'}
+                  >
+                    Experience Live Demo
+                    <Enhanced4DArrowRightIcon className="ml-2 w-5 h-5" size={20} />
+                  </Button>
+                </div>
+              </div>
+              
+              <div className="relative">
+                <img 
+                  src={networkSecurityImg}
+                  alt="ECHO Live Avatar Interface"
+                  className="w-full rounded-xl border border-blue-500/30 shadow-2xl"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-blue-900/60 to-transparent rounded-xl"></div>
+                <div className="absolute top-4 left-4 bg-blue-600/90 text-white text-sm px-3 py-1 rounded font-bold">
+                  5D AVATAR INTERFACE
+                </div>
+                <div className="absolute bottom-4 right-4 bg-slate-900/90 text-white text-xs px-3 py-1 rounded">
+                  Live Avatar with Temporal Analysis
                 </div>
               </div>
             </div>
@@ -540,7 +1109,7 @@ export default function Platform() {
               </Badge>
               <h2 className="text-4xl md:text-5xl font-bold text-white mb-8">
                 Why Organizations Choose<br />
-                <span className="text-orange-400">CyberSecured AI</span>
+                <span className="text-orange-400">ORCA Federal</span>
               </h2>
               <p className="text-xl text-gray-300 max-w-4xl mx-auto mb-16">
                 Beyond advanced technology, we deliver measurable business outcomes that transform
@@ -767,7 +1336,7 @@ export default function Platform() {
                 <span className="text-cyan-400">& Government Organizations</span>
               </h2>
               <p className="text-xl text-gray-300 max-w-4xl mx-auto mb-16">
-                CyberSecured AI is purpose-built for your sector. But don't take our word for it – 
+                ORCA Federal is purpose-built for your sector. But don't take our word for it – 
                 see the results from organizations like yours.
               </p>
             </div>
@@ -1015,7 +1584,7 @@ export default function Platform() {
                     ))}
                   </div>
                   <blockquote className="text-2xl md:text-3xl font-bold text-white mb-8 leading-relaxed italic">
-                    "We pushed CyberSecured AI out to four different campuses. What we found was that one site was clean, 
+                    "We pushed ORCA Federal out to four different campuses. What we found was that one site was clean, 
                     two sites had remnants, and one site had an active threat. That was eye-opening to us, 
                     and we knew we needed to install this for every one of our institutions."
                   </blockquote>
