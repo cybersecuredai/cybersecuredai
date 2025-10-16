@@ -28,13 +28,17 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
+
+      - name: Update browserslist database (optional)
+        run: npx update-browserslist-db@latest || true
+        continue-on-error: true
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
       - name: Build Vite client
-        run: npx vite build
+        run: npm run build:client
 
       - name: Prepare site artifact (dist/public)
         run: |
