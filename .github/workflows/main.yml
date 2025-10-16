@@ -45,13 +45,16 @@ jobs:
           set -euxo pipefail
           mkdir -p _site
           rsync -a --delete dist/public/ _site/
+          # Include custom domain if present
           if [ -f CNAME ]; then cp CNAME _site/CNAME; fi
+          # SPA fallback for deep links
           if [ -f _site/index.html ] && [ ! -f _site/404.html ]; then cp _site/index.html _site/404.html; fi
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: _site
+
   deploy:
     environment:
       name: github-pages
