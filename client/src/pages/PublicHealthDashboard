@@ -91,9 +91,9 @@ import {
 } from 'lucide-react';
 
 // Import types from schema
-import type { 
+import {
   PublicHealthIncident,
-  DiseaseSurveillance, 
+  DiseaseSurveillance,
   ContactTracing,
   HealthFacility,
   PublicHealthAlert,
