@@ -27,27 +27,33 @@ jobs:
           node-version: '20'
           cache: 'npm'
 
-      - name: Install dependencies
-        run: npm install
+      - name: Install dependencies (clean, reproducible)
+        run: npm ci
+
+      - name: Update Browserslist DB (optional)
+        run: npx update-browserslist-db@latest || true
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
       - name: Build Vite client
-        run: npx vite build
+        run: npm run build:client
 
       - name: Prepare site artifact (dist/public)
         run: |
           set -euxo pipefail
           mkdir -p _site
           rsync -a --delete dist/public/ _site/
+          # Include custom domain if present
           if [ -f CNAME ]; then cp CNAME _site/CNAME; fi
+          # SPA fallback to avoid 404s on deep links
           if [ -f _site/index.html ] && [ ! -f _site/404.html ]; then cp _site/index.html _site/404.html; fi
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: _site
+
   deploy:
     environment:
       name: github-pages
