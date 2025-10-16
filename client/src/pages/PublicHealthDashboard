@@ -91,7 +91,7 @@ import {
 } from 'lucide-react';
 
 // Import types from schema
-import { PublicHealthIncident, DiseaseSurveillance, ContactTracing, HealthFacility, PublicHealthAlert, EpidemiologicalData } from '@shared/schema';
+import type { PublicHealthIncident, DiseaseSurveillance, ContactTracing, HealthFacility, PublicHealthAlert, EpidemiologicalData } from '@shared/schema';
 
 // Dashboard-specific interfaces for aggregated data
 interface PublicHealthDashboardData {
