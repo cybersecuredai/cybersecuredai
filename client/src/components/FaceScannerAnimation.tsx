@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import biometricFaceImage from "@assets/3d image_1756256105586.jpg";
 
 interface FaceScannerAnimationProps {
   className?: string;
@@ -11,22 +10,26 @@ export function FaceScannerAnimation({ className = "" }: FaceScannerAnimationPro
   const [scanProgress, setScanProgress] = useState(0);
   const [rotationAngle, setRotationAngle] = useState(-25);
   const [isScanning, setIsScanning] = useState(true);
+  // Image overlay is optional; animation should run even without an image
   const [imageLoaded, setImageLoaded] = useState(false);
   const animationRef = useRef<number>();
 
-  useEffect(() => {
-    // Load the biometric face image
-    const img = new Image();
-    img.src = biometricFaceImage;
-    img.onload = () => {
-      setImageLoaded(true);
-      imgRef.current = img;
-    };
-  }, []);
+  // Note: We intentionally do not load an external image by default to keep
+  // the build self-contained for CI/CD (GitHub Pages). If you want to add a
+  // biometric face overlay, provide a public path and uncomment below.
+  // useEffect(() => {
+  //   const img = new Image();
+  //   img.src = "/assets-optimized/biometric-face.webp"; // place file in client/public
+  //   img.onload = () => {
+  //     setImageLoaded(true);
+  //     imgRef.current = img;
+  //   };
+  // }, []);
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas || !imageLoaded || !imgRef.current) return;
+    // Run even without image overlay; we'll gracefully skip image drawing
+    if (!canvas) return;
 
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
