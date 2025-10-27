@@ -34,61 +34,18 @@ jobs:
           node-version: '20'
           cache: 'npm'
 
-      - name: Install dependencies (clean, reproducible)
+      - name: Install dependencies
         run: npm ci
 
-      - name: Update Browserslist DB (optional)
+      - name: Update browserslist database (optional)
         run: npx update-browserslist-db@latest || true
+        continue-on-error: true
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
-      - name: Normalize PublicHealthDashboard file and schema import
-        run: |
-          set -euxo pipefail
-          # If the PublicHealthDashboard file exists without extension, give it .tsx to help the bundler
-          if [ -f client/src/pages/PublicHealthDashboard ] && [ ! -f client/src/pages/PublicHealthDashboard.tsx ]; then
-            mv client/src/pages/PublicHealthDashboard client/src/pages/PublicHealthDashboard.tsx
-            echo "Renamed PublicHealthDashboard to .tsx"
-          fi
-          # If the TSX exists, normalize any schema imports to type-only to avoid bundling issues
-          if [ -f client/src/pages/PublicHealthDashboard.tsx ]; then
-            node <<'NODE'
-            const fs = require('fs');
-            const path = 'client/src/pages/PublicHealthDashboard.tsx';
-            try {
-              let s = fs.readFileSync(path, 'utf8');
-              const schemaImportRe = /import\s+\{([\s\S]*?)\}\s*from\s+['"]@shared\/schema['"];?/m;
-              if (schemaImportRe.test(s)) {
-                const names = s.match(schemaImportRe)[1]
-                  .split(',')
-                  .map(x => x.trim())
-                  .filter(Boolean)
-                  .join(', ');
-                const replacement = `import type { ${names} } from '@shared/schema';`;
-                s = s.replace(schemaImportRe, replacement);
-                fs.writeFileSync(path, s);
-                console.log('Normalized @shared/schema import to type-only');
-              }
-            } catch (e) {
-              console.log('Normalization step skipped:', e?.message || e);
-            }
-            NODE
-          fi
-
-      - name: Build Vite client (with fallback)
-        run: |
-          set -euxo pipefail
-          # Show available scripts for debugging
-          npm run || true
-          export SKIP_PUBLIC_HEALTH_DASHBOARD=1
-          if node -e "const p=require('./package.json'); process.exit(p.scripts && p.scripts['build:client']?0:1)"; then
-            npm run build:client
-          elif node -e "const p=require('./package.json'); process.exit(p.scripts && p.scripts['build']?0:1)"; then
-            npm run build
-          else
-            npx vite build
-          fi
+      - name: Build Vite client
+        run: npm run build:client
 
       - name: Prepare site artifact (dist/public with fallback)
         run: |

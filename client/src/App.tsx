@@ -70,7 +70,7 @@ const ThreatMap5D = lazy(() => import("@/pages/ThreatMap5D"));
 // Revolutionary ECHO 5D Holographic AI Interface with Live Avatar - lazy loaded due to heavy dependencies
 const EchoInterface = lazy(() => import("@/pages/EchoInterface"));
 // Public Health Dashboard - comprehensive disease surveillance and outbreak management
-const PublicHealthDashboard = lazy(() => import("@/pages/PublicHealthDashboard"));
+const PublicHealthDashboard = lazy(() => import("@/pages/PublicHealthDashboard.tsx"));
 
 // Marketing Website Pages - Lazy loaded
 const Home = lazy(() => import("@/pages/Home"));

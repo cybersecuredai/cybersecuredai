@@ -1,0 +1,47 @@
+name: CI (build + typecheck)
+
+on:
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-check:
+    runs-on: ubuntu-latest
+    concurrency:
+      group: pr-${{ github.head_ref || github.ref_name }}-ci
+      cancel-in-progress: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies (clean)
+        run: npm ci
+
+      - name: Show tool versions
+        run: |
+          node -v
+          npm -v
+          npx vite --version || true
+
+      - name: Typecheck
+        run: npm run check
+
+      - name: Build client
+        run: npm run build:client
+
+      - name: Upload build artifact (client)
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: client-dist
+          path: dist/public
