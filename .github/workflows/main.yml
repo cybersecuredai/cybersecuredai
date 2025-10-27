@@ -3,6 +3,13 @@ name: Deploy client (Vite) to GitHub Pages
 on:
   push:
     branches: [ main ]
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'client/**'
+      - 'vite.config.ts'
+      - '.github/workflows/main.yml'
+      - 'package.json'
   workflow_dispatch:
 
 permissions:
@@ -40,11 +47,19 @@ jobs:
       - name: Build Vite client
         run: npm run build:client
 
-      - name: Prepare site artifact (dist/public)
+      - name: Prepare site artifact (dist/public with fallback)
         run: |
           set -euxo pipefail
           mkdir -p _site
-          rsync -a --delete dist/public/ _site/
+          if [ -d dist/public ]; then
+            rsync -a --delete dist/public/ _site/
+          elif [ -d dist ]; then
+            rsync -a --delete dist/ _site/
+          else
+            echo "Build output not found; showing dist listing (if any)" || true
+            ls -la dist || true
+            exit 1
+          fi
           # Include custom domain if present
           if [ -f CNAME ]; then cp CNAME _site/CNAME; fi
           # SPA fallback for deep links
