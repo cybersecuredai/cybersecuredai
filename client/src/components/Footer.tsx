@@ -13,7 +13,7 @@ import soc2CompliantImg from "@assets/SOC 2_1757954437932.webp";
 
 export function Footer() {
   return (
-    <footer className="bg-surface/20 border-t border-surface/30">
+    <footer className="bg-background/95 backdrop-blur-md border-t border-surface">
       <div className="container mx-auto max-w-6xl px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-8">
           {/* Company Info */}
@@ -117,7 +117,7 @@ export function Footer() {
         </div>
 
         {/* Featured Resources */}
-  <div className="border-t border-surface/30 mt-8 pt-8">
+  <div className="border-t border-surface mt-8 pt-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="bg-gradient-to-r from-cyan-900/10 to-blue-900/10 rounded-lg p-4 border border-cyan-500/20">
               <h4 className="text-white font-semibold mb-2 flex items-center">
@@ -155,7 +155,7 @@ export function Footer() {
         </div>
 
         {/* Contact Info */}
-  <div className="border-t border-surface/30 mt-8 pt-8">
+  <div className="border-t border-surface mt-8 pt-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="flex items-center space-x-3">
               <Mail className="w-5 h-5 text-cyan-400" />
@@ -173,7 +173,7 @@ export function Footer() {
         </div>
 
         {/* Compliance Badges */}
-  <div className="border-t border-surface/30 mt-8 pt-8">
+  <div className="border-t border-surface mt-8 pt-8">
           <div className="flex flex-col lg:flex-row items-center justify-between">
             <div className="flex flex-wrap items-center gap-6 mb-4 lg:mb-0">
               <img 
