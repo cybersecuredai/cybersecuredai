@@ -258,7 +258,7 @@ export default function ORCAPlatform() {
                 <Card className="bg-gradient-to-br from-purple-900/50 to-slate-800/50 border-2 border-purple-500/50 hover:scale-105 transition-all duration-500 cursor-pointer group">
                   <CardContent className="p-8">
                     <div className="flex items-center mb-6">
-                      <img src={apexLogoImg} alt="APEX" className="w-12 h-12 mr-4" />
+                      <img src={apexLogo} alt="APEX" className="w-12 h-12 mr-4" />
                       <div>
                         <h3 className="text-xl font-bold text-white">APEX Genetic AI</h3>
                         <p className="text-purple-300 text-sm">Self-Evolving Intelligence</p>
@@ -279,7 +279,7 @@ export default function ORCAPlatform() {
                 <Card className="bg-gradient-to-br from-cyan-900/50 to-slate-800/50 border-2 border-cyan-500/50 hover:scale-105 transition-all duration-500 cursor-pointer group">
                   <CardContent className="p-8">
                     <div className="flex items-center mb-6">
-                      <img src={echoLogoImg} alt="ECHO" className="w-12 h-12 mr-4" />
+                      <img src={echoLogo} alt="ECHO" className="w-12 h-12 mr-4" />
                       <div>
                         <h3 className="text-xl font-bold text-white">ECHO Holographic</h3>
                         <p className="text-cyan-300 text-sm">5D Interface with AI Avatars</p>
