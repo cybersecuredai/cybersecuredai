@@ -45,10 +45,8 @@ import governmentImg from "@assets/generated_images/Government_AI_Security_Funda
 import platformImg from "@assets/generated_images/Platform_Overview_Datasheet_3d239cec.jpg";
 import threatReportImg from "@assets/generated_images/Threat_Report_2025_Cover_50b3edd9.jpg";
 
-// POD Intelligence System Logos
-import orcaLogoImg from "@assets/ORCA logo_1758558742074.png";
-import apexLogoImg from "@assets/APEX logo_1758557596082.png";
-import echoLogoImg from "@assets/ECHO_1758557621209.png";
+// POD Intelligence System Logos (use public assets to avoid CI failures)
+import { orcaLogo, apexLogo, echoLogo } from "@/assets/logos";
 
 export default function Solutions() {
   const [, setLocation] = useLocation();
@@ -57,7 +55,7 @@ export default function Solutions() {
   const podIntelligenceSolutions = [
     {
       category: "APEX Genetic AI Solutions",
-      icon: <img src={apexLogoImg} alt="APEX" className="w-8 h-8" />,
+  icon: <img src={apexLogo} alt="APEX" className="w-8 h-8" />,
       description: "Self-evolving threat detection powered by genetic algorithms",
       color: "border-purple-500/50",
       gradient: "from-purple-900/50 to-slate-800/50",
@@ -82,7 +80,7 @@ export default function Solutions() {
     },
     {
       category: "ECHO Holographic Solutions",
-      icon: <img src={echoLogoImg} alt="ECHO" className="w-8 h-8" />,
+  icon: <img src={echoLogo} alt="ECHO" className="w-8 h-8" />,
       description: "5D holographic interfaces with live AI avatars",
       color: "border-cyan-500/50",
       gradient: "from-cyan-900/50 to-slate-800/50",

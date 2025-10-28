@@ -26,9 +26,9 @@ import { Link } from "wouter";
 import { MarketingLayout } from "@/components/MarketingLayout";
 
 // POD Intelligence System Logos
-import orcaLogoImg from "@assets/ORCA logo_1758558742074.png";
 import apexLogoImg from "@assets/APEX logo_1758557596082.png";
-import echoLogoImg from "@assets/ECHO_1758557621209.png";
+import { orcaLogo } from "@/assets/logos";
+import { echoLogo } from "@/assets/logos";
 
 export default function Pricing() {
   const pricingPlans = [
@@ -152,7 +152,7 @@ export default function Pricing() {
             <div className="text-center mb-20">
               {/* ORCA Platform Branding */}
               <div className="flex items-center justify-center mb-8">
-                <img src={orcaLogoImg} alt="ORCA Platform" className="h-12 w-auto mr-4" />
+                <img src={orcaLogo} alt="ORCA Platform" className="h-12 w-auto mr-4" />
                 <Badge className="bg-spring-500/20 text-spring-300 border-spring-500/30 text-lg px-6 py-3">
                   CyberSecured AI's ORCA Platform Pricing
                 </Badge>
@@ -177,7 +177,7 @@ export default function Pricing() {
                   <p className="text-xs text-gray-400">Genetic AI</p>
                 </div>
                 <div className="text-center">
-                  <img src={echoLogoImg} alt="ECHO" className="h-10 w-10 mx-auto mb-2" />
+          <img src={echoLogo} alt="ECHO" className="h-10 w-10 mx-auto mb-2" />
                   <span className="text-cyan-400 text-sm font-bold">ECHO</span>
                   <p className="text-xs text-gray-400">5D Interface</p>
                 </div>
@@ -431,7 +431,7 @@ export default function Pricing() {
           <div className="container mx-auto max-w-7xl">
             <div className="text-center mb-16">
               <div className="flex items-center justify-center mb-8">
-                <img src={orcaLogoImg} alt="ORCA Platform" className="h-10 w-auto mr-4" />
+                <img src={orcaLogo} alt="ORCA Platform" className="h-10 w-auto mr-4" />
                 <Badge className="bg-spring-500/20 text-spring-300 border-spring-500/30 text-xl px-8 py-4">
                   Individual POD Intelligence System Pricing
                 </Badge>
@@ -640,7 +640,7 @@ export default function Pricing() {
               <Card className="bg-gradient-to-br from-spring-900/50 to-slate-800/50 border-2 border-spring-500/30 hover:scale-105 transition-all duration-500 lg:col-span-1 xl:col-span-1">
                 <CardHeader className="p-8 text-center">
                   <div className="flex items-center justify-center mb-4">
-                    <img src={orcaLogoImg} alt="ORCA" className="h-12 w-12 mr-3" />
+                    <img src={orcaLogo} alt="ORCA" className="h-12 w-12 mr-3" />
                     <div>
                       <Badge className="mb-2 bg-spring-500/20 text-spring-300">Complete Bundle</Badge>
                       <CardTitle className="text-2xl text-white">Full POD Stack</CardTitle>
