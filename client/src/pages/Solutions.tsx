@@ -45,10 +45,8 @@ import governmentImg from "@assets/generated_images/Government_AI_Security_Funda
 import platformImg from "@assets/generated_images/Platform_Overview_Datasheet_3d239cec.jpg";
 import threatReportImg from "@assets/generated_images/Threat_Report_2025_Cover_50b3edd9.jpg";
 
-// POD Intelligence System Logos
-import orcaLogoImg from "@assets/ORCA logo_1758558742074.png";
-import apexLogoImg from "@assets/APEX logo_1758557596082.png";
-import echoLogoImg from "@assets/ECHO_1758557621209.png";
+// POD Intelligence System Logos (use public assets to avoid CI failures)
+import { orcaLogo, apexLogo, echoLogo } from "@/assets/logos";
 
 export default function Solutions() {
   const [, setLocation] = useLocation();
@@ -57,7 +55,7 @@ export default function Solutions() {
   const podIntelligenceSolutions = [
     {
       category: "APEX Genetic AI Solutions",
-      icon: <img src={apexLogoImg} alt="APEX" className="w-8 h-8" />,
+  icon: <img src={apexLogo} alt="APEX" className="w-8 h-8" />,
       description: "Self-evolving threat detection powered by genetic algorithms",
       color: "border-purple-500/50",
       gradient: "from-purple-900/50 to-slate-800/50",
@@ -82,7 +80,7 @@ export default function Solutions() {
     },
     {
       category: "ECHO Holographic Solutions",
-      icon: <img src={echoLogoImg} alt="ECHO" className="w-8 h-8" />,
+  icon: <img src={echoLogo} alt="ECHO" className="w-8 h-8" />,
       description: "5D holographic interfaces with live AI avatars",
       color: "border-cyan-500/50",
       gradient: "from-cyan-900/50 to-slate-800/50",
@@ -186,7 +184,7 @@ export default function Solutions() {
   const featureSolutions = [
     {
       category: "ORCA Platform",
-      icon: <img src={orcaLogoImg} alt="ORCA" className="w-8 h-8" />,
+      icon: <img src={orcaLogo} alt="ORCA" className="w-8 h-8" />,
       description: "Complete cybersecurity platform integrating all POD Intelligence systems",
       color: "border-spring-500/50",
       gradient: "from-spring-900/50 to-cyan-900/50",
@@ -246,7 +244,7 @@ export default function Solutions() {
             <div className="text-center mb-20">
               {/* ORCA Platform Branding */}
               <div className="flex items-center justify-center mb-8">
-                <img src={orcaLogoImg} alt="ORCA Platform" className="h-12 w-auto mr-4" />
+                <img src={orcaLogo} alt="ORCA Platform" className="h-12 w-auto mr-4" />
                 <Badge className="bg-spring-500/20 text-spring-300 border-spring-500/30 text-lg px-6 py-3">
                   CyberSecured AI's ORCA Solutions
                 </Badge>
@@ -266,7 +264,7 @@ export default function Solutions() {
                 Federal-grade POD Intelligence for educational institutions and government agencies.
               </p>
               <Badge className="mb-8 bg-spring-500/20 text-spring-300 border-spring-500/30 text-sm px-4 py-2 flex items-center justify-center w-fit mx-auto">
-                <img src={orcaLogoImg} alt="ORCA" className="h-4 w-4 mr-2" />
+                <img src={orcaLogo} alt="ORCA" className="h-4 w-4 mr-2" />
                 Powered by CyberSecured AI's ORCA Platform
               </Badge>
               
@@ -287,11 +285,11 @@ export default function Solutions() {
               {/* POD Intelligence Systems Preview */}
               <div className="grid grid-cols-5 gap-4 max-w-4xl mx-auto mb-8">
                 <div className="text-center">
-                  <img src={apexLogoImg} alt="APEX" className="h-10 w-10 mx-auto mb-2" />
+                  <img src={apexLogo} alt="APEX" className="h-10 w-10 mx-auto mb-2" />
                   <span className="text-purple-400 text-sm font-bold">APEX</span>
                 </div>
                 <div className="text-center">
-                  <img src={echoLogoImg} alt="ECHO" className="h-10 w-10 mx-auto mb-2" />
+                  <img src={echoLogo} alt="ECHO" className="h-10 w-10 mx-auto mb-2" />
                   <span className="text-cyan-400 text-sm font-bold">ECHO</span>
                 </div>
                 <div className="text-center">
@@ -327,7 +325,7 @@ export default function Solutions() {
             {/* ORCA Complete Platform Solution */}
             <div className="text-center mb-20">
               <Badge className="mb-8 bg-spring-500/20 text-spring-300 border-spring-500/30 text-xl px-8 py-4 flex items-center justify-center w-fit mx-auto">
-                <img src={orcaLogoImg} alt="ORCA" className="h-6 w-6 mr-3" />
+                <img src={orcaLogo} alt="ORCA" className="h-6 w-6 mr-3" />
                 ORCA CYBERSECURITY SOLUTIONS
               </Badge>
               <h2 className="text-5xl md:text-7xl font-bold text-white mb-8 leading-tight">
@@ -352,7 +350,7 @@ export default function Solutions() {
                 </div>
                 <CardContent className="p-10">
                   <div className="flex items-center mb-8">
-                    <img src={orcaLogoImg} alt="ORCA Complete" className="w-16 h-16 mr-6" />
+                    <img src={orcaLogo} alt="ORCA Complete" className="w-16 h-16 mr-6" />
                     <div>
                       <h3 className="text-3xl font-bold text-white">ORCA Complete Platform</h3>
                       <p className="text-lg text-spring-300">Full POD Intelligence Ecosystem</p>
@@ -369,11 +367,11 @@ export default function Solutions() {
                     <h4 className="text-xl font-bold text-white">Complete Platform Includes:</h4>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                       <div className="flex items-center space-x-3">
-                        <img src={apexLogoImg} alt="APEX" className="w-6 h-6" />
+                        <img src={apexLogo} alt="APEX" className="w-6 h-6" />
                         <span className="text-purple-300 text-sm">APEX Genetic AI</span>
                       </div>
                       <div className="flex items-center space-x-3">
-                        <img src={echoLogoImg} alt="ECHO" className="w-6 h-6" />
+                        <img src={echoLogo} alt="ECHO" className="w-6 h-6" />
                         <span className="text-cyan-300 text-sm">ECHO Holographic</span>
                       </div>
                       <div className="flex items-center space-x-3">
@@ -456,14 +454,14 @@ export default function Solutions() {
                     <div className="space-y-3">
                       <div className="bg-black/30 rounded-lg p-4 border border-purple-500/30">
                         <div className="flex items-center space-x-3 mb-2">
-                          <img src={apexLogoImg} alt="APEX" className="w-8 h-8" />
+                          <img src={apexLogo} alt="APEX" className="w-8 h-8" />
                           <span className="font-bold text-purple-300">ORCA APEX Solution</span>
                         </div>
                         <p className="text-sm text-gray-400">Self-evolving genetic AI for threat detection</p>
                       </div>
                       <div className="bg-black/30 rounded-lg p-4 border border-cyan-500/30">
                         <div className="flex items-center space-x-3 mb-2">
-                          <img src={echoLogoImg} alt="ECHO" className="w-8 h-8" />
+                          <img src={echoLogo} alt="ECHO" className="w-8 h-8" />
                           <span className="font-bold text-cyan-300">ORCA ECHO Solution</span>
                         </div>
                         <p className="text-sm text-gray-400">5D holographic interfaces with AI avatars</p>
@@ -517,7 +515,7 @@ export default function Solutions() {
             {/* Solutions BY TOPIC and BY FEATURE */}
             <div className="text-center mb-16">
               <Badge className="mb-8 bg-spring-500/20 text-spring-300 border-spring-500/30 text-xl px-8 py-4 flex items-center justify-center w-fit mx-auto">
-                <img src={orcaLogoImg} alt="ORCA" className="h-6 w-6 mr-3" />
+                <img src={orcaLogo} alt="ORCA" className="h-6 w-6 mr-3" />
                 CYBERSECURITY SOLUTIONS
               </Badge>
               <h2 className="text-5xl md:text-7xl font-bold text-white mb-8 leading-tight">
@@ -1148,7 +1146,7 @@ export default function Solutions() {
           <div className="container mx-auto max-w-7xl">
             <div className="text-center mb-20">
               <Badge className="mb-8 bg-spring-500/20 text-spring-300 border-spring-500/30 text-xl px-8 py-4 flex items-center justify-center w-fit mx-auto">
-                <img src={orcaLogoImg} alt="ORCA" className="h-6 w-6 mr-3" />
+                <img src={orcaLogo} alt="ORCA" className="h-6 w-6 mr-3" />
                 UNIFIED PLATFORM INTEGRATION
               </Badge>
               <h2 className="text-5xl md:text-7xl font-bold text-white mb-8 leading-tight">
@@ -1248,7 +1246,7 @@ export default function Solutions() {
               <Card className="bg-gradient-to-br from-purple-900/50 to-slate-800/50 border-2 border-purple-500/50">
                 <CardContent className="p-8">
                   <div className="flex items-center mb-6">
-                    <img src={apexLogoImg} alt="APEX" className="w-10 h-10 mr-4" />
+                    <img src={apexLogo} alt="APEX" className="w-10 h-10 mr-4" />
                     <div>
                       <h4 className="text-lg font-bold text-white">APEX Integration</h4>
                       <p className="text-purple-300 text-sm">Genetic AI Evolution</p>
@@ -1270,7 +1268,7 @@ export default function Solutions() {
               <Card className="bg-gradient-to-br from-cyan-900/50 to-slate-800/50 border-2 border-cyan-500/50">
                 <CardContent className="p-8">
                   <div className="flex items-center mb-6">
-                    <img src={echoLogoImg} alt="ECHO" className="w-10 h-10 mr-4" />
+                    <img src={echoLogo} alt="ECHO" className="w-10 h-10 mr-4" />
                     <div>
                       <h4 className="text-lg font-bold text-white">ECHO Integration</h4>
                       <p className="text-cyan-300 text-sm">5D Holographic Interface</p>
@@ -1368,7 +1366,7 @@ export default function Solutions() {
               <Card className="bg-gradient-to-br from-purple-900/50 to-slate-800/50 border-2 border-purple-500/50">
                 <CardHeader className="p-8">
                   <div className="flex items-center mb-6">
-                    <img src={apexLogoImg} alt="APEX" className="w-12 h-12 mr-4" />
+                    <img src={apexLogo} alt="APEX" className="w-12 h-12 mr-4" />
                     <div>
                       <h3 className="text-2xl font-bold text-white">APEX Genetic AI</h3>
                       <p className="text-purple-300">Self-Evolving Threat Detection</p>
@@ -1415,7 +1413,7 @@ export default function Solutions() {
               <Card className="bg-gradient-to-br from-cyan-900/50 to-slate-800/50 border-2 border-cyan-500/50">
                 <CardHeader className="p-8">
                   <div className="flex items-center mb-6">
-                    <img src={echoLogoImg} alt="ECHO" className="w-12 h-12 mr-4" />
+                    <img src={echoLogo} alt="ECHO" className="w-12 h-12 mr-4" />
                     <div>
                       <h3 className="text-2xl font-bold text-white">ECHO Holographic</h3>
                       <p className="text-cyan-300">5D Interface with Live Avatars</p>

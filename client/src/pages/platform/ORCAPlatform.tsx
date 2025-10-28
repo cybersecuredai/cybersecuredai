@@ -16,10 +16,8 @@ import {
   Enhanced4DBuildingIcon
 } from "@/components/LazyCustomIcons";
 
-// Import ORCA and POD Intelligence system logos
-import orcaLogoImg from "@assets/ORCA logo_1758558742074.png";
-import apexLogoImg from "@assets/APEX logo_1758557596082.png";
-import echoLogoImg from "@assets/ECHO_1758557621209.png";
+// Import ORCA and POD Intelligence system logos (public assets)
+import { orcaLogo, apexLogo, echoLogo } from "@/assets/logos";
 
 export default function ORCAPlatform() {
   return (
@@ -32,7 +30,7 @@ export default function ORCAPlatform() {
           <div className="container mx-auto max-w-7xl relative z-10">
             <div className="text-center mb-16">
               <div className="flex items-center justify-center mb-8">
-                <img src={orcaLogoImg} alt="ORCA Platform" className="h-16 w-auto mr-6" />
+                <img src={orcaLogo} alt="ORCA Platform" className="h-16 w-auto mr-6" />
                 <Badge className="bg-spring-500/20 text-spring-300 border-spring-500/30 text-xl px-8 py-4">
                   ORCA UNIFIED PLATFORM
                 </Badge>
@@ -50,12 +48,12 @@ export default function ORCAPlatform() {
               
               <div className="grid grid-cols-5 gap-6 max-w-4xl mx-auto mb-12">
                 <div className="text-center">
-                  <img src={apexLogoImg} alt="APEX" className="h-12 w-12 mx-auto mb-3" />
+                  <img src={apexLogo} alt="APEX" className="h-12 w-12 mx-auto mb-3" />
                   <span className="text-purple-400 text-sm font-bold">APEX</span>
                   <p className="text-xs text-gray-400">Genetic AI</p>
                 </div>
                 <div className="text-center">
-                  <img src={echoLogoImg} alt="ECHO" className="h-12 w-12 mx-auto mb-3" />
+                  <img src={echoLogo} alt="ECHO" className="h-12 w-12 mx-auto mb-3" />
                   <span className="text-cyan-400 text-sm font-bold">ECHO</span>
                   <p className="text-xs text-gray-400">Holographic</p>
                 </div>
@@ -260,7 +258,7 @@ export default function ORCAPlatform() {
                 <Card className="bg-gradient-to-br from-purple-900/50 to-slate-800/50 border-2 border-purple-500/50 hover:scale-105 transition-all duration-500 cursor-pointer group">
                   <CardContent className="p-8">
                     <div className="flex items-center mb-6">
-                      <img src={apexLogoImg} alt="APEX" className="w-12 h-12 mr-4" />
+                      <img src={apexLogo} alt="APEX" className="w-12 h-12 mr-4" />
                       <div>
                         <h3 className="text-xl font-bold text-white">APEX Genetic AI</h3>
                         <p className="text-purple-300 text-sm">Self-Evolving Intelligence</p>
@@ -281,7 +279,7 @@ export default function ORCAPlatform() {
                 <Card className="bg-gradient-to-br from-cyan-900/50 to-slate-800/50 border-2 border-cyan-500/50 hover:scale-105 transition-all duration-500 cursor-pointer group">
                   <CardContent className="p-8">
                     <div className="flex items-center mb-6">
-                      <img src={echoLogoImg} alt="ECHO" className="w-12 h-12 mr-4" />
+                      <img src={echoLogo} alt="ECHO" className="w-12 h-12 mr-4" />
                       <div>
                         <h3 className="text-xl font-bold text-white">ECHO Holographic</h3>
                         <p className="text-cyan-300 text-sm">5D Interface with AI Avatars</p>

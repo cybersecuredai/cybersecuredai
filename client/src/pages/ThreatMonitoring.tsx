@@ -11,13 +11,6 @@ import { AlertTriangle, Shield, Eye, Filter, Clock, Globe, MapPin, Activity, Dat
 import cypherAiGenImage from "@assets/Cypher AI Gen_1757954427635.webp";
 import { ThreatMap } from "@/components/ThreatMap";
 
-// Extend window interface for Google Maps
-declare global {
-  interface Window {
-    google: any;
-  }
-}
-
 export default function ThreatMonitoring() {
   const [selectedTab, setSelectedTab] = useState("map");
   const [timeFilter, setTimeFilter] = useState("24h");
@@ -365,7 +358,7 @@ export default function ThreatMonitoring() {
         disableDefaultUI: true,
         zoomControl: true,
         zoomControlOptions: {
-          position: window.google.maps.ControlPosition.TOP_RIGHT
+          position: (window as any).google.maps.ControlPosition.TOP_RIGHT
         }
       });
 

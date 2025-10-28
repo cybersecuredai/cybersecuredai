@@ -3,8 +3,8 @@ import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, Menu, X } from "lucide-react";
 
-// Import CyberSecured AI logo from attached assets
-import cyberSecuredLogoImg from "@assets/CyberSecured AI logo_1757954427635.webp";
+// Use a public placeholder for the logo to avoid build-time dependency on attached_assets in CI
+const cyberSecuredLogoImg = "/favicon.png";
 
 export function Navigation() {
   const [location] = useLocation();

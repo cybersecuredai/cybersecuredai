@@ -275,9 +275,9 @@ export default function MLAnalytics() {
           <p className="text-muted-foreground">Advanced machine learning threat detection and behavioral analysis</p>
         </div>
         <div className="flex items-center gap-2">
-          <Badge variant={serviceStatus?.service === 'AWS SageMaker ML Service' ? 'default' : 'secondary'}>
+          <Badge variant={(serviceStatus as any)?.service === 'AWS SageMaker ML Service' ? 'default' : 'secondary'}>
             <Bot className="h-3 w-3 mr-1" />
-            {serviceStatus?.status || 'Unknown'}
+            {(serviceStatus as any)?.status || 'Unknown'}
           </Badge>
         </div>
       </div>

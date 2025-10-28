@@ -29,7 +29,8 @@ import {
   Enhanced4DArrowRightIcon,
   Enhanced4DExternalLinkIcon,
   Enhanced4DBuildingIcon,
-  Enhanced4DStarIcon
+  Enhanced4DStarIcon,
+  Enhanced4DTrendingUpIcon
 } from "@/components/LazyCustomIcons";
 import { MarketingLayout } from "@/components/MarketingLayout";
 import { Link, useLocation } from "wouter";
@@ -42,10 +43,8 @@ import networkSecurityImg from "@assets/generated_images/Network_Security_Demo_f
 import incidentResponseImg from "@assets/generated_images/Automated_Incident_Response_9b65f496.jpg";
 import socDashboardImg from "@assets/generated_images/SOC_Dashboard_Management_23c1af0b.jpg";
 
-// POD Intelligence System Logos
-import orcaLogoImg from "@assets/ORCA logo_1758558742074.png";
-import apexLogoImg from "@assets/APEX logo_1758557596082.png";
-import echoLogoImg from "@assets/ECHO_1758557621209.png";
+// POD Intelligence System Logos (use public assets to avoid CI failures)
+import { orcaLogo, apexLogo, echoLogo } from "@/assets/logos";
 
 export default function Platform() {
   const [, setLocation] = useLocation();
@@ -57,7 +56,7 @@ export default function Platform() {
       title: "APEX",
       fullName: "Advanced Pattern Exchange",
       description: "Genetic AI Engine with self-evolving threat detection algorithms powered by PyTorch & DEAP",
-      icon: <img src={apexLogoImg} alt="APEX" className="w-10 h-10" />,
+  icon: <img src={apexLogo} alt="APEX" className="w-10 h-10" />,
       color: "border-purple-500/50",
       gradient: "from-purple-900/50 to-slate-800/50",
       features: [
@@ -86,7 +85,7 @@ export default function Platform() {
       title: "ECHO",
       fullName: "Enhanced Cybersecurity Holographic Operations",
       description: "5D Holographic Interface with live human-like avatar for intuitive threat visualization and interaction",
-      icon: <img src={echoLogoImg} alt="ECHO" className="w-10 h-10" />,
+  icon: <img src={echoLogo} alt="ECHO" className="w-10 h-10" />,
       color: "border-cyan-500/50",
       gradient: "from-cyan-900/50 to-slate-800/50",
       features: [
@@ -401,7 +400,7 @@ export default function Platform() {
             <div className="text-center mb-20">
               {/* ORCA Platform Branding */}
               <div className="flex items-center justify-center mb-8">
-                <img src={orcaLogoImg} alt="ORCA Platform" className="h-12 w-auto mr-4" />
+                <img src={orcaLogo} alt="ORCA Platform" className="h-12 w-auto mr-4" />
                 <Badge className="bg-spring-500/20 text-spring-300 border-spring-500/30 text-lg px-6 py-3">
                   CyberSecured AI's ORCA Platform
                 </Badge>
@@ -421,12 +420,12 @@ export default function Platform() {
               {/* POD Intelligence Systems Preview */}
               <div className="grid grid-cols-5 gap-4 max-w-4xl mx-auto mb-12">
                 <div className="text-center">
-                  <img src={apexLogoImg} alt="APEX" className="h-12 w-12 mx-auto mb-2" />
+                  <img src={apexLogo} alt="APEX" className="h-12 w-12 mx-auto mb-2" />
                   <span className="text-purple-400 text-sm font-bold">APEX</span>
                   <p className="text-xs text-gray-400">Genetic AI</p>
                 </div>
                 <div className="text-center">
-                  <img src={echoLogoImg} alt="ECHO" className="h-12 w-12 mx-auto mb-2" />
+                  <img src={echoLogo} alt="ECHO" className="h-12 w-12 mx-auto mb-2" />
                   <span className="text-cyan-400 text-sm font-bold">ECHO</span>
                   <p className="text-xs text-gray-400">5D Interface</p>
                 </div>
@@ -486,7 +485,7 @@ export default function Platform() {
                   className="w-full rounded-2xl shadow-2xl border border-spring-500/30"
                 />
                 <div className="absolute top-4 right-4 flex items-center space-x-2 bg-black/70 rounded-lg p-3">
-                  <img src={orcaLogoImg} alt="ORCA" className="h-6 w-6" />
+                  <img src={orcaLogo} alt="ORCA" className="h-6 w-6" />
                   <span className="text-spring-400 font-bold text-sm">ORCA Platform</span>
                 </div>
               </div>
@@ -499,7 +498,7 @@ export default function Platform() {
           <div className="container mx-auto max-w-7xl">
             <div className="text-center mb-16">
               <Badge className="mb-6 bg-spring-500/20 text-spring-300 border-spring-500/30 flex items-center justify-center w-fit mx-auto">
-                <img src={orcaLogoImg} alt="ORCA" className="h-5 w-5 mr-2" />
+                <img src={orcaLogo} alt="ORCA" className="h-5 w-5 mr-2" />
                 🚀 POD Intelligence Systems
               </Badge>
               <h2 className="text-4xl md:text-5xl font-bold text-white mb-8">

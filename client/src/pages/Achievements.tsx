@@ -239,7 +239,7 @@ export default function Achievements() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              {userBadges && (
+              {!!userBadges && (
                 <div key="badge-display">
                   <BadgeDisplay 
                     userBadges={userBadges as any} 

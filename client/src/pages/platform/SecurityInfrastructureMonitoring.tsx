@@ -35,7 +35,8 @@ import {
   Monitor,
   Cpu,
   MemoryStick,
-  HardDrive
+  HardDrive,
+  Search
 } from "lucide-react";
 
 interface SecurityDevice {

@@ -38,8 +38,8 @@ import {
 } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-// Import actual Cypher AI images from attached assets
-import cypherAiGenImage from "@assets/Cypher AI Gen_1757954427635.webp";
+// Use an optimized public asset to avoid attached_assets dependency in CI
+const cypherAiGenImage = "/assets-optimized/AI_Threat_Detection_Live_579539ba-DVVLqqZ3.webp";
 // Large asset moved to external storage for deployment optimization (10.51 MB)
 const cypherAiAssistImage = "/public-objects/Cypher AI Assist_1757956837639.png";
 

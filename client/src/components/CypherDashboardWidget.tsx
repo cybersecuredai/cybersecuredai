@@ -177,7 +177,7 @@ export default function CypherDashboardWidget({ enabled = true, compact = false 
           </div>
 
           {/* Daily Security Recommendations */}
-          {dailyRecommendations && (
+          {!!dailyRecommendations && (
             <div className="mb-4 p-3 bg-gradient-to-r from-cyan-900/20 to-blue-900/20 rounded-lg border border-cyan-700/50">
               <div className="flex items-center justify-between mb-3">
                 <span className="text-sm font-medium text-cyan-300 flex items-center space-x-2">

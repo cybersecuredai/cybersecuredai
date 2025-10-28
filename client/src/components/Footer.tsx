@@ -3,19 +3,20 @@ import { Bot, Shield, Mail, Phone, MapPin, Twitter, Linkedin, Github, ExternalLi
 // Import actual webp images from attached assets
 // Large asset moved to external storage for deployment optimization (10.51 MB)
 const cypherAiAssistImage = "/public-objects/Cypher AI Assist_1757956837639.png";
-import ferpaCompliantImg from "@assets/FERPA_1757954427636.webp";
-import fismaCompliantImg from "@assets/FISME_1757954427636.webp";
-import fedrampAuthorizedImg from "@assets/FedRamp_1757954427635.webp";
-import nistCompliantImg from "@assets/NIST_1757954437923.webp";
-import isoCompliantImg from "@assets/ISO_1757954427638.webp";
-import cyberSecuredLogoImg from "@assets/CyberSecured AI logo_1757954427635.webp";
-import soc2CompliantImg from "@assets/SOC 2_1757954437932.webp";
+const ferpaCompliantImg = "/favicon.png";
+const fismaCompliantImg = "/favicon.png";
+const fedrampAuthorizedImg = "/favicon.png";
+const nistCompliantImg = "/favicon.png";
+const isoCompliantImg = "/favicon.png";
+const cyberSecuredLogoImg = "/favicon.png";
+const soc2CompliantImg = "/favicon.png";
 
 type FooterTone = 'default' | 'lighter';
 
 export function Footer({ tone = 'default' }: { tone?: FooterTone }) {
-  const rootBg = tone === 'lighter' ? 'bg-surface/15' : 'bg-surface/30';
-  const borderTone = tone === 'lighter' ? 'border-surface/20' : 'border-surface/30';
+  const isLighter = tone === 'lighter';
+  const rootBg = isLighter ? 'bg-surface/10' : 'bg-surface/30';
+  const borderTone = isLighter ? 'border-surface/15' : 'border-surface/30';
   return (
   <footer className={`${rootBg} border-t ${borderTone}`}>
       <div className="container mx-auto max-w-6xl px-4 py-12">
@@ -123,7 +124,7 @@ export function Footer({ tone = 'default' }: { tone?: FooterTone }) {
     {/* Featured Resources */}
   <div className={`border-t ${borderTone} mt-8 pt-8`}>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-gradient-to-r from-cyan-900/10 to-blue-900/10 rounded-lg p-4 border border-cyan-500/10">
+            <div className={`bg-gradient-to-r ${isLighter ? 'from-cyan-900/5 to-blue-900/5 border-cyan-500/10' : 'from-cyan-900/10 to-blue-900/10 border-cyan-500/10'} rounded-lg p-4 border`}>
               <h4 className="text-white font-semibold mb-2 flex items-center">
                 <span>Annual Threat Report 2025</span>
                 <ExternalLink className="w-4 h-4 ml-2 text-cyan-400" />
@@ -136,7 +137,7 @@ export function Footer({ tone = 'default' }: { tone?: FooterTone }) {
               </Link>
             </div>
             
-            <div className="bg-gradient-to-r from-purple-900/10 to-blue-900/10 rounded-lg p-4 border border-purple-500/10">
+            <div className={`bg-gradient-to-r ${isLighter ? 'from-purple-900/5 to-blue-900/5 border-purple-500/10' : 'from-purple-900/10 to-blue-900/10 border-purple-500/10'} rounded-lg p-4 border`}>
               <h4 className="text-white font-semibold mb-2">Compare Solutions</h4>
               <p className="text-gray-300 text-sm mb-3">
                 See how CyberSecured AI compares to other cybersecurity platforms in the market.
@@ -146,7 +147,7 @@ export function Footer({ tone = 'default' }: { tone?: FooterTone }) {
               </Link>
             </div>
             
-            <div className="bg-gradient-to-r from-green-900/10 to-blue-900/10 rounded-lg p-4 border border-green-500/10">
+            <div className={`bg-gradient-to-r ${isLighter ? 'from-green-900/5 to-blue-900/5 border-green-500/10' : 'from-green-900/10 to-blue-900/10 border-green-500/10'} rounded-lg p-4 border`}>
               <h4 className="text-white font-semibold mb-2">Free Security Scan</h4>
               <p className="text-gray-300 text-sm mb-3">
                 Get a complimentary security assessment of your organization's current posture.
