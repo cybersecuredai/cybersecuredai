@@ -67,7 +67,8 @@ const complianceImg = "/assets-optimized/Federal_Compliance_Framework_bd4b8e1a-D
 const imacMockupImg = "/assets-optimized/Security_Dashboard_Display_a8f2c653-BvnYxPq2.webp";
 const zeroTrustImg = "/assets-optimized/Zero_Trust_Implementation_e9d7f412-CkLpRw8v.webp";
 const aiSecurityImg = "/assets-optimized/AI_Security_Implementation_9c4e6d78-DhMnQx5z.webp";
-const scanningImg = "/assets-optimized/Cypher_AI_Scanning_7f2a8b91-EkPqSw3x.webp";
+// Use the provided raw GitHub URL to guarantee availability on PR previews and production
+const scanningImg = "https://raw.githubusercontent.com/cybersecuredai/cybersecuredai/feat/face-scanner-ci/attached_assets/cybersecured%20ai%20scan_1756296311900-BJ0reccu_1757953669053.webp";
 
 // Use optimized webp images from public assets
 const cypherAiAssistImage = "/assets-optimized/Cypher AI Assist_1757956837639-BFbk9fYh.webp";
