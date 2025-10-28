@@ -11,9 +11,13 @@ import isoCompliantImg from "@assets/ISO_1757954427638.webp";
 import cyberSecuredLogoImg from "@assets/CyberSecured AI logo_1757954427635.webp";
 import soc2CompliantImg from "@assets/SOC 2_1757954437932.webp";
 
-export function Footer() {
+type FooterTone = 'default' | 'lighter';
+
+export function Footer({ tone = 'default' }: { tone?: FooterTone }) {
+  const rootBg = tone === 'lighter' ? 'bg-surface/15' : 'bg-surface/30';
+  const borderTone = tone === 'lighter' ? 'border-surface/20' : 'border-surface/30';
   return (
-    <footer className="bg-surface/50 border-t border-surface/50">
+  <footer className={`${rootBg} border-t ${borderTone}`}>
       <div className="container mx-auto max-w-6xl px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-8">
           {/* Company Info */}
@@ -116,10 +120,10 @@ export function Footer() {
           </div>
         </div>
 
-        {/* Featured Resources */}
-        <div className="border-t border-surface/50 mt-8 pt-8">
+    {/* Featured Resources */}
+  <div className={`border-t ${borderTone} mt-8 pt-8`}>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-gradient-to-r from-cyan-900/20 to-blue-900/20 rounded-lg p-4 border border-cyan-500/20">
+            <div className="bg-gradient-to-r from-cyan-900/10 to-blue-900/10 rounded-lg p-4 border border-cyan-500/10">
               <h4 className="text-white font-semibold mb-2 flex items-center">
                 <span>Annual Threat Report 2025</span>
                 <ExternalLink className="w-4 h-4 ml-2 text-cyan-400" />
@@ -132,7 +136,7 @@ export function Footer() {
               </Link>
             </div>
             
-            <div className="bg-gradient-to-r from-purple-900/20 to-blue-900/20 rounded-lg p-4 border border-purple-500/20">
+            <div className="bg-gradient-to-r from-purple-900/10 to-blue-900/10 rounded-lg p-4 border border-purple-500/10">
               <h4 className="text-white font-semibold mb-2">Compare Solutions</h4>
               <p className="text-gray-300 text-sm mb-3">
                 See how CyberSecured AI compares to other cybersecurity platforms in the market.
@@ -142,7 +146,7 @@ export function Footer() {
               </Link>
             </div>
             
-            <div className="bg-gradient-to-r from-green-900/20 to-blue-900/20 rounded-lg p-4 border border-green-500/20">
+            <div className="bg-gradient-to-r from-green-900/10 to-blue-900/10 rounded-lg p-4 border border-green-500/10">
               <h4 className="text-white font-semibold mb-2">Free Security Scan</h4>
               <p className="text-gray-300 text-sm mb-3">
                 Get a complimentary security assessment of your organization's current posture.
@@ -154,8 +158,8 @@ export function Footer() {
           </div>
         </div>
 
-        {/* Contact Info */}
-        <div className="border-t border-surface/50 mt-8 pt-8">
+    {/* Contact Info */}
+  <div className={`border-t ${borderTone} mt-8 pt-8`}>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="flex items-center space-x-3">
               <Mail className="w-5 h-5 text-cyan-400" />
@@ -172,8 +176,8 @@ export function Footer() {
           </div>
         </div>
 
-        {/* Compliance Badges */}
-        <div className="border-t border-surface/50 mt-8 pt-8">
+    {/* Compliance Badges */}
+  <div className={`border-t ${borderTone} mt-8 pt-8`}>
           <div className="flex flex-col lg:flex-row items-center justify-between">
             <div className="flex flex-wrap items-center gap-6 mb-4 lg:mb-0">
               <img 
