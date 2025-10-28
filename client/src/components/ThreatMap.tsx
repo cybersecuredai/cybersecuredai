@@ -16,12 +16,6 @@ interface ThreatMapProps {
   className?: string;
 }
 
-declare global {
-  interface Window {
-    google: any;
-  }
-}
-
 export function ThreatMap({ className = "" }: ThreatMapProps) {
   const mapRef = useRef<HTMLDivElement>(null);
   const [map, setMap] = useState<any>(null);
@@ -111,7 +105,7 @@ export function ThreatMap({ className = "" }: ThreatMapProps) {
       hasMap: !!map, 
       hasData: !!threatLocations, 
       isArray: Array.isArray(threatLocations),
-      dataCount: threatLocations?.length,
+      dataCount: Array.isArray(threatLocations) ? threatLocations.length : 0,
       data: threatLocations 
     });
 

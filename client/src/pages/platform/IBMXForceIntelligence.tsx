@@ -222,9 +222,9 @@ export default function IBMXForceIntelligence() {
           <p className="text-muted-foreground">Premium threat intelligence and security research platform</p>
         </div>
         <div className="flex items-center gap-2">
-          <Badge variant={serviceStatus?.status === 'configured' ? 'default' : 'secondary'}>
+          <Badge variant={(serviceStatus as any)?.status === 'configured' ? 'default' : 'secondary'}>
             <Crown className="h-3 w-3 mr-1" />
-            {serviceStatus?.status || 'Unknown'}
+            {(serviceStatus as any)?.status || 'Unknown'}
           </Badge>
         </div>
       </div>
@@ -600,7 +600,7 @@ export default function IBMXForceIntelligence() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
-              {serviceStatus?.features?.map((feature: string, index: number) => (
+              {((serviceStatus as any)?.features ?? []).map((feature: string, index: number) => (
                 <div key={index} className="flex items-center gap-2 text-xs">
                   <CheckCircle className="h-3 w-3 text-green-500" />
                   <span>{feature}</span>

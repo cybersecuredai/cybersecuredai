@@ -88,7 +88,7 @@ export function EmailCaptureModal({
       await apiRequest("/api/subscribers", "POST", {
         name,
         email,
-        subscribedToEmails,
+        subscribedToEmails: subscribeToEmails,
         resourceId
       });
 

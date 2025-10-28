@@ -99,7 +99,7 @@ export default function TaxiiStixManagement() {
   });
 
   // Fetch TAXII servers
-  const { data: servers = [], isLoading: serversLoading } = useQuery({
+  const { data: servers = [], isLoading: serversLoading } = useQuery<TaxiiServer[]>({
     queryKey: ['/api/taxii/servers'],
     refetchInterval: 30000
   });
@@ -111,7 +111,7 @@ export default function TaxiiStixManagement() {
   });
 
   // Fetch STIX objects for selected server/collection
-  const { data: stixObjects = [], isLoading: stixLoading } = useQuery({
+  const { data: stixObjects = [], isLoading: stixLoading } = useQuery<StixObject[]>({
     queryKey: ['/api/taxii/servers', selectedServer, 'collections', selectedCollection, 'objects', stixFilter],
     enabled: !!(selectedServer && selectedCollection),
     refetchInterval: 120000
@@ -417,7 +417,9 @@ export default function TaxiiStixManagement() {
                           <CardTitle className="text-white flex items-center">
                             {server.name}
                             {server.cisaCompliant && (
-                              <Shield className="w-4 h-4 ml-2 text-spring-green" title="CISA Compliant" />
+                              <span title="CISA Compliant">
+                                <Shield className="w-4 h-4 ml-2 text-spring-green" />
+                              </span>
                             )}
                           </CardTitle>
                           <p className="text-gray-400 text-sm">{server.url}</p>
@@ -532,7 +534,7 @@ export default function TaxiiStixManagement() {
                     <SelectValue placeholder="Select Collection" />
                   </SelectTrigger>
                   <SelectContent>
-                    {servers.find((s: TaxiiServer) => s.id === selectedServer)?.collections?.map((collection) => (
+                    {servers.find((s: TaxiiServer) => s.id === selectedServer)?.collections?.map((collection: TaxiiCollection) => (
                       <SelectItem key={collection.id} value={collection.id}>
                         {collection.title}
                       </SelectItem>

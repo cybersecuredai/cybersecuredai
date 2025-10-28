@@ -9,8 +9,8 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Bot, Shield, Lock, Eye, EyeOff } from "lucide-react";
-// Import actual Cypher AI Assistant image
-import cypherAiAssistImage from "@assets/Cypher AI Assist_1757956837639.png";
+// Import Cypher AI Assistant image from public optimized assets to avoid CI dependency on attached_assets
+import cypherAiAssistImage from "/assets-optimized/Cypher AI Assist_1757956837639-BFbk9fYh.webp";
 
 const loginSchema = z.object({
   email: z.string().email("Please enter a valid email address"),

@@ -167,8 +167,8 @@ export function TheHiveIntegration() {
         <div className="flex items-center space-x-2">
           <Shield className="h-6 w-6 text-blue-500" />
           <h1 className="text-2xl font-bold">TheHive Case Management</h1>
-          <Badge variant={status?.initialized ? "default" : "secondary"} data-testid="thehive-status">
-            {status?.initialized ? "Connected" : "Demo Mode"}
+          <Badge variant={Boolean((status as any)?.initialized) ? "default" : "secondary"} data-testid="thehive-status">
+            {Boolean((status as any)?.initialized) ? "Connected" : "Demo Mode"}
           </Badge>
         </div>
         <Button variant="outline" size="sm" data-testid="button-refresh">

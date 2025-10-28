@@ -92,9 +92,9 @@ export function FaceScannerAnimation({ className = "" }: FaceScannerAnimationPro
         const headX = centerX + offsetX;
         const headY = centerY - 5;
         
-        // Create 3D head vertex points for geometric assembly
-        const vertices = [];
-        const faces = [];
+  // Create 3D head vertex points for geometric assembly
+  type Vertex = { x: number; y: number; z: number };
+  const vertices: Vertex[] = [];
         
         // Define 3D head geometry vertices
         const baseVertices = [

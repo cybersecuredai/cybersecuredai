@@ -300,7 +300,7 @@ function ControlPanel({
                     <div key={threat.id} className="flex justify-between items-center">
                       <span className="text-xs text-gray-200">{threat.name}</span>
                       <Badge 
-                        size="sm"
+                        className="text-[10px] leading-4 px-1.5 py-0.5"
                         variant={threat.severity === 'critical' ? 'destructive' : 'secondary'}
                       >
                         {threat.severity}

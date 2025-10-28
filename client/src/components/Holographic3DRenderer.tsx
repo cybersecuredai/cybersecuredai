@@ -486,7 +486,7 @@ export const Holographic3DRenderer: React.FC<Holographic3DRendererProps> = ({
       }
 
       // Particle animation
-      const particles = threatGroup.children.find((child: any) => child instanceof THREE.Points);
+  const particles = threatGroup.children.find((child: any) => (child as any)?.isPoints);
       if (particles) {
         particles.rotation.y = elapsedTime * 0.5;
         particles.rotation.x = elapsedTime * 0.2;
@@ -506,13 +506,13 @@ export const Holographic3DRenderer: React.FC<Holographic3DRendererProps> = ({
     }
   };
 
-  const findThreatByObject = (object: THREE.Object3D): ThreatVisualization3D | null => {
+  const findThreatByObject = (object: any): ThreatVisualization3D | null => {
     let currentObject = object;
     while (currentObject) {
       if ((currentObject as any).threatData) {
         return (currentObject as any).threatData;
       }
-      currentObject = currentObject.parent as THREE.Object3D;
+      currentObject = currentObject.parent as any;
     }
     return null;
   };

@@ -291,20 +291,20 @@ export default function UnifiedSystemStatus() {
                 {system.id === 'pulse' && system.data && (
                   <>
                     <div className="text-center">
-                      <div className="text-lg font-bold text-white">{system.data.currentGeneration}</div>
+                      <div className="text-lg font-bold text-white">{(system.data as any).currentGeneration}</div>
                       <div className="text-xs text-gray-400">Generation</div>
                     </div>
                     <div className="text-center">
-                      <div className="text-lg font-bold text-white">{system.data.actualAccuracy}%</div>
+                      <div className="text-lg font-bold text-white">{(system.data as any).actualAccuracy}%</div>
                       <div className="text-xs text-gray-400">Accuracy</div>
                     </div>
                     <div className="text-center">
-                      <div className="text-lg font-bold text-white">{system.data.totalThreatsProcessed}</div>
+                      <div className="text-lg font-bold text-white">{(system.data as any).totalThreatsProcessed}</div>
                       <div className="text-xs text-gray-400">Threats Processed</div>
                     </div>
                     <div className="text-center">
-                      <Badge variant={system.data.autonomousMode ? "default" : "secondary"} className="w-full text-xs">
-                        {system.data.autonomousMode ? 'AUTONOMOUS' : 'MANUAL'}
+                      <Badge variant={(system.data as any).autonomousMode ? "default" : "secondary"} className="w-full text-xs">
+                        {(system.data as any).autonomousMode ? 'AUTONOMOUS' : 'MANUAL'}
                       </Badge>
                     </div>
                   </>
@@ -313,19 +313,19 @@ export default function UnifiedSystemStatus() {
                 {system.id === 'live-location' && system.data && (
                   <>
                     <div className="text-center">
-                      <div className="text-lg font-bold text-white">{system.data.totalDevices}</div>
+                      <div className="text-lg font-bold text-white">{(system.data as any).totalDevices}</div>
                       <div className="text-xs text-gray-400">Total Devices</div>
                     </div>
                     <div className="text-center">
-                      <div className="text-lg font-bold text-green-400">{system.data.onlineDevices}</div>
+                      <div className="text-lg font-bold text-green-400">{(system.data as any).onlineDevices}</div>
                       <div className="text-xs text-gray-400">Online</div>
                     </div>
                     <div className="text-center">
-                      <div className="text-lg font-bold text-yellow-400">{system.data.activeAlerts}</div>
+                      <div className="text-lg font-bold text-yellow-400">{(system.data as any).activeAlerts}</div>
                       <div className="text-xs text-gray-400">Active Alerts</div>
                     </div>
                     <div className="text-center">
-                      <div className="text-lg font-bold text-white">{system.data.geofences}</div>
+                      <div className="text-lg font-bold text-white">{(system.data as any).geofences}</div>
                       <div className="text-xs text-gray-400">Geofences</div>
                     </div>
                   </>
@@ -334,20 +334,20 @@ export default function UnifiedSystemStatus() {
                 {system.id === 'echo' && system.data && (
                   <>
                     <div className="text-center">
-                      <div className="text-lg font-bold text-white">{system.data.activeSessions}</div>
+                      <div className="text-lg font-bold text-white">{(system.data as any).activeSessions}</div>
                       <div className="text-xs text-gray-400">Active Sessions</div>
                     </div>
                     <div className="text-center">
-                      <div className="text-lg font-bold text-white">{system.data.threatsVisualized}</div>
+                      <div className="text-lg font-bold text-white">{(system.data as any).threatsVisualized}</div>
                       <div className="text-xs text-gray-400">Threats Visualized</div>
                     </div>
                     <div className="text-center">
-                      <div className="text-lg font-bold text-white">{system.data.aiInteractions}</div>
+                      <div className="text-lg font-bold text-white">{(system.data as any).aiInteractions}</div>
                       <div className="text-xs text-gray-400">AI Interactions</div>
                     </div>
                     <div className="text-center">
-                      <Badge variant={system.data.holographicEffects ? "default" : "secondary"} className="w-full text-xs">
-                        {system.data.renderQuality.toUpperCase()}
+                      <Badge variant={(system.data as any).holographicEffects ? "default" : "secondary"} className="w-full text-xs">
+                        {(system.data as any).renderQuality.toUpperCase()}
                       </Badge>
                     </div>
                   </>
@@ -356,19 +356,19 @@ export default function UnifiedSystemStatus() {
                 {system.id === 'surge' && system.data && (
                   <>
                     <div className="text-center">
-                      <div className="text-lg font-bold text-white">{system.data.totalDrones}</div>
+                      <div className="text-lg font-bold text-white">{(system.data as any).totalDrones}</div>
                       <div className="text-xs text-gray-400">Total Drones</div>
                     </div>
                     <div className="text-center">
-                      <div className="text-lg font-bold text-green-400">{system.data.activeDrones}</div>
+                      <div className="text-lg font-bold text-green-400">{(system.data as any).activeDrones}</div>
                       <div className="text-xs text-gray-400">Active</div>
                     </div>
                     <div className="text-center">
-                      <div className="text-lg font-bold text-white">{system.data.activeDeployments}</div>
+                      <div className="text-lg font-bold text-white">{(system.data as any).activeDeployments}</div>
                       <div className="text-xs text-gray-400">Deployments</div>
                     </div>
                     <div className="text-center">
-                      <div className="text-lg font-bold text-white">{system.data.averageBatteryLevel}%</div>
+                      <div className="text-lg font-bold text-white">{(system.data as any).averageBatteryLevel}%</div>
                       <div className="text-xs text-gray-400">Avg Battery</div>
                     </div>
                   </>

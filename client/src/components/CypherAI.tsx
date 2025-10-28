@@ -87,7 +87,7 @@ export function CypherAI({ isExpanded = false, onToggleExpand, className = "" }:
   });
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const recognition = useRef<SpeechRecognition | null>(null);
+  const recognition = useRef<any | null>(null);
   const { toast } = useToast();
 
   const scrollToBottom = () => {
@@ -101,13 +101,13 @@ export function CypherAI({ isExpanded = false, onToggleExpand, className = "" }:
   // Initialize speech recognition
   useEffect(() => {
     if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      recognition.current = new SpeechRecognition();
+  const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+  recognition.current = new SpeechRecognition();
       recognition.current.continuous = false;
       recognition.current.interimResults = false;
       recognition.current.lang = 'en-US';
 
-      recognition.current.onresult = (event) => {
+  recognition.current.onresult = (event: any) => {
         const transcript = event.results[0][0].transcript;
         setCurrentInput(transcript);
         setIsListening(false);

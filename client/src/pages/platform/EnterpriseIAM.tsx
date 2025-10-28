@@ -531,7 +531,7 @@ export default function EnterpriseIAM() {
                               </span>
                               <span className="text-white">
                                 {typeof value === 'boolean' ? (value ? 'Yes' : 'No') : 
-                                 Array.isArray(value) ? value.join(', ') : value}
+                                 Array.isArray(value) ? value.join(', ') : String(value)}
                               </span>
                             </div>
                           ))}

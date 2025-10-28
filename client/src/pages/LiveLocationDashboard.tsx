@@ -122,12 +122,6 @@ interface DashboardStats {
   averageResponseTime: number;
 }
 
-declare global {
-  interface Window {
-    google: any;
-  }
-}
-
 export default function LiveLocationDashboard() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -447,13 +441,14 @@ export default function LiveLocationDashboard() {
 
   // Update device markers on map
   useEffect(() => {
-    if (!map || !devicesData?.devices) return;
+    const devices = (devicesData as any)?.devices ?? [];
+    if (!map || devices.length === 0) return;
 
     // Clear existing markers
     markers.forEach(marker => marker.setMap(null));
     const newMarkers: any[] = [];
 
-    devicesData.devices.forEach((device: LiveLocationDevice) => {
+  devices.forEach((device: LiveLocationDevice) => {
       // Get latest location for device
       if (!device.locationTrackingEnabled) return;
 
@@ -539,8 +534,8 @@ export default function LiveLocationDashboard() {
           position: { lat: coords.lat + 0.02, lng: coords.lng },
           map: map,
           icon: {
-            labelOrigin: new window.google.maps.Point(0, 0),
-            size: new window.google.maps.Size(0, 0),
+            labelOrigin: new (window as any).google.maps.Point(0, 0),
+            size: new (window as any).google.maps.Size(0, 0),
           },
           label: {
             text: device.deviceName,
@@ -559,7 +554,7 @@ export default function LiveLocationDashboard() {
 
     // Global function for device selection
     (window as any).selectDevice = (deviceId: string) => {
-      const device = devicesData.devices.find((d: LiveLocationDevice) => d.id === deviceId);
+      const device = devices.find((d: LiveLocationDevice) => d.id === deviceId);
       if (device) {
         setSelectedDevice(device);
       }
@@ -568,13 +563,14 @@ export default function LiveLocationDashboard() {
 
   // Update geofence overlays
   useEffect(() => {
-    if (!map || !geofencesData?.geofences || !showGeofences) return;
+    const geofences = (geofencesData as any)?.geofences ?? [];
+    if (!map || geofences.length === 0 || !showGeofences) return;
 
     // Clear existing overlays
     geofenceOverlays.forEach(overlay => overlay.setMap(null));
     const newOverlays: any[] = [];
 
-    geofencesData.geofences.forEach((geofence: LiveLocationGeoFence) => {
+  geofences.forEach((geofence: LiveLocationGeoFence) => {
       if (!geofence.isActive) return;
 
       let overlay: any;
@@ -802,7 +798,7 @@ export default function LiveLocationDashboard() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-gray-400">Total Devices</p>
-                    <p className="text-2xl font-bold text-white">{dashboardData?.stats?.totalDevices || 0}</p>
+                    <p className="text-2xl font-bold text-white">{((dashboardData as any)?.stats?.totalDevices) || 0}</p>
                   </div>
                   <Monitor className="w-8 h-8 text-blue-400" />
                 </div>
@@ -814,7 +810,7 @@ export default function LiveLocationDashboard() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-gray-400">Online Devices</p>
-                    <p className="text-2xl font-bold text-green-400">{dashboardData?.stats?.onlineDevices || 0}</p>
+                    <p className="text-2xl font-bold text-green-400">{((dashboardData as any)?.stats?.onlineDevices) || 0}</p>
                   </div>
                   <Activity className="w-8 h-8 text-green-400" />
                 </div>
@@ -826,7 +822,7 @@ export default function LiveLocationDashboard() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-gray-400">Active Alerts</p>
-                    <p className="text-2xl font-bold text-red-400">{dashboardData?.stats?.activeAlerts || 0}</p>
+                    <p className="text-2xl font-bold text-red-400">{((dashboardData as any)?.stats?.activeAlerts) || 0}</p>
                   </div>
                   <AlertTriangle className="w-8 h-8 text-red-400" />
                 </div>
@@ -838,7 +834,7 @@ export default function LiveLocationDashboard() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-gray-400">Geofences</p>
-                    <p className="text-2xl font-bold text-purple-400">{dashboardData?.stats?.geofences || 0}</p>
+                    <p className="text-2xl font-bold text-purple-400">{((dashboardData as any)?.stats?.geofences) || 0}</p>
                   </div>
                   <Shield className="w-8 h-8 text-purple-400" />
                 </div>
@@ -985,14 +981,14 @@ export default function LiveLocationDashboard() {
                       <Skeleton key={i} className="h-16 bg-gray-700" />
                     ))}
                   </div>
-                ) : alertsData?.alerts?.length === 0 ? (
+                ) : ((alertsData as any)?.alerts?.length === 0) ? (
                   <div className="text-center py-8">
                     <CheckCircle className="w-12 h-12 mx-auto mb-2 text-green-400" />
                     <p className="text-gray-400">No active alerts</p>
                   </div>
                 ) : (
                   <div className="space-y-3 max-h-96 overflow-y-auto">
-                    {alertsData?.alerts?.slice(0, 10).map((alert: LiveLocationAlert) => (
+                    {(((alertsData as any)?.alerts) ?? []).slice(0, 10).map((alert: LiveLocationAlert) => (
                       <div key={alert.id} className="p-3 bg-gray-700 rounded-lg">
                         <div className="flex items-start justify-between mb-2">
                           <div className="flex items-center space-x-2">
@@ -1067,7 +1063,7 @@ export default function LiveLocationDashboard() {
                     </tr>
                   </thead>
                   <tbody>
-                    {devicesData?.devices?.map((device: LiveLocationDevice) => (
+                    {(((devicesData as any)?.devices) ?? []).map((device: LiveLocationDevice) => (
                       <tr key={device.id} className="border-b border-gray-700 hover:bg-gray-700">
                         <td className="py-3 px-2">
                           <div className="flex items-center space-x-3">

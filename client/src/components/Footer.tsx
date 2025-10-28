@@ -3,13 +3,13 @@ import { Bot, Shield, Mail, Phone, MapPin, Twitter, Linkedin, Github, ExternalLi
 // Import actual webp images from attached assets
 // Large asset moved to external storage for deployment optimization (10.51 MB)
 const cypherAiAssistImage = "/public-objects/Cypher AI Assist_1757956837639.png";
-import ferpaCompliantImg from "@assets/FERPA_1757954427636.webp";
-import fismaCompliantImg from "@assets/FISME_1757954427636.webp";
-import fedrampAuthorizedImg from "@assets/FedRamp_1757954427635.webp";
-import nistCompliantImg from "@assets/NIST_1757954437923.webp";
-import isoCompliantImg from "@assets/ISO_1757954427638.webp";
-import cyberSecuredLogoImg from "@assets/CyberSecured AI logo_1757954427635.webp";
-import soc2CompliantImg from "@assets/SOC 2_1757954437932.webp";
+const ferpaCompliantImg = "/favicon.png";
+const fismaCompliantImg = "/favicon.png";
+const fedrampAuthorizedImg = "/favicon.png";
+const nistCompliantImg = "/favicon.png";
+const isoCompliantImg = "/favicon.png";
+const cyberSecuredLogoImg = "/favicon.png";
+const soc2CompliantImg = "/favicon.png";
 
 type FooterTone = 'default' | 'lighter';
 

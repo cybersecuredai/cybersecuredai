@@ -494,7 +494,7 @@ export default function EchoInterface() {
             <Badge variant="outline" data-testid="websocket-status">
               WS: {wsConnectionStatus}
             </Badge>
-            {dashboardData && (
+            {!!dashboardData && (
               <Badge variant="outline" data-testid="threats-count">
                 Threats: {threats3D.length}
               </Badge>
