@@ -169,9 +169,9 @@ export default function Home() {
               
               {/* Professional Dashboard Interface - Matching cybersecuredai.com */}
               <div className="max-w-6xl mx-auto mb-16">
-                <div className="relative bg-slate-800/70 rounded-xl border border-cyan-500/30 shadow-2xl overflow-hidden">
+                <div className="relative bg-slate-800/60 rounded-xl border border-cyan-500/30 shadow-2xl overflow-hidden">
                   {/* Browser-style Header */}
-                  <div className="bg-slate-700/70 p-3 border-b border-cyan-500/20">
+                  <div className="bg-slate-700/60 p-3 border-b border-cyan-500/20">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-2">
                         <div className="flex space-x-1">
@@ -186,7 +186,7 @@ export default function Home() {
                   </div>
 
                   {/* Dashboard Header */}
-                  <div className="bg-slate-800/70 p-3 md:p-4 border-b border-cyan-500/20">
+                  <div className="bg-slate-800/60 p-3 md:p-4 border-b border-cyan-500/20">
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0">
                       <div className="flex items-center space-x-3">
                         <Enhanced4DShieldIcon className="w-5 h-5 md:w-6 md:h-6 text-cyan-400" size={24} />
@@ -799,7 +799,7 @@ export default function Home() {
                 </div>
                 
                 {/* Status Indicators */}
-                <div className="absolute top-6 left-6 bg-slate-900/70 rounded-lg p-3 border border-cyan-500/30">
+                <div className="absolute top-6 left-6 bg-slate-900/60 rounded-lg p-3 border border-cyan-500/30">
                   <div className="flex items-center space-x-2">
                     <div className="w-3 h-3 rounded-full bg-cyan-400 animate-pulse"></div>
                     <span className="text-white text-sm font-medium">
@@ -809,7 +809,7 @@ export default function Home() {
                 </div>
 
                 {/* Demo Overlay */}
-                <div className="absolute top-[10%] right-[20%] bg-slate-900/70 rounded-lg p-4 border border-cyan-500/50 max-w-xs">
+                <div className="absolute top-[10%] right-[20%] bg-slate-900/60 rounded-lg p-4 border border-cyan-500/50 max-w-xs">
                   <div className="text-cyan-400 text-sm font-bold mb-2">⚡ LIVE DEMO</div>
                   <div className="space-y-1 text-xs text-gray-300">
                     <div>Facial Recognition: Active</div>
@@ -1239,7 +1239,7 @@ export default function Home() {
                 
                 {/* Dashboard Header */}
                 <div className="absolute top-6 left-6 right-6 z-10">
-                  <div className="flex items-center justify-between bg-slate-800/70 rounded-lg p-3 border border-cyan-500/30">
+                  <div className="flex items-center justify-between bg-slate-800/60 rounded-lg p-3 border border-cyan-500/30">
                     <div className="flex items-center space-x-3">
                       <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
                       <span className="text-white font-semibold">Cypher AI + Threat Intelligence</span>
@@ -1255,11 +1255,11 @@ export default function Home() {
                 {/* Threat Statistics */}
                 <div className="absolute top-20 left-6 right-6 z-10">
                   <div className="grid grid-cols-3 gap-4 mb-6">
-                    <div className="bg-slate-800/70 rounded-lg p-3 border border-red-500/30 text-center">
+                    <div className="bg-slate-800/60 rounded-lg p-3 border border-red-500/30 text-center">
                       <div className="text-red-400 text-2xl font-bold">247</div>
                       <div className="text-gray-300 text-xs">Threats Blocked</div>
                     </div>
-                    <div className="bg-slate-800/70 rounded-lg p-3 border border-yellow-500/30 text-center">
+                    <div className="bg-slate-800/60 rounded-lg p-3 border border-yellow-500/30 text-center">
                       <div className="text-yellow-400 text-2xl font-bold">12</div>
                       <div className="text-gray-300 text-xs">Investigations</div>
                     </div>
