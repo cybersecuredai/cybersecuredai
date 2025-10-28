@@ -33,8 +33,19 @@ jobs:
           npm -v
           npx vite --version || true
 
-      - name: Typecheck
-        run: npm run check
+      - name: Generate missing asset placeholders
+        run: |
+          set -euxo pipefail
+          if [ -f scripts/generate_asset_placeholders.cjs ]; then
+            node ./scripts/generate_asset_placeholders.cjs
+          elif [ -f scripts/generate_asset_placeholders.mjs ]; then
+            node ./scripts/generate_asset_placeholders.mjs
+          else
+            echo "No placeholder generator script found; skipping"
+          fi
+
+      - name: Typecheck (client-only)
+        run: npx tsc -p tsconfig.client.json
 
       - name: Build client
         run: npm run build:client

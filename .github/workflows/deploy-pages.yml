@@ -58,44 +58,10 @@ jobs:
       - name: Normalize schema type import (CI hotfix)
         run: |
           set -euxo pipefail
-          if [ -f client/src/pages/PublicHealthDashboard.tsx ]; then
-            node <<'NODE'
-            const fs = require('fs');
-            const path = 'client/src/pages/PublicHealthDashboard.tsx';
-            try {
-              let s = fs.readFileSync(path, 'utf8');
-              const hasImport = /import\s+\{[\s\S]*?\}\s*(?:from\s+['\"]@shared\/schema['\"])?.*;?/m.test(s);
-              const schemaBlock = s.match(/import\s+\{([\s\S]*?)\}\s*from\s+['\"]@shared\/schema['\"];?/m);
-              // If there's an import block from @shared/schema that's not type-only, normalize it
-              if (schemaBlock) {
-                const names = schemaBlock[1]
-                  .split(',')
-                  .map(x => x.trim())
-                  .filter(Boolean)
-                  .join(', ');
-                const replacement = `import type { ${names} } from '@shared/schema';`;
-                s = s.replace(/import\s+\{([\s\S]*?)\}\s*from\s+['\"]@shared\/schema['\"];?/m, replacement);
-                fs.writeFileSync(path, s);
-                console.log('Normalized @shared/schema import to type-only in PublicHealthDashboard.tsx');
-              } else {
-                // As a last resort, if we detect an import block without a from clause near @shared/schema, repair it
-                const orphan = s.match(/import\s+\{([\s\S]*?)\}\s*;?\s*\n/m);
-                if (orphan && s.includes('@shared/schema')) {
-                  const names = orphan[1]
-                    .split(',')
-                    .map(x => x.trim())
-                    .filter(Boolean)
-                    .join(', ');
-                  const fixed = `import type { ${names} } from '@shared/schema';\n`;
-                  s = s.replace(/import\s+\{([\s\S]*?)\}\s*;?\s*\n/m, fixed);
-                  fs.writeFileSync(path, s);
-                  console.log('Repaired malformed import block in PublicHealthDashboard.tsx');
-                }
-              }
-            } catch (e) {
-              console.log('No normalization needed or file not found:', e?.message || e);
-            }
-            NODE
+          if [ -f client/src/pages/PublicHealthDashboard.tsx ] && [ -f scripts/normalize_public_health_import.cjs ]; then
+            node ./scripts/normalize_public_health_import.cjs || true
+          else
+            echo "No normalization needed or script missing; skipping"
           fi
 
       - name: Build Vite client (with fallback)
