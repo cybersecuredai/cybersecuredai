@@ -171,7 +171,7 @@ export default function Home() {
               <div className="max-w-6xl mx-auto mb-16">
                 <div className="relative bg-slate-800/70 rounded-xl border border-cyan-500/30 shadow-2xl overflow-hidden">
                   {/* Browser-style Header */}
-                  <div className="bg-slate-700/80 p-3 border-b border-cyan-500/20">
+                  <div className="bg-slate-700/70 p-3 border-b border-cyan-500/20">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-2">
                         <div className="flex space-x-1">
@@ -262,13 +262,13 @@ export default function Home() {
                           </div>
                           
                           {/* REAL-TIME Indicator */}
-                          <div className="absolute top-3 right-3 bg-green-600/90 text-white text-xs px-2 py-1 rounded flex items-center space-x-1 z-20">
+                          <div className="absolute top-3 right-3 bg-green-600/70 text-white text-xs px-2 py-1 rounded flex items-center space-x-1 z-20">
                             <span className="text-green-300">●</span>
                             <span>REAL-TIME</span>
                           </div>
 
                           {/* Threat Levels Legend */}
-                          <div className="absolute bottom-3 left-3 bg-slate-900/90 rounded p-3 z-20">
+                          <div className="absolute bottom-3 left-3 bg-slate-900/70 rounded p-3 z-20">
                             <div className="text-white text-xs font-bold mb-2">Threat Levels</div>
                             <div className="space-y-1">
                               <div className="flex items-center space-x-2">
@@ -293,7 +293,7 @@ export default function Home() {
                           </div>
 
                           {/* Active Threats Counter */}
-                          <div className="absolute bottom-3 right-3 bg-slate-900/90 text-white text-xs px-3 py-1 rounded font-bold z-20">
+                          <div className="absolute bottom-3 right-3 bg-slate-900/70 text-white text-xs px-3 py-1 rounded font-bold z-20">
                             5 ACTIVE THREATS
                           </div>
 
@@ -842,7 +842,7 @@ export default function Home() {
               <Card className="holographic-card border-cyan-500/30 bg-slate-800/50 relative overflow-hidden">
                 <CardHeader>
                   <div className="flex items-center space-x-3 mb-4">
-                    <div className="w-16 h-16 bg-slate-800/80 rounded-2xl border-2 border-cyan-500/50 flex items-center justify-center hover:border-cyan-400 transition-all duration-300">
+                    <div className="w-16 h-16 bg-slate-800/70 rounded-2xl border-2 border-cyan-500/50 flex items-center justify-center hover:border-cyan-400 transition-all duration-300">
                       <Enhanced4DShieldIcon className="w-8 h-8 text-cyan-400" size={32} />
                     </div>
                     <CardTitle className="text-cyan-300 font-bold">
@@ -876,7 +876,7 @@ export default function Home() {
               <Card className="holographic-card border-purple-500/30 bg-slate-800/50 relative overflow-hidden">
                 <CardHeader>
                   <div className="flex items-center space-x-3 mb-4">
-                    <div className="w-16 h-16 bg-slate-800/80 rounded-2xl border-2 border-purple-500/50 flex items-center justify-center hover:border-purple-400 transition-all duration-300">
+                    <div className="w-16 h-16 bg-slate-800/70 rounded-2xl border-2 border-purple-500/50 flex items-center justify-center hover:border-purple-400 transition-all duration-300">
                       <Enhanced4DLockIcon className="w-8 h-8 text-purple-400" size={32} />
                     </div>
                     <CardTitle className="text-purple-300 font-bold">
@@ -910,7 +910,7 @@ export default function Home() {
               <Card className="holographic-card border-red-500/30 bg-slate-800/50">
                 <CardHeader>
                   <div className="flex items-center space-x-3 mb-4">
-                    <div className="w-16 h-16 bg-slate-800/80 rounded-2xl border-2 border-red-500/50 flex items-center justify-center hover:border-red-400 transition-all duration-300">
+                    <div className="w-16 h-16 bg-slate-800/70 rounded-2xl border-2 border-red-500/50 flex items-center justify-center hover:border-red-400 transition-all duration-300">
                       <Enhanced4DAlertTriangleIcon className="w-8 h-8 text-red-400" size={32} />
                     </div>
                     <CardTitle className="text-red-300 font-bold">
@@ -1061,7 +1061,7 @@ export default function Home() {
                 <Card className="bg-gradient-to-br from-purple-900/50 to-slate-800/50 border-2 border-purple-500/50 hover:border-purple-400 transition-all duration-300">
                   <CardContent className="p-8">
                     <div className="flex items-center mb-6">
-                      <div className="w-16 h-16 bg-slate-800/80 rounded-2xl border-2 border-purple-500/50 flex items-center justify-center mr-4 hover:border-purple-400 transition-all duration-300">
+                      <div className="w-16 h-16 bg-slate-800/70 rounded-2xl border-2 border-purple-500/50 flex items-center justify-center mr-4 hover:border-purple-400 transition-all duration-300">
                         <img src={cypherAiGenImage} alt="Cypher AI Gen" className="w-12 h-12 rounded-full" />
                       </div>
                       <div>
@@ -1093,7 +1093,7 @@ export default function Home() {
                 <Card className="bg-gradient-to-br from-cyan-900/50 to-slate-800/50 border-2 border-cyan-500/50 hover:border-cyan-400 transition-all duration-300">
                   <CardContent className="p-8">
                     <div className="flex items-center mb-6">
-                      <div className="w-16 h-16 bg-slate-800/80 rounded-2xl border-2 border-cyan-500/50 flex items-center justify-center mr-4 hover:border-cyan-400 transition-all duration-300">
+                      <div className="w-16 h-16 bg-slate-800/70 rounded-2xl border-2 border-cyan-500/50 flex items-center justify-center mr-4 hover:border-cyan-400 transition-all duration-300">
                         <img src={cypherAiAssistImage} alt="Cypher AI Assistant" className="w-12 h-12 rounded-full" />
                       </div>
                       <div>
@@ -1147,7 +1147,7 @@ export default function Home() {
                 <Card className="bg-slate-800/50 border-purple-500/30">
                   <CardContent className="p-6">
                     <div className="flex items-center mb-4">
-                      <div className="w-12 h-12 bg-slate-800/80 rounded-xl border-2 border-purple-500/50 flex items-center justify-center mr-3 hover:border-purple-400 transition-all duration-300">
+                      <div className="w-12 h-12 bg-slate-800/70 rounded-xl border-2 border-purple-500/50 flex items-center justify-center mr-3 hover:border-purple-400 transition-all duration-300">
                         <Enhanced4DBrainIcon className="w-6 h-6 text-purple-400" size={24} />
                       </div>
                       <h4 className="text-lg font-bold text-white">Genetic Evolution Engine</h4>
@@ -1161,7 +1161,7 @@ export default function Home() {
                 <Card className="bg-slate-800/50 border-cyan-500/30">
                   <CardContent className="p-6">
                     <div className="flex items-center mb-4">
-                      <div className="w-12 h-12 bg-slate-800/80 rounded-xl border-2 border-cyan-500/50 flex items-center justify-center mr-3 hover:border-cyan-400 transition-all duration-300">
+                      <div className="w-12 h-12 bg-slate-800/70 rounded-xl border-2 border-cyan-500/50 flex items-center justify-center mr-3 hover:border-cyan-400 transition-all duration-300">
                         <Enhanced4DActivityIcon className="w-6 h-6 text-cyan-400" size={24} />
                       </div>
                       <h4 className="text-lg font-bold text-white">Meeting Intelligence</h4>
@@ -1175,7 +1175,7 @@ export default function Home() {
                 <Card className="bg-slate-800/50 border-green-500/30">
                   <CardContent className="p-6">
                     <div className="flex items-center mb-4">
-                      <div className="w-12 h-12 bg-slate-800/80 rounded-xl border-2 border-green-500/50 flex items-center justify-center mr-3 hover:border-green-400 transition-all duration-300">
+                      <div className="w-12 h-12 bg-slate-800/70 rounded-xl border-2 border-green-500/50 flex items-center justify-center mr-3 hover:border-green-400 transition-all duration-300">
                         <Enhanced4DCheckCircleIcon className="w-6 h-6 text-green-400" size={24} />
                       </div>
                       <h4 className="text-lg font-bold text-white">Adaptive Threat Detection</h4>
@@ -1189,7 +1189,7 @@ export default function Home() {
                 <Card className="bg-slate-800/50 border-orange-500/30">
                   <CardContent className="p-6">
                     <div className="flex items-center mb-4">
-                      <div className="w-12 h-12 bg-slate-800/80 rounded-xl border-2 border-orange-500/50 flex items-center justify-center mr-3 hover:border-orange-400 transition-all duration-300">
+                      <div className="w-12 h-12 bg-slate-800/70 rounded-xl border-2 border-orange-500/50 flex items-center justify-center mr-3 hover:border-orange-400 transition-all duration-300">
                         <Enhanced4DTargetIcon className="w-6 h-6 text-orange-400" size={24} />
                       </div>
                       <h4 className="text-lg font-bold text-white">Ticket Intelligence</h4>
@@ -1203,7 +1203,7 @@ export default function Home() {
                 <Card className="bg-slate-800/50 border-blue-500/30">
                   <CardContent className="p-6">
                     <div className="flex items-center mb-4">
-                      <div className="w-12 h-12 bg-slate-800/80 rounded-xl border-2 border-blue-500/50 flex items-center justify-center mr-3 hover:border-blue-400 transition-all duration-300">
+                      <div className="w-12 h-12 bg-slate-800/70 rounded-xl border-2 border-blue-500/50 flex items-center justify-center mr-3 hover:border-blue-400 transition-all duration-300">
                         <Enhanced4DUsersIcon className="w-6 h-6 text-blue-400" size={24} />
                       </div>
                       <h4 className="text-lg font-bold text-white">24/7 Operations</h4>
@@ -1217,7 +1217,7 @@ export default function Home() {
                 <Card className="bg-slate-800/50 border-yellow-500/30">
                   <CardContent className="p-6">
                     <div className="flex items-center mb-4">
-                      <div className="w-12 h-12 bg-slate-800/80 rounded-xl border-2 border-yellow-500/50 flex items-center justify-center mr-3 hover:border-yellow-400 transition-all duration-300">
+                      <div className="w-12 h-12 bg-slate-800/70 rounded-xl border-2 border-yellow-500/50 flex items-center justify-center mr-3 hover:border-yellow-400 transition-all duration-300">
                         <Enhanced4DZapIcon className="w-6 h-6 text-yellow-400" size={24} />
                       </div>
                       <h4 className="text-lg font-bold text-white">Communication Tracking</h4>
@@ -1255,15 +1255,15 @@ export default function Home() {
                 {/* Threat Statistics */}
                 <div className="absolute top-20 left-6 right-6 z-10">
                   <div className="grid grid-cols-3 gap-4 mb-6">
-                    <div className="bg-slate-800/80 rounded-lg p-3 border border-red-500/30 text-center">
+                    <div className="bg-slate-800/70 rounded-lg p-3 border border-red-500/30 text-center">
                       <div className="text-red-400 text-2xl font-bold">247</div>
                       <div className="text-gray-300 text-xs">Threats Blocked</div>
                     </div>
-                    <div className="bg-slate-800/80 rounded-lg p-3 border border-yellow-500/30 text-center">
+                    <div className="bg-slate-800/70 rounded-lg p-3 border border-yellow-500/30 text-center">
                       <div className="text-yellow-400 text-2xl font-bold">12</div>
                       <div className="text-gray-300 text-xs">Investigations</div>
                     </div>
-                    <div className="bg-slate-800/80 rounded-lg p-3 border border-green-500/30 text-center">
+                    <div className="bg-slate-800/70 rounded-lg p-3 border border-green-500/30 text-center">
                       <div className="text-green-400 text-2xl font-bold">99.8%</div>
                       <div className="text-gray-300 text-xs">Uptime</div>
                     </div>
@@ -1408,7 +1408,7 @@ export default function Home() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-20">
               
               {/* AI Threat Detection */}
-              <Card className="bg-slate-800/80 border border-cyan-500/30 hover:border-cyan-400/60 transition-all duration-300 group cursor-pointer">
+              <Card className="bg-slate-800/70 border border-cyan-500/30 hover:border-cyan-400/60 transition-all duration-300 group cursor-pointer">
                 <CardHeader className="text-center p-8">
                   <div className="w-20 h-20 bg-cyan-500/20 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:bg-cyan-500/30 transition-colors">
                     <CustomBrainIcon className="w-10 h-10 text-cyan-400" size={40} />
@@ -1429,7 +1429,7 @@ export default function Home() {
               </Card>
 
               {/* Zero Trust Security */}
-              <Card className="bg-slate-800/80 border border-blue-500/30 hover:border-blue-400/60 transition-all duration-300 group cursor-pointer">
+              <Card className="bg-slate-800/70 border border-blue-500/30 hover:border-blue-400/60 transition-all duration-300 group cursor-pointer">
                 <CardHeader className="text-center p-8">
                   <div className="w-20 h-20 bg-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:bg-blue-500/30 transition-colors">
                     <CustomShieldIcon className="w-10 h-10 text-blue-400" size={40} />
@@ -1450,7 +1450,7 @@ export default function Home() {
               </Card>
 
               {/* Compliance Automation */}
-              <Card className="bg-slate-800/80 border border-green-500/30 hover:border-green-400/60 transition-all duration-300 group cursor-pointer">
+              <Card className="bg-slate-800/70 border border-green-500/30 hover:border-green-400/60 transition-all duration-300 group cursor-pointer">
                 <CardHeader className="text-center p-8">
                   <div className="w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:bg-green-500/30 transition-colors">
                     <CustomFileTextIcon className="w-10 h-10 text-green-400" size={40} />
@@ -1763,7 +1763,7 @@ export default function Home() {
               
               <div className="flex items-center space-x-2 relative z-10">
                 <img src={cypherAiAssistImage} alt="Cypher AI Assistant" className="w-18 h-18 rounded-full" style={{ width: '72px', height: '72px' }} />
-                <span className="hidden group-hover:block absolute right-20 top-1/2 transform -translate-y-1/2 bg-slate-800/90 backdrop-blur-sm text-white px-3 py-1 rounded-lg text-sm whitespace-nowrap shadow-lg border border-slate-600/50">
+                <span className="hidden group-hover:block absolute right-20 top-1/2 transform -translate-y-1/2 bg-slate-800/70 backdrop-blur-sm text-white px-3 py-1 rounded-lg text-sm whitespace-nowrap shadow-lg border border-slate-600/50">
                   Ask Cypher AI
                 </span>
               </div>
