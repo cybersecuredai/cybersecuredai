@@ -87,6 +87,10 @@ jobs:
             ls -la dist || true
             exit 1
           fi
+          # Include attached_assets so absolute references like /attached_assets/... resolve on Pages
+          if [ -d attached_assets ]; then
+            rsync -a attached_assets/ _site/attached_assets/
+          fi
           # Ensure CNAME is included for custom domain
           if [ -f CNAME ]; then cp CNAME _site/CNAME; fi
           # SPA/404 fallback to avoid 404s on deep links
