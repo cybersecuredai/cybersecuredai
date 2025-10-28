@@ -42,10 +42,8 @@ import networkSecurityImg from "@assets/generated_images/Network_Security_Demo_f
 import incidentResponseImg from "@assets/generated_images/Automated_Incident_Response_9b65f496.jpg";
 import socDashboardImg from "@assets/generated_images/SOC_Dashboard_Management_23c1af0b.jpg";
 
-// POD Intelligence System Logos
-import orcaLogoImg from "@assets/ORCA logo_1758558742074.png";
-import apexLogoImg from "@assets/APEX logo_1758557596082.png";
-import echoLogoImg from "@assets/ECHO_1758557621209.png";
+// POD Intelligence System Logos (use public assets to avoid CI failures)
+import { orcaLogo, apexLogo, echoLogo } from "@/assets/logos";
 
 export default function Platform() {
   const [, setLocation] = useLocation();
@@ -57,7 +55,7 @@ export default function Platform() {
       title: "APEX",
       fullName: "Advanced Pattern Exchange",
       description: "Genetic AI Engine with self-evolving threat detection algorithms powered by PyTorch & DEAP",
-      icon: <img src={apexLogoImg} alt="APEX" className="w-10 h-10" />,
+  icon: <img src={apexLogo} alt="APEX" className="w-10 h-10" />,
       color: "border-purple-500/50",
       gradient: "from-purple-900/50 to-slate-800/50",
       features: [
@@ -86,7 +84,7 @@ export default function Platform() {
       title: "ECHO",
       fullName: "Enhanced Cybersecurity Holographic Operations",
       description: "5D Holographic Interface with live human-like avatar for intuitive threat visualization and interaction",
-      icon: <img src={echoLogoImg} alt="ECHO" className="w-10 h-10" />,
+  icon: <img src={echoLogo} alt="ECHO" className="w-10 h-10" />,
       color: "border-cyan-500/50",
       gradient: "from-cyan-900/50 to-slate-800/50",
       features: [

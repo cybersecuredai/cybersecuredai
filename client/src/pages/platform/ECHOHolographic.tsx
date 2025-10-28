@@ -74,7 +74,7 @@ import {
 } from "@/components/LazyCustomIcons";
 
 // ECHO Logo
-import echoLogoImg from "@assets/ECHO_1758557621209.png";
+import { echoLogo } from "@/assets/logos";
 
 export default function ECHOHolographic() {
   const [isLive, setIsLive] = useState(true);
@@ -377,7 +377,7 @@ export default function ECHOHolographic() {
             <div className="flex items-center space-x-6 mb-8">
               <div className="w-20 h-20 flex-shrink-0">
                 <img 
-                  src={echoLogoImg} 
+              src={echoLogo} 
                   alt="ECHO - Enhanced Cybersecurity Holographic Operations" 
                   className="w-full h-full object-contain"
                   data-testid="echo-logo"

@@ -28,6 +28,8 @@ import { Link } from "wouter";
 import platformImg from "@assets/generated_images/Security_Analytics_Dashboard_ca1f5822.jpg";
 import innovationImg from "@assets/generated_images/AI_Security_Implementation_d7886bac.jpg";
 import complianceImg from "@assets/generated_images/Federal_Compliance_Certification_2faa9e41.jpg";
+// Ensure ECHO logo references public asset to avoid CI failures (if used on this page)
+import { echoLogo } from "@/assets/logos";
 
 export default function AboutUs() {
   const keyMetrics = [

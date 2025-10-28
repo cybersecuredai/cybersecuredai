@@ -43,7 +43,7 @@ import {
 } from "@/components/LazyCustomIcons";
 
 // ECHO Logo
-import echoLogoImg from "@assets/ECHO_1758557621209.png";
+import { echoLogo } from "@/assets/logos";
 
 export default function ECHOSystem() {
   const holographicCapabilities = [
@@ -251,7 +251,7 @@ export default function ECHOSystem() {
           <div className="container mx-auto max-w-6xl text-center relative z-10">
             <div className="flex items-center justify-center mb-8">
               <div className="w-24 h-24 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-3xl p-2 shadow-2xl">
-                <img src={echoLogoImg} alt="ECHO Logo" className="w-full h-full object-contain" />
+                <img src={echoLogo} alt="ECHO Logo" className="w-full h-full object-contain" />
               </div>
             </div>
             <h1 className="text-6xl md:text-7xl font-bold text-white mb-6 geometric-text">

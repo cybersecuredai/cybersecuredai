@@ -49,10 +49,8 @@ import managedServicesImg from "@assets/generated_images/SOC_Dashboard_Managemen
 import professionalImg from "@assets/generated_images/Client_Success_Story_e83fb121.jpg";
 import supportImg from "@assets/generated_images/Success_Kit_Collection_aad5a657.jpg";
 
-// POD Intelligence System Logos
-import orcaLogoImg from "@assets/ORCA logo_1758558742074.png";
-import apexLogoImg from "@assets/APEX logo_1758557596082.png";
-import echoLogoImg from "@assets/ECHO_1758557621209.png";
+// POD Intelligence System Logos (use public assets to avoid CI failures)
+import { orcaLogo, apexLogo, echoLogo } from "@/assets/logos";
 
 export default function Services() {
   const [selectedCategory, setSelectedCategory] = useState("managed");
@@ -62,7 +60,7 @@ export default function Services() {
   const podIntelligenceServices = [
     {
       category: "APEX Genetic AI Services",
-      icon: <img src={apexLogoImg} alt="APEX" className="w-10 h-10" />,
+  icon: <img src={apexLogo} alt="APEX" className="w-10 h-10" />,
       description: "Self-evolving AI security services powered by genetic algorithms",
       color: "border-purple-500/50",
       gradient: "from-purple-900/50 to-slate-800/50",
@@ -92,7 +90,7 @@ export default function Services() {
     },
     {
       category: "ECHO Holographic Services",
-      icon: <img src={echoLogoImg} alt="ECHO" className="w-10 h-10" />,
+  icon: <img src={echoLogo} alt="ECHO" className="w-10 h-10" />,
       description: "5D holographic interface deployment and AI avatar integration",
       color: "border-cyan-500/50",
       gradient: "from-cyan-900/50 to-slate-800/50",
