@@ -1,0 +1,112 @@
+name: DB Ping Smoke (GovCloud)
+
+on:
+  workflow_dispatch:
+    inputs:
+      app_url:
+        description: "Base URL to your app (e.g.,https://Orca-ALB-222526124.us-gov-west-1.elb.amazonaws.com)"
+        required: true
+        type: string
+      path:
+        description: "Endpoint path to ping"
+        required: false
+        default: "/api/db/ping"
+        type: string
+      expect_status:
+        description: "Expected HTTP status code"
+        required: false
+        default: "200"
+        type: string
+      retries:
+        description: "Max number of retries"
+        required: false
+        default: "12"
+        type: string
+      delay_seconds:
+        description: "Delay between retries in seconds"
+        required: false
+        default: "10"
+        type: string
+      insecure:
+        description: "Allow insecure TLS (self-signed certs)"
+        required: false
+        default: false
+        type: boolean
+
+concurrency:
+  group: db-ping-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  ping:
+    name: Ping endpoint
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Build URL
+        id: build
+        shell: bash
+        run: |
+          PATH_INPUT="${{ inputs.path }}"
+          if [[ -z "$PATH_INPUT" ]]; then PATH_INPUT="/api/db/ping"; fi
+          if [[ "$PATH_INPUT" != /* ]]; then PATH_INPUT="/$PATH_INPUT"; fi
+          URL="${{ inputs.app_url }}${PATH_INPUT}"
+          echo "url=$URL" >> "$GITHUB_OUTPUT"
+
+      - name: Show config
+        shell: bash
+        run: |
+          echo "URL: ${{ steps.build.outputs.url }}"
+          echo "Expected: ${{ inputs.expect_status }}"
+          echo "Retries: ${{ inputs.retries }}, Delay: ${{ inputs.delay_seconds }}s"
+
+      - name: Check /api/health (optional)
+        id: health
+        continue-on-error: true
+        shell: bash
+        run: |
+          HEALTH_URL="${{ inputs.app_url }}/api/health"
+          echo "Hitting $HEALTH_URL"
+          set -x
+          curl -sS -m 10 -w "%{http_code}\n" -o /tmp/health.json "$HEALTH_URL" | tee /tmp/health.code
+          echo "body=$(cat /tmp/health.json | sed 's/%/%%/g')" >> "$GITHUB_OUTPUT"
+          echo "code=$(cat /tmp/health.code)" >> "$GITHUB_OUTPUT"
+
+      - name: Ping endpoint with retries
+        id: ping
+        shell: bash
+        run: |
+          URL="${{ steps.build.outputs.url }}"
+          EXPECT="${{ inputs.expect_status }}"
+          RETRIES="${{ inputs.retries }}"
+          DELAY="${{ inputs.delay_seconds }}"
+          CURL_OPTS=( -sS -m 10 -w "%{http_code}\n" -o /tmp/ping.json )
+          if [[ "${{ inputs.insecure }}" == "true" ]]; then
+            CURL_OPTS+=( -k )
+          fi
+          attempt=1
+          code=""
+          while [[ $attempt -le $RETRIES ]]; do
+            echo "Attempt $attempt/$RETRIES: $URL"
+            code=$(curl "${CURL_OPTS[@]}" "$URL")
+            echo "HTTP $code"
+            if [[ "$code" == "$EXPECT" ]]; then
+              break
+            fi
+            sleep "$DELAY"
+            attempt=$((attempt+1))
+          done
+          echo "code=$code" >> "$GITHUB_OUTPUT"
+          echo "body=$(cat /tmp/ping.json | sed 's/%/%%/g')" >> "$GITHUB_OUTPUT"
+          if [[ "$code" != "$EXPECT" ]]; then
+            echo "::error::Expected $EXPECT but got $code"
+            echo "Response body:" && cat /tmp/ping.json || true
+            exit 1
+          fi
+
+      - name: Print response body
+        if: success()
+        shell: bash
+        run: |
+          echo "Response body:"
+          cat /tmp/ping.json || true
