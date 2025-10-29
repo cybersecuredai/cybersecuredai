@@ -9,14 +9,13 @@ interface MarketingLayoutProps {
 
 export function MarketingLayout({ children }: MarketingLayoutProps) {
   const [location] = useLocation();
-  const isHome = location === '/';
   return (
     <div className="min-h-screen ai-dashboard-bg marketing-website">
       <Navigation />
       <main>
         {children}
       </main>
-      <Footer tone={isHome ? 'lighter' : 'default'} />
+      <Footer />
     </div>
   );
 }
