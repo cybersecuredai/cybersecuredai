@@ -15,10 +15,11 @@ type FooterTone = 'default' | 'lighter';
 
 export function Footer({ tone = 'default' }: { tone?: FooterTone }) {
   const isLighter = tone === 'lighter';
-  const rootBg = isLighter ? 'bg-surface/10' : 'bg-surface/30';
+  // Use a consistent, solid background and elevate z-index so no page overlay hides the footer
+  const rootBg = 'bg-slate-900';
   const borderTone = isLighter ? 'border-surface/15' : 'border-surface/30';
   return (
-  <footer className={`${rootBg} border-t ${borderTone}`}>
+  <footer className={`${rootBg} border-t ${borderTone} relative z-10`}>
       <div className="container mx-auto max-w-6xl px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-8">
           {/* Company Info */}
