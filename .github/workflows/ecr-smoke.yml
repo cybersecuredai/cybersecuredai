@@ -1,0 +1,70 @@
+name: ECR Smoke (GovCloud)
+
+on:
+  workflow_dispatch:
+    inputs:
+      aws_region:
+        description: "AWS GovCloud region (e.g., us-gov-west-1)"
+        required: true
+        type: string
+      role_to_assume:
+        description: "GovCloud IAM role to assume via OIDC (e.g., arn:aws-us-gov:iam::465947697623:role/GitHub_OIDC_CI)"
+        required: true
+        type: string
+      ecr_repository:
+        description: "ECR repository (e.g., cybersecured-ai-api)"
+        required: true
+        type: string
+      image_tag:
+        description: "Optional image tag (default: smoke-${GITHUB_SHA::12})"
+        required: false
+        type: string
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  build-and-push:
+    name: Build and push to ECR (GovCloud)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws-us-gov:iam::465947697623:role/GitHub_OIDC_CI
+          aws-region: ${{ inputs.aws_region }}
+
+      - name: Login to Amazon ECR (GovCloud)
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Compute image tag
+        id: meta
+        run: |
+          IMAGE_TAG_INPUT="${{ inputs.image_tag }}"
+          if [ -z "$IMAGE_TAG_INPUT" ]; then IMAGE_TAG_INPUT="smoke-${GITHUB_SHA::12}"; fi
+          echo "tag=$IMAGE_TAG_INPUT" >> "$GITHUB_OUTPUT"
+
+      - name: Resolve ECR repository URI
+        id: ecr
+        run: |
+          set -euo pipefail
+          URI=$(aws ecr describe-repositories --repository-names "${{ inputs.ecr_repository }}" --query 'repositories[0].repositoryUri' --output text)
+          echo "uri=$URI" >> "$GITHUB_OUTPUT"
+
+      - name: Build image
+        run: |
+          docker build -t ${{ steps.ecr.outputs.uri }}:${{ steps.meta.outputs.tag }} .
+
+      - name: Push image
+        run: |
+          docker push ${{ steps.ecr.outputs.uri }}:${{ steps.meta.outputs.tag }}
+
+      - name: Output image reference
+        run: |
+          echo "Pushed: ${{ steps.ecr.outputs.uri }}:${{ steps.meta.outputs.tag }}"
+          echo "image=${{ steps.ecr.outputs.uri }}:${{ steps.meta.outputs.tag }}" >> "$GITHUB_OUTPUT"
