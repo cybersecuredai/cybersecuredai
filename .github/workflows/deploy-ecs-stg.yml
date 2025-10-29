@@ -1,0 +1,154 @@
+name: Deploy ECS Staging (GovCloud)
+
+on:
+  workflow_dispatch:
+    inputs:
+      aws_region:
+        description: "AWS GovCloud region (e.g., us-gov-west-1)"
+        required: true
+        type: string
+      role_to_assume:
+        description: "IAM role ARN to assume via OIDC (Gov partition)"
+        required: true
+        type: string
+      ecr_repository:
+        description: "ECR repository name (e.g., cybersecuredai/api)"
+        required: true
+        type: string
+      ecs_cluster:
+        description: "ECS cluster name (e.g., orca-staging-01)"
+        required: true
+        type: string
+      ecs_service:
+        description: "ECS service name (e.g., router-stg-svc)"
+        required: true
+        type: string
+      ecs_task_family:
+        description: "ECS task family (e.g., cybersecured-ai-api-stg)"
+        required: true
+        type: string
+      container_name:
+        description: "Container name within task definition to update (e.g., api)"
+        required: true
+        type: string
+      image_tag:
+        description: "Docker image tag (default: stg-<sha>)"
+        required: false
+        type: string
+      health_url:
+        description: "Optional: full URL to /api/health through ALB for smoke check"
+        required: false
+        type: string
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  build-and-deploy:
+    name: Build, Push, and Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate inputs
+        run: |
+          set -euo pipefail
+          echo "Inputs received:" \
+            "region=${{ inputs.aws_region }}" \
+            "cluster=${{ inputs.ecs_cluster }}" \
+            "service=${{ inputs.ecs_service }}" \
+            "task_family=${{ inputs.ecs_task_family }}" \
+            "repo=${{ inputs.ecr_repository }}" \
+            "container=${{ inputs.container_name }}"
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ inputs.role_to_assume }}
+          aws-region: ${{ inputs.aws_region }}
+
+      - name: Who am I? (STS identity)
+        run: aws sts get-caller-identity
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      - name: Compute image tag
+        id: meta
+        run: |
+          IMAGE_TAG_INPUT="${{ inputs.image_tag }}"
+          if [ -z "$IMAGE_TAG_INPUT" ]; then IMAGE_TAG_INPUT="stg-${GITHUB_SHA::12}"; fi
+          echo "tag=$IMAGE_TAG_INPUT" >> "$GITHUB_OUTPUT"
+
+      - name: Resolve ECR repository URI
+        id: ecr
+        run: |
+          set -euo pipefail
+          URI=$(aws ecr describe-repositories --repository-names "${{ inputs.ecr_repository }}" --query 'repositories[0].repositoryUri' --output text)
+          echo "uri=$URI" >> "$GITHUB_OUTPUT"
+
+      - name: Build Docker image
+        run: |
+          docker build -t ${{ steps.ecr.outputs.uri }}:${{ steps.meta.outputs.tag }} .
+
+      - name: Push Docker image
+        run: |
+          docker push ${{ steps.ecr.outputs.uri }}:${{ steps.meta.outputs.tag }}
+
+      - name: Prepare new task definition JSON
+        id: taskdef
+        run: |
+          set -euo pipefail
+          TD=$(aws ecs describe-task-definition --task-definition "${{ inputs.ecs_task_family }}" --query 'taskDefinition' --output json)
+          # Strip read-only fields
+          TD=$(echo "$TD" \
+            | jq 'del(.taskDefinitionArn, .revision, .status, .requiresAttributes, .compatibilities, .registeredAt, .registeredBy, .deregisteredAt, .inferenceAccelerators)')
+          # Update container image for the named container
+          NEW_IMG="${{ steps.ecr.outputs.uri }}:${{ steps.meta.outputs.tag }}"
+          TD=$(echo "$TD" | jq --arg name "${{ inputs.container_name }}" --arg img "$NEW_IMG" '\
+            .containerDefinitions = (.containerDefinitions | map(if .name == $name then .image = $img | . else . end))')
+          echo "$TD" > taskdef.stg.json
+          echo "file=taskdef.stg.json" >> "$GITHUB_OUTPUT"
+
+      - name: Register new task definition revision
+        id: register
+        run: |
+          ARN=$(aws ecs register-task-definition --cli-input-json file://${{ steps.taskdef.outputs.file }} --query 'taskDefinition.taskDefinitionArn' --output text)
+          echo "arn=$ARN" >> "$GITHUB_OUTPUT"
+
+      - name: Update ECS service
+        run: |
+          aws ecs update-service \
+            --cluster "${{ inputs.ecs_cluster }}" \
+            --service "${{ inputs.ecs_service }}" \
+            --task-definition "${{ steps.register.outputs.arn }}" \
+            --force-new-deployment 
+
+      - name: Wait for service stability
+        run: |
+          aws ecs wait services-stable --cluster "${{ inputs.ecs_cluster }}" --services "${{ inputs.ecs_service }}"
+
+      - name: Output deployment summary
+        run: |
+          echo "Deployed image: ${{ steps.ecr.outputs.uri }}:${{ steps.meta.outputs.tag }}"
+          echo "Task Definition: ${{ steps.register.outputs.arn }}"
+
+      - name: Smoke check (optional)
+        if: ${{ inputs.health_url != '' }}
+        run: |
+          set -euo pipefail
+          URL="${{ inputs.health_url }}"
+          echo "Pinging $URL"
+          for i in {1..10}; do
+            code=$(curl -s -o /dev/null -w "%{http_code}" "$URL" || true)
+            if [ "$code" = "200" ]; then echo "Health OK (200)"; exit 0; fi
+            echo "Attempt $i/10: got $code; retrying in 10s..."; sleep 10;
+          done
+          echo "Health check failed after retries" >&2
+          exit 1
